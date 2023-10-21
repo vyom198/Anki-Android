@@ -143,6 +143,7 @@
     <string name="card_editor_preview_card" comment="Button offering to preview some card(s)">Xem trước</string>
     <string name="preview_progress_bar_text" comment="What card we are on out of how many in card previewer progress bar">%1$d of %2$d</string>
     <string name="rename" comment="Confirm that the renaming action should be processed.">Đổi tên</string>
+    <string name="checks_action">Check</string>
     <string name="check_db">Kiểm tra CSDL</string>
     <string name="check_media">Kiểm tra các tệp đa phương tiện</string>
     <string name="empty_cards">Các thẻ rỗng</string>
@@ -265,7 +266,6 @@
     <string name="insert_heading">Trèn đề mục</string>
     <string name="format_font_size">Thay đổi cỡ chữ</string>
     <string name="insert_mathjax">Chèn công thức toán</string>
-    <string name="insert_cloze">Chèn Đánh dấu Cloze</string>
     <string name="note_editor_toolbar_icon">Chữ trên nút</string>
     <string name="before_text">HTML trước vùng chọn</string>
     <string name="after_text">HTML Sau Vùng chọn</string>
@@ -305,7 +305,7 @@
     <string name="home">Home</string>
     <!-- Reviewer actions 
     Each of these strings ends with a period, following the notation of Anki Desktop -->
-    <string name="card_buried">Card buried.</string>
+    <string name="card_buried">Các thẻ bị chôn</string>
     <plurals name="note_suspended">
         <item quantity="other">%d thẻ bị khóa.</item>
     </plurals>
@@ -317,14 +317,14 @@
     <string name="scoped_storage_postpone">Trì hoãn</string>
     <string name="scoped_storage_migrate">Di chuyển</string>
     <string name="search_card_js_api_no_results">Không có kết quả tìm kiếm</string>
-    <string name="migration_update_request_requires_media_sync" commnet="use HTML linebreaks in this string">AnkiDroid needs to migrate its storage to comply with Android 10 security policy.\n\nThis will improve media sync performance.&lt;br&gt;&lt;br&gt;During the migration you will be unable to sync and some settings will be disabled. A media sync will occur before the migration starts to keep your data safe.&lt;br&gt;&lt;br&gt;It is safe to use or close AnkiDroid during this process.</string>
+    <string name="migration_update_request_requires_media_sync" commnet="use HTML linebreaks in this string">AnkiDroid cần di dời bộ nhớ của mình để tuân thủ chính sách bảo mật của Android 10.\n\nĐiều này sẽ cải thiện hiệu suất đồng bộ đa phương tiện.&lt;br&gt;&lt;br&gt;Trong quá trình di chuyển, bạn sẽ không thể đồng bộ hóa và một số cài đặt sẽ bị tắt. Đồng bộ đa phương tiện sẽ diễn ra trước khi quá trình di chuyển bắt đầu để giữ an toàn cho dữ liệu của bạn.&lt;br&gt;&lt;br&gt;Việc sử dụng hoặc đóng AnkiDroid trong quá trình này là an toàn.</string>
     <string name="start_migration_progress_message">Bắt đầu di chuyển bộ nhớ. Bạn có thể tiếp tục sử dụng AnkiDroid trong thời gian ngắn.</string>
     <string name="migration_part_1_done_resume">Bạn có thể tiếp tục sử dụng AnkiDroid.
 \nQuá trình di chuyển bộ nhớ sẽ tiếp tục ở chế độ nền.</string>
     <!--  JS Addons  -->
     <string name="not_valid_js_addon">%s không phải là gói tiện ích javascript hợp lệ</string>
     <string name="could_not_create_dir">Không thể tạo thư mục %s</string>
-    <string name="malicious_archive_entry_outside">Malicious archive. Contains entry outside of the target dir: %s</string>
+    <string name="malicious_archive_entry_outside">Lưu trữ nguy hiểm. Chứa mục nhập bên ngoài thư mục đích: %s</string>
     <string name="malicious_archive_exceeds_limit">Lưu trữ độc hại. Kích thước vượt quá %1$s hoặc chứa nhiều hơn %2$d tệp</string>
     <string name="file_extract_exceeds_storage_space">Tệp giải nén vượt quá dung lượng lưu trữ</string>
     <!--  Hierarchical Tags  -->

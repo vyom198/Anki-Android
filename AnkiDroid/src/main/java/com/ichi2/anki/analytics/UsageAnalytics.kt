@@ -470,6 +470,11 @@ object UsageAnalytics {
         "showSyncStatusBadge", // Display synchronization status
         "allowMetered", // Allow sync on metered connections
         "force_full_sync", // Force full sync
+        // Backup
+        "minutes_between_automatic_backups",
+        "daily_backups_to_keep",
+        "weekly_backups_to_keep",
+        "monthly_backups_to_keep",
         // Appearance
         "appTheme", // Theme
         "dayTheme", // Day theme
@@ -534,7 +539,6 @@ object UsageAnalytics {
         "showCardAnswerButtonTime",
         // Advanced
         "deckPath", // AnkiDroid directory
-        "backupMax", // Max number of backups
         "double_scrolling", // Double scrolling
         "softwareRender", // Disable card hardware render
         "safeDisplay", // Safe display mode

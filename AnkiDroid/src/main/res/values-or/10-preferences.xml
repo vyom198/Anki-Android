@@ -95,8 +95,8 @@
     <string name="gestures_summ">ପତ୍ରଗୁଡ଼ିକର ଉତ୍ତର ଏବଂ ସମ୍ପାଦନ କରିବା ଭଳି କାର୍ଯ୍ୟରେ ଅଙ୍ଗଭଙ୍ଗୀ ନ୍ୟସ୍ତ କରନ୍ତୁ</string>
     <string name="gestures_corner_touch" maxLength="41">୯-ଅଙ୍କ ସ୍ପର୍ଶ</string>
     <string name="gestures_corner_touch_summary">ସ୍କ୍ରୀନ୍ କୋଣରେ ସ୍ପର୍ଶ ଅଙ୍ଗଭଙ୍ଗୀକୁ ଅନୁମତି ଦିଅନ୍ତୁ</string>
-    <string name="gestures_full_screen_nav_drawer" maxLength="41">ପୂର୍ଣ୍ଣ ସ୍କ୍ରୀନ୍ ନେଵିଗେଶନ୍ ଡ୍ରୟର୍</string>
-    <string name="gestures_fullscreen_nav_drawer_summary">ସ୍କ୍ରୀନ୍‌ର ଯେକୌଣସି ସ୍ଥାନରୁ ଡାହାଣକୁ ସ୍ୱାଇପ୍ କରିବା ମାତ୍ରେ ନେଵିଗେଶନ୍ ଡ୍ରୟର୍ ଖୋଲନ୍ତୁ</string>
+    <string name="gestures_full_screen_nav_drawer" maxLength="41">ପୂର୍ଣ୍ଣ ସ୍କ୍ରୀନ୍ ଦିଗଚଳନ ଡ୍ରର୍</string>
+    <string name="gestures_fullscreen_nav_drawer_summary">ସ୍କ୍ରୀନ୍‌ର ଯେକୌଣସି ସ୍ଥାନରୁ ଡାହାଣକୁ ସ୍ୱାଇପ୍ କରିବା ମାତ୍ରେ ଦିଗଚଳନ ଡ୍ରର୍ ଖୋଲିବା</string>
     <string name="gestures_none" maxLength="41">କିଛି ନାହିଁ</string>
     <string name="gestures_swipe_up" maxLength="41">ଉପରକୁ ସ୍ଵାଇପ୍ କଲେ</string>
     <string name="gestures_swipe_down" maxLength="41">ତଳକୁ ସ୍ଵାଇପ୍ କଲେ</string>
@@ -133,6 +133,8 @@
     <string name="sync_status_badge_summ">ଯେତେବେଳେ ପରିବର୍ତ୍ତନଗୁଡିକ ଅପଲୋଡ୍ ହୋଇପାରିବ, ସିଙ୍କ ଚିହ୍ନ ପରିବର୍ତ୍ତନ କରନ୍ତୁ</string>
     <string name="metered_sync_title" maxLength="41">ମିଟର୍ ସଂଯୋଜନାଗୁଡ଼ିକରେ ସିଙ୍କ୍ କରିବାକୁ ଦେବା</string>
     <string name="metered_sync_summary">ଯଦି ଅକ୍ଷମ କରାଗଲା, ଆଉ ଆପଣ କୌଣସି ମିଟର୍ ହେଉଥିବା ସଂଯୋଜନାରେ ସିଙ୍କ୍ କରିବାକୁ ଚେଷ୍ଟା କରନ୍ତି ତେବେ ଆପଣଙ୍କୁ ଚେତାଵନୀ ଦିଆଯିବ</string>
+    <string name="backup_limits_frequency">Frequency</string>
+    <string name="backup_limits_lifetime">Lifetime</string>
     <string name="app_theme" maxLength="41">ଥିମ୍</string>
     <string name="day_theme" maxLength="41">ଦିନ ଥିମ୍</string>
     <string name="night_theme" maxLength="41">ରାତ୍ରି ଥିମ୍</string>
@@ -160,7 +162,6 @@
     <string name="disable_extended_text_ui_summ">ଲ୍ୟାଣ୍ଡସ୍କେପ୍ ମୋଡ୍ ରେ \'କ୍ଲୋଜ ବିଲୋପ\' ପ୍ରସଙ୍ଗ ମେନୁକୁ ଅନୁମତି ଦିଏ</string>
     <string name="vertical_centering" maxLength="41">କେନ୍ଦ୍ର ଶ୍ରେଣୀବଦ୍ଧତା</string>
     <string name="vertical_centering_summ">ପତ୍ରଗୁଡ଼ିକର ଵିଷୟବସ୍ତୁକୁ ଭୂଲମ୍ବ ଭାଵରେ କେନ୍ଦ୍ରିତ କରିରଖିବା</string>
-    <string name="pref_backup_max" maxLength="41">ବ୍ୟାକଅପ୍ ର ସର୍ବାଧିକ ସଂଖ୍ୟା</string>
     <string name="pref_double_tap_time_interval" maxLength="41">ଡବଲ୍ ଟ୍ୟାପ୍ ସମୟ ଅନ୍ତରାଳ (ମିଲିସେକେଣ୍ଡ)</string>
     <string name="pref_double_tap_time_interval_summary">ଯଦି ଏହି ସମୟ ଅତିବାହିତ ହୋଇନାହିଁ ତେବେ ଉତ୍ତର ବଟନର ଦ୍ୱିତୀୟ ଟ୍ୟାପ୍ ଅଣଦେଖା କରାଯିବ। ଏହା ଆକସ୍ମିକ ଡବଲ୍ ଟ୍ୟାପ୍ ପ୍ରତିରୋଧ କରେ</string>
     <string name="pref_show_answer_long_press" maxLength="41">Show answer long-press time (ms)</string>
@@ -220,12 +221,12 @@
     <!-- Key Bindings -->
     <string name="keyboard">କୀବୋର୍ଡ୍</string>
     <string name="bluetooth">Bluetooth</string>
-    <string name="answer_buttons" maxLength="41">Answer buttons</string>
-    <string name="card" maxLength="41">Card</string>
-    <string name="note" maxLength="41">Note</string>
-    <string name="navigation" maxLength="41">Navigation</string>
-    <string name="media" maxLength="41">Media</string>
-    <string name="misc" maxLength="41">Misc</string>
+    <string name="answer_buttons" maxLength="41">ଉତ୍ତର ବଟନ୍</string>
+    <string name="card" maxLength="41">ପତ୍ର</string>
+    <string name="note" maxLength="41">ନୋଟ୍</string>
+    <string name="navigation" maxLength="41">ଦିଗଚଳନ</string>
+    <string name="media" maxLength="41">ମିଡ଼ିଆ</string>
+    <string name="misc" maxLength="41">ଵିଵିଧ</string>
     <!-- studyoptions -->
     <string name="studyoptions_limit_select_tags">ଟ୍ୟାଗ୍ ଚୟନ କରନ୍ତୁ</string>
     <!-- Deck configurations -->
@@ -286,7 +287,6 @@
     <!-- #######################################################################################
          #################################### Backup options ###################################
          ####################################################################################### -->
-    <string name="pref__backup_options__title" maxLength="41">ବ୍ୟାକଅପ୍ ଵିକଳ୍ପ</string>
     <string name="pref__backups_help__summary"><![CDATA[        AnkiDroid ପର୍ଯ୍ୟାୟକ୍ରମେ ଆପଣଙ୍କ ସଂଗ୍ରହର ବ୍ୟାକଅପ୍ ନିଏ।
         ବ୍ୟାକଅପ୍ ଦୁଇ ଦିନରୁ ଅଧିକ ପୁରୁଣା ହେବା ପରେ,
         AnkiDroid ଡିସ୍କ ସ୍ପେସ୍ ମୁକ୍ତ କରିବାକୁ ସେମାନଙ୍କ ମଧ୍ୟରୁ କିଛିଟି ଅପସାରଣ କରିବା ଆରମ୍ଭ କରିବ।

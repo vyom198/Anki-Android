@@ -247,6 +247,11 @@
         <item>@string/automatic_sync_choice</item>
     </string-array>
 
+    <string-array name="backup_limits_summary_entries">
+        <item>@string/backup_limits_frequency</item>
+        <item>@string/backup_limits_lifetime</item>
+    </string-array>
+
     <string-array name="notifications_summary_entries">
         <item>@string/notification_pref_title</item>
         <item>@string/notification_minimum_cards_due_vibrate</item>
@@ -290,6 +295,12 @@
         <item>large</item>
         <item>x-large</item>
         <item>xx-large</item>
+    </string-array>
+
+    <string name="manage_external_storage_permission">android.permission.MANAGE_EXTERNAL_STORAGE</string>
+    <string-array name="legacy_storage_permissions">
+        <item>android.permission.READ_EXTERNAL_STORAGE</item>
+        <item>android.permission.WRITE_EXTERNAL_STORAGE</item>
     </string-array>
 
     <!-- Onboarding -->

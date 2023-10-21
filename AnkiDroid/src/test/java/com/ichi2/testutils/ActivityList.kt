@@ -29,6 +29,7 @@ import com.ichi2.anki.pages.PagesActivity
 import com.ichi2.anki.preferences.Preferences
 import com.ichi2.anki.services.ReminderService.Companion.getReviewDeckIntent
 import com.ichi2.anki.ui.windows.managespace.ManageSpaceActivity
+import com.ichi2.anki.ui.windows.permissions.PermissionsActivity
 import com.ichi2.testutils.ActivityList.ActivityLaunchParam.Companion.get
 import org.robolectric.Robolectric
 import org.robolectric.android.controller.ActivityController
@@ -53,7 +54,6 @@ object ActivityList {
             get(ModelFieldEditor::class.java),
             // Likely has unhandled intents
             get(Reviewer::class.java),
-            get(VideoPlayer::class.java),
             get(MyAccount::class.java),
             get(Preferences::class.java),
             get(CropImageActivity::class.java),
@@ -73,7 +73,8 @@ object ActivityList {
             get(LoginActivity::class.java),
             get(IntroductionActivity::class.java),
             get(ManageNotetypes::class.java),
-            get(ManageSpaceActivity::class.java)
+            get(ManageSpaceActivity::class.java),
+            get(PermissionsActivity::class.java)
         )
     }
 

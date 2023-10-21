@@ -28,6 +28,8 @@
     <string name="sync_status_badge_key">showSyncStatusBadge</string>
     <string name="metered_sync_key">allowMetered</string>
     <string name="custom_sync_server_key">custom_sync_server_link</string>
+    <!-- Backup -->
+    <string name="pref_backup_limits_screen_key">backupLimitsScreen</string>
     <!-- Appearance -->
     <string name="pref_appearance_screen_key">appearance_preference_group</string>
     <string name="app_theme_key">appTheme</string>
@@ -165,7 +167,6 @@
     <string name="about_screen_key">aboutScreen</string>
 
     <!-- Backup limits -->
-    <string name="pref_backup_max_key">backupMax</string>
     <string name="pref_backups_help_key">backups_help</string>
     <string name="pref_minutes_between_automatic_backups_key">minutes_between_automatic_backups</string>
     <string name="pref_daily_backups_to_keep_key">daily_backups_to_keep</string>

@@ -250,6 +250,10 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             />
         <activity
+            android:name=".ui.windows.permissions.PermissionsActivity"
+            android:exported="false"
+            />
+        <activity
             android:name=".ModelFieldEditor"
             android:label="@string/model_editor_label"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -266,12 +270,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.ichi2.anki.VideoPlayer"
-            android:exported="false"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            />
         <activity
             android:name="com.ichi2.anki.MyAccount"
             android:label="@string/menu_my_account"

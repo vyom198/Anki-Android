@@ -191,10 +191,12 @@ class ReviewerTest : RobolectricTest() {
         val basic = models.byName(AnkiDroidApp.appResources.getString(R.string.basic_model_name))
         basic!!.put("did", didAb)
         addNoteUsingBasicModel("foo", "bar")
+        // This deck already exists. This gets the deck, not create it.
         val didA = addDeck("A")
         decks.select(didA)
         val reviewer = startReviewer()
         waitForAsyncTasksToComplete()
+        // The only card is in deck A::B, so the title should be B
         assertThat(reviewer.supportActionBar!!.title, equalTo("B"))
     }
 
@@ -275,7 +277,7 @@ class ReviewerTest : RobolectricTest() {
         assertThat("Unexpected card ord", ord + 1, not(equalTo(i)))
     }
 
-    private suspend fun undo(reviewer: Reviewer) {
+    private fun undo(reviewer: Reviewer) {
         reviewer.undo()
     }
 
@@ -343,12 +345,6 @@ class ReviewerTest : RobolectricTest() {
         newTemplate.put("qfmt", newTemplate.getString("qfmt") + extra)
 
         notetypes.addTemplate(m, newTemplate)
-    }
-
-    private fun displayAnswer(reviewer: Reviewer) {
-        waitForAsyncTasksToComplete()
-        reviewer.displayCardAnswer()
-        waitForAsyncTasksToComplete()
     }
 
     private fun startReviewer(): Reviewer {

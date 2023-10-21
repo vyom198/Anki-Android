@@ -86,7 +86,6 @@ import com.ichi2.libanki.Consts.BUTTON_TYPE
 import com.ichi2.libanki.Sound.OnErrorListener.ErrorHandling
 import com.ichi2.libanki.Sound.SingleSoundSide
 import com.ichi2.libanki.Sound.SoundSide
-import com.ichi2.libanki.SoundPlayer
 import com.ichi2.themes.Themes
 import com.ichi2.themes.Themes.getResFromAttr
 import com.ichi2.ui.FixedEditText
@@ -101,7 +100,6 @@ import kotlinx.coroutines.Job
 import net.ankiweb.rsdroid.RustCleanup
 import timber.log.Timber
 import java.io.*
-import java.lang.ref.WeakReference
 import java.net.URLDecoder
 import java.util.*
 import java.util.concurrent.locks.Lock
@@ -523,9 +521,7 @@ abstract class AbstractFlashcardViewer :
         super.onCollectionLoaded(col)
         val mediaDir = col.media.dir
         mBaseUrl = getBaseUrl(mediaDir).also { baseUrl ->
-            mSoundPlayer = Sound(baseUrl).also { sound ->
-                sound.setupVideoActivityCallback()
-            }
+            mSoundPlayer = Sound(baseUrl)
             mViewerUrl = baseUrl + "__viewer__.html"
         }
         mAssetLoader = WebViewAssetLoader.Builder()
@@ -586,9 +582,6 @@ abstract class AbstractFlashcardViewer :
 
     override fun onResume() {
         super.onResume()
-        if (this::mSoundPlayer.isInitialized) {
-            mSoundPlayer.setupVideoActivityCallback()
-        }
         automaticAnswer.enable()
         // Reset the activity title
         updateActionBar()
@@ -1024,7 +1017,7 @@ abstract class AbstractFlashcardViewer :
         webView.settings.allowFileAccess = true
 
         // Problems with focus and input tags is the reason we keep the old type answer mechanism for old Androids.
-        webView.isFocusableInTouchMode = typeAnswer!!.useInputTag
+        webView.isFocusableInTouchMode = typeAnswer!!.autoFocus
         webView.isScrollbarFadingEnabled = true
         Timber.d("Focusable = %s, Focusable in touch mode = %s", webView.isFocusable, webView.isFocusableInTouchMode)
         webView.webViewClient = CardViewerWebClient(mAssetLoader, this)
@@ -1907,20 +1900,20 @@ abstract class AbstractFlashcardViewer :
     }
 
     internal open inner class MyGestureDetector : SimpleOnGestureListener() {
-        override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+        override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             Timber.d("onFling")
 
             // #5741 - A swipe from the top caused delayedHide to be triggered,
             // accepting a gesture and quickly disabling the status bar, which wasn't ideal.
             // it would be lovely to use e1.getEdgeFlags(), but alas, it doesn't work.
-            if (isTouchingEdge(e1)) {
+            if (e1 != null && isTouchingEdge(e1)) {
                 Timber.d("ignoring edge fling")
                 return false
             }
 
             // Go back to immersive mode if the user had temporarily exited it (and then execute swipe gesture)
             this@AbstractFlashcardViewer.onFling()
-            if (mGesturesEnabled) {
+            if (e1 != null && mGesturesEnabled) {
                 try {
                     val dy = e2.y - e1.y
                     val dx = e2.x - e1.x
@@ -2595,28 +2588,6 @@ abstract class AbstractFlashcardViewer :
                 Gesture.SWIPE_RIGHT -> ActivityTransitionAnimation.Direction.RIGHT
                 Gesture.SWIPE_LEFT -> ActivityTransitionAnimation.Direction.LEFT
                 else -> ActivityTransitionAnimation.Direction.FADE
-            }
-        }
-    }
-
-    /**
-     * Set the context for the calling activity (necessary for playing videos)
-     */
-    private fun SoundPlayer.setupVideoActivityCallback() {
-        val activityRef = WeakReference(this@AbstractFlashcardViewer)
-        this.playVideoExternallyCallback = { soundPath, onCompletionListener ->
-            val activity = activityRef.get()
-            if (activity == null) {
-                false
-            } else {
-                Timber.d("Requesting AbstractFlashcardViewer->VideoPlayer for video")
-                VideoPlayer.mediaCompletionListener = onCompletionListener
-                activity.startActivityWithoutAnimation(
-                    Intent(activity, VideoPlayer::class.java).apply {
-                        putExtra("path", soundPath)
-                    }
-                )
-                true
             }
         }
     }

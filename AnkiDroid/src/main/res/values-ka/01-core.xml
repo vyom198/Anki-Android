@@ -131,7 +131,6 @@
     grant AnkiDroid the \'Storage\' permission. This needs to be a fairly generic message as implementations
     of the permissions/app info screen will differ between devices. -->
     <string name="startup_no_storage_permission">გთხოვთ მისცეთ AnkiDroid-ს მეხსიერებასთან წვდომა, რომ გავაგრძელოთ</string>
-    <string name="startup_all_files_access_permission">გასაგრძელებლად გთხოვთ AnkiDroid-ს მიანიჭოთ ყველა ფაილზე წვდომის უფლება</string>
     <!--
         The time_quantities are units of time. They are used without
         plurals or dots.
@@ -230,11 +229,11 @@
     <string name="migration__calculating_transfer_size" comment="Notification message that is shown when calculating the total size of media files to move.         As this is shown on the same line as the notification title, prefer shorter text.">გადასატანი მონაცემთა ზომის გამოთვლა&#8230;</string>
     <string name="migration__moved_x_of_y" comment="Notification message that is shown when moving media files.         As this is shown on the same line as the notification title, prefer shorter text.         The placeholders will be replaced with short localized byte amounts,         e.g. Moved 10 kB of 5.2 MB">გადატანილია %1$s / %2$s</string>
     <string name="migration_successful_message" comment="A title for a dialog, or a short message shown in a notification,         when storage migration succeeds">მიგრაცია წარმატებით დასრულდა</string>
-    <string name="migration__succeeded__message" comment="A more detailed message shown when storage migration succeeds">        Your data has been migrated successfully.
-        AnkiDroid is fully functional again, and you can sync.
+    <string name="migration__succeeded__message" comment="A more detailed message shown when storage migration succeeds">        თქვენი მონაცემების მიგრაცია წარმატებით დასრულდა.
+        AnkiDroid-ის ფუნქციონირებადობა სრულად აღდგა და შეგიძლიათ დაასინქრონოთ.
         \n
-        \nNote that your collection is now located in a folder that is removed when uninstalling the app.
-        Please make sure that your data is safe by regularly syncing or exporting backups.
+        \nგაითვალისწინეთ, რომ თქვენი კოლექცია ახლა ისეთ საქარალდეშია, რომელიც აპლიკაციის დეინსტალირების თანავე წაიშლება.
+        თქვენი მონაცემების დაცვის მიზნით გთხოვთ, რეგულარულად დაასინქრონოთ ან სარეზერვო ასლები დააექსპორტოთ.
     </string>
     <string name="migration__failed__title" comment="A title for a dialog, or a short message shown in a notification,         when storage migration fails">მიგრაცია ვერ მოხერხდა</string>
     <string name="migration__failed__changes_rolled_back__message" comment="A more detailed message shown when storage migration fails, with the changes rolled back"><![CDATA[        Copying database files failed with the error: %1$s.
@@ -272,4 +271,9 @@
     <string name="restore_data_from_backup">არდგენა .colpkg სარეზერვო ასლიდან (გაღრმავებული პარამეტრი)</string>
     <string name="create_new_collection">ახალი კოლექციის შექმნა</string>
     <string name="new_unsafe_collection">ახალი კოლექცია წაიშლება თქვენი მოწყობილობიდან თუკი მოახდენთ AnkiDroid-ის დეინსტალაციას</string>
+    <!-- Permissions screen -->
+    <string name="permissions_screen_headline">AnkiDroid needs some permissions to work</string>
+    <string name="storage_access_title">Storage access</string>
+    <string name="storage_access_summary">Saves your collection in a safe place that will not be deleted if the app is uninstalled</string>
+    <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">All files access</string>
 </resources>
