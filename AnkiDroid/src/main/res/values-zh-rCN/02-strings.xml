@@ -100,8 +100,6 @@
         <item>卡片创建时间</item>
         <item>笔记修改时间</item>
     </string-array>
-    <!-- Filter Sheet -->
-    <string name="apply_filter">应用</string>
     <string name="filter_by_flags">旗标</string>
     <!-- Custom study options -->
     <string name="custom_study_increase_new_limit">修改今天的新卡片数量限制</string>
@@ -143,7 +141,7 @@
     <string name="card_editor_preview_card" comment="Button offering to preview some card(s)">预览</string>
     <string name="preview_progress_bar_text" comment="What card we are on out of how many in card previewer progress bar">%2$d 中的 %1$d</string>
     <string name="rename" comment="Confirm that the renaming action should be processed.">重命名</string>
-    <string name="checks_action">Check</string>
+    <string name="checks_action">检查</string>
     <string name="check_db">检查数据库</string>
     <string name="check_media">检查媒体</string>
     <string name="empty_cards">空白卡片</string>
@@ -251,7 +249,6 @@
     <string name="card_viewer_could_not_find_image">卡片内容错误：加载「%s」失败</string>
     <string name="card_viewer_media_relative_protocol">卡片内容错误：需要更新媒体</string>
     <!-- Deck Picker -->
-    <string name="deck_picker_failed_deck_load">加载牌组「%s」失败</string>
     <string name="search_decks">搜索牌组</string>
     <string name="show_migration_progress" comment="Title for a button in deck picker\'s toolbar that shows ongoing migration progress.         Usually shown as a tooltip. The button opens a dialog with a more detailed progress information.">显示迁移进度</string>
     <string name="ankidroid_init_failed_webview_title">严重错误</string>
@@ -355,4 +352,5 @@
     <string name="storage_migration_sync_notification" comment="Appears on a notification after the user has opted into a storage migration and provided consent to sync         and AnkiDroid was minimised when the sync completed">轻按开始存储迁移</string>
     <string name="media_sync_required_title">需要进行媒体同步</string>
     <string name="media_sync_unavailable_message">媒体同步在设置中被禁用。请同步并备份任何尚未同步的媒体，然后继续</string>
+    <string name="audio_saved">录音已保存</string>
 </resources>

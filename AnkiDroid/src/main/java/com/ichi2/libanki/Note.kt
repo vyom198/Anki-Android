@@ -38,7 +38,7 @@ class Note : Cloneable {
     @get:VisibleForTesting
     var guId: String? = null
         private set
-    private lateinit var notetype: NotetypeJson
+    lateinit var notetype: NotetypeJson
 
     var mid: Long = 0
         private set
@@ -138,11 +138,6 @@ class Note : Cloneable {
                 this.id
             )
         )
-    }
-
-    @KotlinCleanup("replace with variable")
-    fun model(): NotetypeJson {
-        return notetype
     }
 
     /**
@@ -329,35 +324,5 @@ class Note : Cloneable {
             }
             return highestClozeId + 1
         }
-    }
-
-    fun ephemeralCard(
-        col: Collection,
-        ord: Int = 0,
-        fillEmpty: Boolean = false
-    ): Card {
-        val card = Card(col, null)
-        card.ord = ord
-        card.did = 1
-
-        val nt = notetype
-        val templateIdx = if (nt.type == Consts.MODEL_CLOZE) {
-            0
-        } else {
-            ord
-        }
-        val template = nt.tmpls[templateIdx] as JSONObject
-        template.put("ord", card.ord)
-
-        val output = TemplateManager.TemplateRenderContext.fromCardLayout(
-            this,
-            card,
-            notetype = nt,
-            template = template,
-            fillEmpty = fillEmpty
-        ).render()
-        card.renderOutput = output
-        card.setNote(this)
-        return card
     }
 }

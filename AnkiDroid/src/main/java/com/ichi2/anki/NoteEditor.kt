@@ -34,6 +34,7 @@ import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
+import androidx.activity.addCallback
 import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
@@ -45,6 +46,7 @@ import androidx.core.content.edit
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
 import anki.config.ConfigKey
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
 import com.ichi2.anim.ActivityTransitionAnimation
 import com.ichi2.anim.ActivityTransitionAnimation.Direction.*
@@ -86,7 +88,6 @@ import com.ichi2.libanki.Note.ClozeUtils
 import com.ichi2.libanki.Note.DupeOrEmpty
 import com.ichi2.libanki.Notetypes.Companion.NOT_FOUND_NOTE_TYPE
 import com.ichi2.libanki.exception.ConfirmModSchemaException
-import com.ichi2.themes.Themes
 import com.ichi2.utils.*
 import com.ichi2.widget.WidgetStatus
 import org.json.JSONArray
@@ -260,18 +261,25 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
             }
             // Sets the background and icon color of toolbar respectively.
             setBackgroundColor(
-                Themes.getColorFromAttr(
+                MaterialColors.getColor(
                     this@NoteEditor,
-                    R.attr.toolbarBackgroundColor
+                    R.attr.toolbarBackgroundColor,
+                    0
                 )
             )
-            setIconColor(Themes.getColorFromAttr(this@NoteEditor, R.attr.toolbarIconColor))
+            setIconColor(MaterialColors.getColor(this@NoteEditor, R.attr.toolbarIconColor, 0))
         }
         val mainView = findViewById<View>(android.R.id.content)
         // Enable toolbar
         enableToolbar(mainView)
         startLoadingCollection()
         mOnboarding.onCreate()
+        // TODO this callback doesn't handle predictive back navigation!
+        // see #14678, added to temporarily fix for a bug
+        onBackPressedDispatcher.addCallback(this) {
+            Timber.i("NoteEditor:: onBackPressed()")
+            closeCardEditorWithCheck()
+        }
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
@@ -362,7 +370,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
         // Deck Selector
         val deckTextView = findViewById<TextView>(R.id.CardEditorDeckText)
         // If edit mode and more than one card template distinguish between "Deck" and "Card deck"
-        if (!addNote && mEditorNote!!.model().getJSONArray("tmpls").length() > 1) {
+        if (!addNote && mEditorNote!!.notetype.getJSONArray("tmpls").length() > 1) {
             deckTextView.setText(R.string.CardEditorCardDeck)
         }
         mDeckSpinnerSelection =
@@ -672,6 +680,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
     }
 
     @VisibleForTesting
+    @NeedsTest("14664: 'first field must not be empty' no longer applies after saving the note")
     suspend fun saveNote() {
         val res = resources
         if (mSelectedTags == null) {
@@ -697,7 +706,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
                 updateField(f)
             }
             // Save deck to model
-            mEditorNote!!.model().put("did", deckId)
+            mEditorNote!!.notetype.put("did", deckId)
             // Save tags to model
             mEditorNote!!.setTagsFromStr(tagsAsString(mSelectedTags!!))
             val tags = JSONArray()
@@ -754,11 +763,6 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
                 // then set the card ID to the new deck
                 mCurrentEditedCard!!.did = deckId
                 modified = true
-            }
-            // Check if the front of the card is not empty
-            if (getCurrentFieldText(0).isEmpty()) {
-                displayErrorSavingNote()
-                return
             }
             // now load any changes to the fields from the form
             for (f in mEditFields!!) {
@@ -817,13 +821,6 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
         mEditorNote!!.load()
         // close note editor
         closeNoteEditor()
-    }
-
-    @Suppress("DEPRECATION", "Deprecated in API34+dependencies for predictive back feature")
-    override fun onBackPressed() {
-        Timber.i("NoteEditor:: onBackPressed()")
-        super.onBackPressed()
-        closeCardEditorWithCheck()
     }
 
     override fun onDestroy() {
@@ -993,7 +990,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
         }
         previewer.putExtra(
             CardTemplateNotetype.INTENT_MODEL_FILENAME,
-            CardTemplateNotetype.saveTempModel(this, mEditorNote!!.model())
+            CardTemplateNotetype.saveTempModel(this, mEditorNote!!.notetype)
         )
 
         // Send the previewer all our current editing information
@@ -1193,7 +1190,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
                     Timber.d("onActivityResult() template edit return - current card exists")
                     // reload current card - the template ordinals are possibly different post-edit
                     mCurrentEditedCard = getColUnsafe.getCard(mCurrentEditedCard!!.id)
-                    updateCards(mEditorNote!!.model())
+                    updateCards(mEditorNote!!.notetype)
                 }
             }
         }
@@ -1223,14 +1220,14 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
      */
     @KotlinCleanup("fix the requireNoNulls")
     private fun getCurrentMultimediaEditableNote(col: Collection): MultimediaEditableNote {
-        val note = NoteService.createEmptyNote(mEditorNote!!.model())
+        val note = NoteService.createEmptyNote(mEditorNote!!.notetype)
         val fields = currentFieldStrings.requireNoNulls()
         NoteService.updateMultimediaNoteFromFields(col, fields, mEditorNote!!.mid, note!!)
         return note
     }
 
     val currentFields: JSONArray
-        get() = mEditorNote!!.model().getJSONArray("flds")
+        get() = mEditorNote!!.notetype.getJSONArray("flds")
 
     @get:CheckResult
     val currentFieldStrings: Array<String?>
@@ -1286,15 +1283,10 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
             newEditText.setCapitalize(prefs.getBoolean(PREF_NOTE_EDITOR_CAPITALIZE, true))
             val mediaButton = editLineView.mediaButton
             val toggleStickyButton = editLineView.toggleSticky
-            // Load icons from attributes
-            val icons = Themes.getResFromAttr(
-                this,
-                intArrayOf(R.attr.attachFileImage, R.attr.upDownImage, R.attr.toggleStickyImage)
-            )
             // Make the icon change between media icon and switch field icon depending on whether editing note type
             if (editModelMode && allowFieldRemapping()) {
                 // Allow remapping if originally more than two fields
-                mediaButton.setBackgroundResource(icons[1])
+                mediaButton.setBackgroundResource(R.drawable.ic_import_export)
                 setRemapButtonListener(mediaButton, i)
                 toggleStickyButton.setBackgroundResource(0)
             } else if (editModelMode && !allowFieldRemapping()) {
@@ -1302,11 +1294,11 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
                 toggleStickyButton.setBackgroundResource(0)
             } else {
                 // Use media editor button if not changing note type
-                mediaButton.setBackgroundResource(icons[0])
+                mediaButton.setBackgroundResource(R.drawable.ic_attachment)
                 setMMButtonListener(mediaButton, i)
                 if (addNote) {
                     // toggle sticky button
-                    toggleStickyButton.setBackgroundResource(icons[2])
+                    toggleStickyButton.setBackgroundResource(R.drawable.ic_baseline_push_pin_24)
                     setToggleStickyButtonListener(toggleStickyButton, i)
                 } else {
                     toggleStickyButton.setBackgroundResource(0)
@@ -1506,6 +1498,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
                         // we only want to decorate when we lose focus
                         return@OnFocusChangeListener
                     }
+                    @SuppressLint("CheckResult")
                     val currentFieldStrings = currentFieldStrings
                     if (currentFieldStrings.size != 2 || currentFieldStrings[1]!!.isNotEmpty()) {
                         // we only decorate on 2-field cards while second field is still empty
@@ -1526,9 +1519,10 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
         // Sets the background color of disabled EditText.
         if (!enabled) {
             editText.setBackgroundColor(
-                Themes.getColorFromAttr(
+                MaterialColors.getColor(
                     this@NoteEditor,
-                    R.attr.editTextBackgroundColor
+                    R.attr.editTextBackgroundColor,
+                    0
                 )
             )
         }
@@ -1652,7 +1646,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
         setNoteTypePosition()
         setDid(note)
         updateTags()
-        updateCards(mEditorNote!!.model())
+        updateCards(mEditorNote!!.notetype)
         updateToolbar()
         populateEditFields(changeType, false)
         updateFieldsFromStickyText()
@@ -1660,7 +1654,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
 
     private fun addClozeButton(@DrawableRes drawableRes: Int, description: String, type: AddClozeType) {
         val drawable = ResourcesCompat.getDrawable(resources, drawableRes, null)!!.apply {
-            setTint(Themes.getColorFromAttr(this@NoteEditor, R.attr.toolbarIconColor))
+            setTint(MaterialColors.getColor(this@NoteEditor, R.attr.toolbarIconColor, 0))
         }
         val button = toolbar.insertItem(0, drawable) { insertCloze(type) }.apply {
             contentDescription = description
@@ -1687,7 +1681,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
             toolbar.visibility = View.VISIBLE
         }
         toolbar.clearCustomItems()
-        if (mEditorNote!!.model().isCloze) {
+        if (mEditorNote!!.notetype.isCloze) {
             addClozeButton(
                 drawableRes = R.drawable.ic_cloze_new_card,
                 description = TR.editingClozeDeletion(),
@@ -1722,7 +1716,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
         // Let the user add more buttons (always at the end).
         // Sets the add custom tag icon color.
         val drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_add_toolbar_icon, null)
-        drawable!!.setTint(Themes.getColorFromAttr(this@NoteEditor, R.attr.toolbarIconColor))
+        drawable!!.setTint(MaterialColors.getColor(this@NoteEditor, R.attr.toolbarIconColor, 0))
         val addButton = toolbar.insertItem(0, drawable) { displayAddToolbarDialog() }
         addButton.contentDescription = resources.getString(R.string.add_toolbar_item)
         TooltipCompat.setTooltipText(addButton, resources.getString(R.string.add_toolbar_item))
@@ -1842,7 +1836,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
 
     private fun setNoteTypePosition() {
         // Set current note type and deck positions in spinners
-        val position = mAllModelIds!!.indexOf(mEditorNote!!.model().getLong("id"))
+        val position = mAllModelIds!!.indexOf(mEditorNote!!.notetype.getLong("id"))
         // set selection without firing selectionChanged event
         mNoteTypeSpinner!!.setSelection(position, false)
     }
@@ -1867,7 +1861,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
         for (i in 0 until tmpls.length()) {
             var name = tmpls.getJSONObject(i).optString("name")
             // If more than one card, and we have an existing card, underline existing card
-            if (!addNote && tmpls.length() > 1 && model === mEditorNote!!.model() && mCurrentEditedCard != null && mCurrentEditedCard!!.template()
+            if (!addNote && tmpls.length() > 1 && model === mEditorNote!!.notetype && mCurrentEditedCard != null && mCurrentEditedCard!!.template()
                 .optString("name") == name
             ) {
                 name = "<u>$name</u>"
@@ -1878,7 +1872,7 @@ class NoteEditor : AnkiActivity(), DeckSelectionListener, SubtitleListener, Tags
             }
         }
         // Make cards list red if the number of cards is being reduced
-        if (!addNote && tmpls.length() < mEditorNote!!.model().getJSONArray("tmpls").length()) {
+        if (!addNote && tmpls.length() < mEditorNote!!.notetype.getJSONArray("tmpls").length()) {
             cardsList = StringBuilder("<font color='red'>$cardsList</font>")
         }
         mCardsButton!!.text = HtmlCompat.fromHtml(

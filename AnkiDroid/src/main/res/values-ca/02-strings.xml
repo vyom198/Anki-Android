@@ -100,8 +100,6 @@
         <item>Creada</item>
         <item>Nota modificada</item>
     </string-array>
-    <!-- Filter Sheet -->
-    <string name="apply_filter">Aplica</string>
     <string name="filter_by_flags">Bandera</string>
     <!-- Custom study options -->
     <string name="custom_study_increase_new_limit">Canviar el límit de cartes noves d\'avui</string>
@@ -257,7 +255,6 @@
     <string name="card_viewer_could_not_find_image">Error de contingut de la carta: Error al carregar \'%s\'</string>
     <string name="card_viewer_media_relative_protocol">Error de contingut a la carta: Cal actualitzar el medi</string>
     <!-- Deck Picker -->
-    <string name="deck_picker_failed_deck_load">Error al carregar paquet \'%s\'</string>
     <string name="search_decks">Cerca de paquets</string>
     <string name="show_migration_progress" comment="Title for a button in deck picker\'s toolbar that shows ongoing migration progress.         Usually shown as a tooltip. The button opens a dialog with a more detailed progress information.">Mostra el progrés de la migració</string>
     <string name="ankidroid_init_failed_webview_title">Error fatal</string>
@@ -362,4 +359,5 @@
     <string name="storage_migration_sync_notification" comment="Appears on a notification after the user has opted into a storage migration and provided consent to sync         and AnkiDroid was minimised when the sync completed">Toqueu per iniciar la migració d\'emmagatzematge</string>
     <string name="media_sync_required_title">Cal sincronitzar els mitjans</string>
     <string name="media_sync_unavailable_message">La sincronització multimèdia està desactivada als paràmetres. Si us plau, abans de continuar, sincronitzeu i feu una còpia de seguretat de qualsevol mitjà que no s\'hagi sincronitzat</string>
+    <string name="audio_saved">Recording saved</string>
 </resources>

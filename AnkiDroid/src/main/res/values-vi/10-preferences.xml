@@ -133,8 +133,8 @@
     <string name="sync_status_badge_summ">Thay đổi biểu tượng đồng bộ hóa khi các thay đổi có thể được tải lên</string>
     <string name="metered_sync_title" maxLength="41">Cho phép đồng bộ trên các kết nối tính cước</string>
     <string name="metered_sync_summary">Nếu tắt, bạn sẽ được cảnh báo khi cố gắng đồng bộ hóa trên kết nối có tính cước</string>
-    <string name="backup_limits_frequency">Frequency</string>
-    <string name="backup_limits_lifetime">Lifetime</string>
+    <string name="backup_limits_frequency">Tần suất</string>
+    <string name="backup_limits_lifetime">Thời gian tồn tại</string>
     <string name="app_theme" maxLength="41">Giao diện</string>
     <string name="day_theme" maxLength="41">Chủ đề ban ngày</string>
     <string name="night_theme" maxLength="41">Chủ đề ban đêm</string>
@@ -181,7 +181,9 @@
     <string name="time_limit" maxLength="41">Giới hạn thời gian của hộp thời gian</string>
     <string name="new_timezone" maxLength="41">Xử lý múi giờ mới</string>
     <string name="day_offset_with_description" maxLength="41">Bắt đầu ngày hôm sau (0 là nửa đêm, 23 là 11 giờ tối)</string>
-    <string name="day_offset_summary">%s giờ đã qua nửa đêm</string>
+    <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
+        <item quantity="other">%d hours past midnight</item>
+    </plurals>
     <string name="pref_keep_screen_on" maxLength="41">Luôn bật màn hình</string>
     <string name="pref_keep_screen_on_summ">Tắt thời gian chờ của màn hình</string>
     <string name="enable_api_title" maxLength="41">Bật AnkiDroid API</string>

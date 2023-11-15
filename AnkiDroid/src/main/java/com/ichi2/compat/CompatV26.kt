@@ -26,13 +26,12 @@ import android.os.Vibrator
 import android.view.View
 import androidx.annotation.VisibleForTesting
 import com.ichi2.anki.NotificationChannels
-import com.ichi2.utils.KotlinCleanup
 import java.io.*
 import java.nio.file.*
 
 /** Implementation of [Compat] for SDK level 26 and higher. Check  [Compat]'s for more detail.  */
 @TargetApi(26)
-open class CompatV26 : CompatV23(), Compat {
+open class CompatV26 : CompatV24(), Compat {
     /**
      * In Oreo and higher, you must create a channel for all notifications.
      * This will create the channel if it doesn't exist, or if it exists it will update the name.
@@ -44,11 +43,9 @@ open class CompatV26 : CompatV23(), Compat {
     override fun setTooltipTextByContentDescription(view: View) { /* Nothing to do API26+ */
     }
 
-    @Suppress("DEPRECATION")
-    @KotlinCleanup("when solving the deprecation of Context.VIBRATOR_SERVICE fix the SENSELESS_COMPARISON warning")
+    @Suppress("DEPRECATION") // VIBRATOR_SERVICE => VIBRATOR_MANAGER_SERVICE handled in CompatV31
     override fun vibrate(context: Context, durationMillis: Long) {
-        val vibratorManager = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        @Suppress("SENSELESS_COMPARISON")
+        val vibratorManager = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
         if (vibratorManager != null) {
             val effect = VibrationEffect.createOneShot(durationMillis, VibrationEffect.DEFAULT_AMPLITUDE)
             vibratorManager.vibrate(effect)

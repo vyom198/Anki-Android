@@ -55,18 +55,11 @@
     <string name="studyoptions_due_today">На сьогодні:</string>
     <string name="studyoptions_new_total">Всього нових карток:</string>
     <string name="studyoptions_total_cards">Всього карток:</string>
-    <string name="studyoptions_eta">Очікуваний час (хв.):</string>
     <string name="studyoptions_start">Вивчати</string>
     <!-- DeckPicker.kt -->
     <string name="expand">Розгорнути</string>
     <string name="collapse">Згорнути</string>
     <string name="study_more">Вчити ще</string>
-    <plurals name="deckpicker_title">
-        <item quantity="one">%1$d картка до (%2$s)</item>
-        <item quantity="few">%1$d картки для перегляду (%2$s)</item>
-        <item quantity="many">%1$d карток до (%2$s)</item>
-        <item quantity="other">%1$d картокк для перегляду (%2$s)</item>
-    </plurals>
     <plurals name="reviewer_window_title">
         <item quantity="one">Залишилася %d хвилина</item>
         <item quantity="few">Залишилося %d хвилини</item>
@@ -139,22 +132,6 @@
     grant AnkiDroid the \'Storage\' permission. This needs to be a fairly generic message as implementations
     of the permissions/app info screen will differ between devices. -->
     <string name="startup_no_storage_permission">Щоб продовжити, надайте AnkiDroid дозвіл на доступ до сховища</string>
-    <!--
-        The time_quantities are units of time. They are used without
-        plurals or dots.
-        s, min, h, d, are standard (ISO 31-1) units and should usually
-        not be translated, at least not for languages using the Latin
-        alphabet.
-    -->
-    <string name="time_quantity_seconds">%d сек</string>
-    <string name="time_quantity_minutes">%d хв</string>
-    <string name="time_quantity_hours_minutes">%1$d год. %2$d хв.</string>
-    <string name="time_quantity_hours">%d год</string>
-    <string name="time_quantity_days">%d дн</string>
-    <string name="time_quantity_days_hours">%1$d д. %2$d год.</string>
-    <string name="time_quantity_months">%.1f міс</string>
-    <string name="time_quantity_years">%.1f р</string>
-    <!-- or "%.1f a" -->
     <string name="rebuild_filtered_deck">Перебудова фільтрованої колоди&#8230;</string>
     <string name="rebuild_cram_label">Перебудувати</string>
     <string name="empty_cram_label">Спорожнити</string>
@@ -250,27 +227,26 @@
         Будь ласка, дбайте, щоб ваші дані були в безпеці, регулярно синхронізуючись або експортуючи резервні копії.
     </string>
     <string name="migration__failed__title" comment="A title for a dialog, or a short message shown in a notification,         when storage migration fails">Не вдалось перенести дані</string>
-    <string name="migration__failed__changes_rolled_back__message" comment="A more detailed message shown when storage migration fails, with the changes rolled back"><![CDATA[        Copying database files failed with the error: %1$s.
-        <br><br>
-        The changes were reverted.
-        <br><br>
-        Please try re-running the migration.
-        To resolve the problem, you may need to free up some disk space,
-        or reconnect the removable storage that holds your collection.
-        <br><br>
-        <a href="%2$s">Learn more and get help</a>
-    ]]></string>
-    <string name="migration__failed__changes_not_rolled_back__message" comment="A more detailed message shown when storage migration fails, with the changes not rolled back"><![CDATA[        Moving media files is paused after having failed with the error: %1$s.
-        <br><br>
-        The changes were <i>not</i> reverted.
-        While no data should’ve been lost,
-        the media files might be split between the old and the new folder.
-        <br><br>
-        Please try re-running the migration.
-        To resolve the problem, you may need to free up some disk space,
-        or reconnect the removable storage that holds your collection.
-        <br><br>
-        <a href="%2$s">Learn more and get help</a>
+    <string name="migration__failed__changes_rolled_back__message" comment="A more detailed message shown when storage migration fails, with the changes rolled back"><![CDATA[         Копіювання файлів бази даних закінчилося невдачею з помилкою: %1$s.
+         <br><br>
+         Зміни скасовано.
+         <br><br>
+         Спробуйте повторно запустити міграцію.
+         Щоб розв\'язати проблему, вам може знадобитися звільнити місце на диску,
+         або повторно під\'єднайте знімний носій, у якому зберігається ваша колекція.
+         <br><br>
+         <a href="%2$s">Дізнайтеся більше та отримайте допомогу</a>]]></string>
+    <string name="migration__failed__changes_not_rolled_back__message" comment="A more detailed message shown when storage migration fails, with the changes not rolled back"><![CDATA[        Переміщення мультимедійних файлів поки зупинено через невдачу з помилкою: %1$s.
+         <br><br>
+         Зміни <i>не</i> скасовано.
+         Хоча дані не мають втратитися,
+         медіафайли можуть розділитися між старою та новою теками.
+         <br><br>
+         Спробуйте повторно запустити міграцію.
+         Щоб розв\'язати проблему, вам може знадобитися звільнити місце на диску,
+         або повторно під\'єднайте знімний носій, у якому зберігається ваша колекція.
+         <br><br>
+         <a href="%2$s">Дізнайтеся більше та отримайте допомогу</a>
     ]]></string>
     <string name="migration__resume_after_failed_dialog__message"><![CDATA[        Перенесення сховища призупинено після збою з помилкою: %1$s.
         <br><br>
@@ -286,8 +262,8 @@
     <string name="create_new_collection">створити нову колекцію</string>
     <string name="new_unsafe_collection">Нова колекція буде видалена з вашого телефону, якщо ви видалите AnkiDroid</string>
     <!-- Permissions screen -->
-    <string name="permissions_screen_headline">AnkiDroid needs some permissions to work</string>
-    <string name="storage_access_title">Storage access</string>
-    <string name="storage_access_summary">Saves your collection in a safe place that will not be deleted if the app is uninstalled</string>
-    <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">All files access</string>
+    <string name="permissions_screen_headline">AnkiDroid потребує деяких дозволів для роботи</string>
+    <string name="storage_access_title">Доступ до сховища</string>
+    <string name="storage_access_summary">Зберігає вашу колекцію в безпечному місці, яке не видалиться, якщо ви видалите програму</string>
+    <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">Доступ до всіх файлів</string>
 </resources>

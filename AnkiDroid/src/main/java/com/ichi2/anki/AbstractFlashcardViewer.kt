@@ -77,7 +77,6 @@ import com.ichi2.anki.snackbar.BaseSnackbarBuilderProvider
 import com.ichi2.anki.snackbar.SnackbarBuilder
 import com.ichi2.anki.snackbar.showSnackbar
 import com.ichi2.annotations.NeedsTest
-import com.ichi2.compat.CompatHelper.Companion.compat
 import com.ichi2.compat.CompatHelper.Companion.resolveActivityCompat
 import com.ichi2.compat.ResolveInfoFlagsCompat
 import com.ichi2.libanki.*
@@ -175,7 +174,7 @@ abstract class AbstractFlashcardViewer :
     private var mCardFrame: FrameLayout? = null
     private var mTouchLayer: FrameLayout? = null
     protected var answerField: FixedEditText? = null
-    protected var flipCardLayout: LinearLayout? = null
+    protected var flipCardLayout: FrameLayout? = null
     private var easeButtonsLayout: LinearLayout? = null
 
     @KotlinCleanup("internal for AnkiDroidJsApi")
@@ -257,11 +256,6 @@ abstract class AbstractFlashcardViewer :
     // LISTENERS
     // ----------------------------------------------------------------------------
     private val mLongClickHandler = newHandler()
-    private val mLongClickTestRunnable = Runnable {
-        Timber.i("AbstractFlashcardViewer:: onEmulatedLongClick")
-        compat.vibrate(AnkiDroidApp.instance.applicationContext, 50)
-        mLongClickHandler.postDelayed(mStartLongClickAction, 300)
-    }
     private val mStartLongClickAction = Runnable { mGestureProcessor.onLongTap() }
 
     // Handler for the "show answer" button
@@ -544,7 +538,7 @@ abstract class AbstractFlashcardViewer :
         registerExternalStorageListener()
         restoreCollectionPreferences(col)
         initLayout()
-        mHtmlGenerator = createInstance(this, typeAnswer!!)
+        mHtmlGenerator = createInstance(this, col, typeAnswer!!)
 
         // Initialize text-to-speech. This is an asynchronous operation.
         mTTS.initialize(this, ReadTextListener())
@@ -571,7 +565,6 @@ abstract class AbstractFlashcardViewer :
     override fun onPause() {
         super.onPause()
         automaticAnswer.disable()
-        mLongClickHandler.removeCallbacks(mLongClickTestRunnable)
         mLongClickHandler.removeCallbacks(mStartLongClickAction)
         if (this::mSoundPlayer.isInitialized) {
             mSoundPlayer.stopSounds()
@@ -799,7 +792,7 @@ abstract class AbstractFlashcardViewer :
     protected fun showDeleteNoteDialog() {
         AlertDialog.Builder(this).show {
             title(R.string.delete_card_title)
-            iconAttr(R.attr.dialogErrorIcon)
+            setIcon(R.drawable.ic_warning)
             message(
                 text = resources.getString(
                     R.string.delete_note_message,
@@ -904,8 +897,7 @@ abstract class AbstractFlashcardViewer :
             easeButton3!!.hideNextReviewTime()
             easeButton4!!.hideNextReviewTime()
         }
-        val flipCard = findViewById<Button>(R.id.flip_card)
-        flipCardLayout = findViewById<LinearLayout>(R.id.flashcard_layout_flip)
+        flipCardLayout = findViewById(R.id.flashcard_layout_flip)
         flipCardLayout?.let { layout ->
             if (minimalClickSpeed == 0) {
                 layout.setOnClickListener(mFlipCardListener)
@@ -929,7 +921,7 @@ abstract class AbstractFlashcardViewer :
             }
         }
         if (animationEnabled()) {
-            flipCard.setBackgroundResource(getResFromAttr(this, R.attr.hardButtonRippleRef))
+            flipCardLayout?.setBackgroundResource(getResFromAttr(this, R.attr.hardButtonRippleRef))
         }
         if (!mButtonHeightSet && mRelativeButtonSize != 100) {
             val params = flipCardLayout!!.layoutParams
@@ -1475,7 +1467,8 @@ abstract class AbstractFlashcardViewer :
         }
     }
 
-    private fun readCardTts(side: SingleSoundSide) {
+    @VisibleForTesting
+    fun readCardTts(side: SingleSoundSide) {
         val tags = legacyGetTtsTags(currentCard!!, side, this)
         mTTS.readCardText(tags, currentCard!!, side.toSoundSide())
     }
@@ -1549,7 +1542,7 @@ abstract class AbstractFlashcardViewer :
             server?.reviewerHtml = content
             if (card != null) {
                 card.settings.mediaPlaybackRequiresUserGesture = !mCardSoundConfig!!.autoplay
-                Timber.e("*** set server %s content to %s", server, content)
+                Timber.v("*** set server %s content to %s", server, content)
                 card.loadUrl(server?.baseUrl() + "reviewer.html")
             }
         }
@@ -1835,7 +1828,6 @@ abstract class AbstractFlashcardViewer :
     protected open fun closeReviewer(result: Int) {
         automaticAnswer.disable()
         mPreviousAnswerIndicator!!.stopAutomaticHide()
-        mLongClickHandler.removeCallbacks(mLongClickTestRunnable)
         mLongClickHandler.removeCallbacks(mStartLongClickAction)
         this@AbstractFlashcardViewer.setResult(result)
         finishWithAnimation(ActivityTransitionAnimation.Direction.END)
@@ -1941,7 +1933,6 @@ abstract class AbstractFlashcardViewer :
 
         override fun onSingleTapUp(e: MotionEvent): Boolean {
             if (mTouchStarted) {
-                mLongClickHandler.removeCallbacks(mLongClickTestRunnable)
                 mTouchStarted = false
             }
             return false

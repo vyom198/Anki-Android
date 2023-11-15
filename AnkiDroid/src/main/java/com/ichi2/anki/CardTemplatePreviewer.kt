@@ -25,6 +25,7 @@ import com.ichi2.anki.cardviewer.PreviewLayout.Companion.createAndDisplay
 import com.ichi2.annotations.NeedsTest
 import com.ichi2.libanki.Card
 import com.ichi2.libanki.Collection
+import com.ichi2.libanki.Consts
 import com.ichi2.libanki.Note
 import com.ichi2.libanki.NotetypeJson
 import com.ichi2.libanki.TemplateManager
@@ -231,7 +232,7 @@ open class CardTemplatePreviewer : AbstractFlashcardViewer() {
             // loading from the note editor
             val toPreview = setCurrentCardFromNoteEditorBundle(col)
             if (toPreview != null) {
-                mTemplateCount = toPreview.note().model().templatesNames.size
+                mTemplateCount = toPreview.note().notetype.templatesNames.size
                 if (mTemplateCount >= 2) {
                     previewLayout!!.showNavigationButtons()
                 }
@@ -360,7 +361,7 @@ open class CardTemplatePreviewer : AbstractFlashcardViewer() {
             i++
         }
         try {
-            return n.ephemeralCard(getColUnsafe, index, false)
+            return EphemeralCard.fromNote(n, getColUnsafe, index)
         } catch (e: Exception) {
             // Calling code handles null return, so we can log this for developer's interest but move on
             Timber.d(e, "getDummyCard() unable to create card")
@@ -414,6 +415,39 @@ open class CardTemplatePreviewer : AbstractFlashcardViewer() {
                     context.render()
             }
             return renderOutput!!
+        }
+    }
+}
+
+private class EphemeralCard(col: Collection, id: Long?) : Card(col, id) {
+    override fun renderOutput(reload: Boolean, browser: Boolean): TemplateRenderOutput {
+        return this.renderOutput!!
+    }
+    companion object {
+        fun fromNote(n: Note, col: Collection, ord: Int = 0): EphemeralCard {
+            val card = EphemeralCard(col, null)
+            card.did = 1
+            card.ord = ord
+
+            val nt = n.notetype
+            val templateIdx = if (nt.type == Consts.MODEL_CLOZE) {
+                0
+            } else {
+                ord
+            }
+            val template = nt.tmpls[templateIdx] as JSONObject
+            template.put("ord", card.ord)
+
+            val output = TemplateManager.TemplateRenderContext.fromCardLayout(
+                n,
+                card,
+                notetype = nt,
+                template = template,
+                fillEmpty = false
+            ).render()
+            card.renderOutput = output
+            card.setNote(n)
+            return card
         }
     }
 }

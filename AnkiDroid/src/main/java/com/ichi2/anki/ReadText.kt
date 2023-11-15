@@ -31,7 +31,6 @@ import com.ichi2.libanki.DeckId
 import com.ichi2.libanki.Sound.SoundSide
 import com.ichi2.libanki.TTSTag
 import com.ichi2.utils.HandlerUtils.postDelayedOnNewHandler
-import com.ichi2.utils.iconAttr
 import com.ichi2.utils.message
 import com.ichi2.utils.positiveButton
 import com.ichi2.utils.title
@@ -43,7 +42,6 @@ object ReadText {
     @get:VisibleForTesting(otherwise = VisibleForTesting.NONE)
     var textToSpeech: TextToSpeech? = null
         private set
-    private val availableTtsLocales = ArrayList<Locale>()
 
     @get:VisibleForTesting(otherwise = VisibleForTesting.NONE)
     var textToSpeak: String? = null
@@ -100,21 +98,17 @@ object ReadText {
         mOrd = ord
         val res = flashCardViewer.get()!!.resources
         val dialog = AlertDialog.Builder(flashCardViewer.get()!!)
-        // Build the language list if it's empty
-        if (availableTtsLocales.isEmpty()) {
-            buildAvailableLanguages()
-        }
-        if (availableTtsLocales.isEmpty()) {
+        if (availableLocales().isEmpty()) {
             Timber.w("ReadText.textToSpeech() no TTS languages available")
             dialog.message(R.string.no_tts_available_message)
-                .iconAttr(R.attr.dialogErrorIcon)
+                .setIcon(R.drawable.ic_warning)
                 .positiveButton(R.string.dialog_ok)
         } else {
             val localeMappings: List<Pair<String, CharSequence>> =
                 mutableListOf<Pair<String, String>>().apply {
                     add(Pair(NO_TTS, res.getString(R.string.tts_no_tts))) // add option: "no tts"
                     addAll(
-                        availableTtsLocales
+                        availableLocales()
                             .sortedWith(compareBy { it.displayName })
                             .map { Pair(it.isO3Language, it.displayName) }
                     )
@@ -253,9 +247,7 @@ object ReadText {
         // Create new TTS object and setup its onInit Listener
         textToSpeech = TextToSpeech(context) { status: Int ->
             if (status == TextToSpeech.SUCCESS) {
-                // build list of available languages
-                buildAvailableLanguages()
-                if (!availableTtsLocales.isEmpty()) {
+                if (availableLocales().isNotEmpty()) {
                     // notify the reviewer that TTS has been initialized
                     Timber.d("TTS initialized and available languages found")
                     (context as AbstractFlashcardViewer).ttsInitialized()
@@ -268,15 +260,35 @@ object ReadText {
                         listener.onDone(questionAnswer)
                     }
 
-                    @Deprecated("")
-                    override fun onError(utteranceId: String) {
-                        Timber.v("Android TTS failed. Check logcat for error. Indicates a problem with Android TTS engine.")
+                    fun errorToDeveloperString(errorCode: Int): String {
+                        return when (errorCode) {
+                            TextToSpeech.ERROR -> "Generic failure"
+                            TextToSpeech.ERROR_SYNTHESIS -> "TTS engine failed to synthesize input"
+                            TextToSpeech.ERROR_INVALID_REQUEST -> "Invalid request"
+                            TextToSpeech.ERROR_NETWORK -> "Network connectivity problem"
+                            TextToSpeech.ERROR_NETWORK_TIMEOUT -> "Network timeout"
+                            TextToSpeech.ERROR_NOT_INSTALLED_YET -> "Unfinished download of the voice data"
+                            TextToSpeech.ERROR_OUTPUT -> "Output error (audio device or a file)"
+                            TextToSpeech.ERROR_SERVICE -> "TTS service"
+                            else -> "Unhandled Error [$errorCode]"
+                        }
+                    }
+
+                    override fun onError(utteranceId: String?, errorCode: Int) {
+                        Timber.v("Android TTS failed: %s (%d). Check logcat for error. Indicates a problem with Android TTS engine.", errorToDeveloperString(errorCode), errorCode)
                         val helpUrl = Uri.parse(context.getString(R.string.link_faq_tts))
                         val ankiActivity = context as AnkiActivity
                         ankiActivity.mayOpenUrl(helpUrl)
+                        // TODO: We can do better in this UI now we have a reason for failure
                         ankiActivity.showSnackbar(R.string.no_tts_available_message) {
                             setAction(R.string.help) { openTtsHelpUrl(helpUrl) }
                         }
+                    }
+
+                    @Deprecated("")
+                    override fun onError(utteranceId: String) {
+                        // required for UtteranceProgressListener, but also deprecated
+                        Timber.e("onError(string) should not have been called")
                     }
 
                     override fun onStart(arg0: String) {
@@ -295,24 +307,6 @@ object ReadText {
     private fun openTtsHelpUrl(helpUrl: Uri) {
         val activity = flashCardViewer.get() as AnkiActivity?
         activity!!.openUrl(helpUrl)
-    }
-
-    fun buildAvailableLanguages() {
-        availableTtsLocales.clear()
-        val systemLocales = Locale.getAvailableLocales()
-        availableTtsLocales.ensureCapacity(systemLocales.size)
-        for (loc in systemLocales) {
-            try {
-                val retCode = textToSpeech!!.isLanguageAvailable(loc)
-                if (retCode >= TextToSpeech.LANG_COUNTRY_AVAILABLE) {
-                    availableTtsLocales.add(loc)
-                } else {
-                    Timber.v("ReadText.buildAvailableLanguages() :: %s  not available (error code %d)", loc.displayName, retCode)
-                }
-            } catch (e: IllegalArgumentException) {
-                Timber.w(e, "Error checking if language %s available", loc.displayName)
-            }
-        }
     }
 
     /**
@@ -342,6 +336,9 @@ object ReadText {
         MetaDB.close()
         System.gc()
     }
+
+    @Suppress("DEPRECATION") // we'll be removing this functionality, little point in fixing
+    private fun availableLocales() = TtsVoices.availableLocalesBlocking()
 
     interface ReadTextListener {
         fun onDone(playedSide: SoundSide?)

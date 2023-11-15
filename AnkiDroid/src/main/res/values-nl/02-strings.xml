@@ -100,8 +100,6 @@
         <item>Gemaakt</item>
         <item>Memo gewijzigd</item>
     </string-array>
-    <!-- Filter Sheet -->
-    <string name="apply_filter">Toepassen</string>
     <string name="filter_by_flags">Vlaggen </string>
     <!-- Custom study options -->
     <string name="custom_study_increase_new_limit">Nieuwe kaartenlimiet voor vandaag wijzigen</string>
@@ -257,7 +255,6 @@
     <string name="card_viewer_could_not_find_image">Fout met de kaartinhoud: Laden van ‘%s ’ is mislukt</string>
     <string name="card_viewer_media_relative_protocol">Fout met de kaartinhoud: Media-update vereist</string>
     <!-- Deck Picker -->
-    <string name="deck_picker_failed_deck_load">Laden van set ‘%s ’ mislukt</string>
     <string name="search_decks">Sets doorzoeken</string>
     <string name="show_migration_progress" comment="Title for a button in deck picker\'s toolbar that shows ongoing migration progress.         Usually shown as a tooltip. The button opens a dialog with a more detailed progress information.">Toon migratie voortgang</string>
     <string name="ankidroid_init_failed_webview_title">Onherstelbare fout</string>
@@ -362,4 +359,5 @@
     <string name="storage_migration_sync_notification" comment="Appears on a notification after the user has opted into a storage migration and provided consent to sync         and AnkiDroid was minimised when the sync completed">Tap to start storage migration</string>
     <string name="media_sync_required_title">Media-synchronisatie vereist</string>
     <string name="media_sync_unavailable_message">Media sync is disabled in the settings. Please sync and backup any media which hasn\'t been synced before continuing</string>
+    <string name="audio_saved">Recording saved</string>
 </resources>

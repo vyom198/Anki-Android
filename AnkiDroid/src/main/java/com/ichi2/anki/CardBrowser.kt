@@ -33,6 +33,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.edit
 import anki.collection.OpChanges
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
 import com.ichi2.anim.ActivityTransitionAnimation
 import com.ichi2.anki.CollectionManager.TR
@@ -71,7 +72,6 @@ import com.ichi2.compat.Compat
 import com.ichi2.libanki.*
 import com.ichi2.libanki.SortOrder.NoOrdering
 import com.ichi2.libanki.SortOrder.UseCollectionOrdering
-import com.ichi2.themes.Themes.getColorFromAttr
 import com.ichi2.ui.CardBrowserSearchView
 import com.ichi2.ui.FixedTextView
 import com.ichi2.utils.*
@@ -450,6 +450,9 @@ open class CardBrowser :
         // for intent coming from search query js api
         intent.getStringExtra("search_query")?.let {
             mSearchTerms = it
+            if (intent.getBooleanExtra("all_decks", false)) {
+                onDeckSelected(SelectableDeck(ALL_DECKS_ID, getString(R.string.card_browser_all_decks)))
+            }
             searchCards()
         }
 
@@ -1639,11 +1642,6 @@ open class CardBrowser :
     private fun filterByTags(selectedTags: List<String>, option: Int) {
         // TODO: Duplication between here and CustomStudyDialog:onSelectedTags
         mSearchView!!.setQuery("", false)
-        val tags = selectedTags.toString()
-        mSearchView!!.queryHint = resources.getString(
-            R.string.CardEditorTags,
-            tags.substring(1, tags.length - 1)
-        )
 
         val sb = StringBuilder()
         sb.append(
@@ -1659,7 +1657,7 @@ open class CardBrowser :
             sb.append("($tagsConcat)") // Only if we added anything to the tag list
         }
         mSearchTerms = sb.toString()
-        searchCards()
+        searchWithFilterQuery(mSearchTerms)
     }
 
     /** Updates search terms to only show cards with selected flag.  */
@@ -1953,7 +1951,7 @@ open class CardBrowser :
                     col.text = card.getColumnHeaderText(fromKeys[i]) // set text for column
                 }
             // set card's background color
-            val backgroundColor: Int = getColorFromAttr(this@CardBrowser, card.color)
+            val backgroundColor: Int = MaterialColors.getColor(this@CardBrowser, card.color, 0)
             v.setBackgroundColor(backgroundColor)
             // setup checkbox to change color in multi-select mode
             val checkBox = v.findViewById<CheckBox>(R.id.card_checkbox)

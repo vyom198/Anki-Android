@@ -134,8 +134,8 @@
     <string name="sync_status_badge_summ">A szinkronizálás ikonjának módosítása, amikor a változások feltölthetők</string>
     <string name="metered_sync_title" maxLength="41">Szinkronizálás forgalmi díjas kapcsolaton</string>
     <string name="metered_sync_summary">Ha letiltva, figyelmeztet, ha szinkronizálni próbál mért kapcsolaton.</string>
-    <string name="backup_limits_frequency">Frequency</string>
-    <string name="backup_limits_lifetime">Lifetime</string>
+    <string name="backup_limits_frequency">Gyakoriság</string>
+    <string name="backup_limits_lifetime">Időköz</string>
     <string name="app_theme" maxLength="41">Sablon</string>
     <string name="day_theme" maxLength="41">Nappali téma</string>
     <string name="night_theme" maxLength="41">Éjszakai téma</string>
@@ -182,7 +182,10 @@
     <string name="time_limit" maxLength="41">Időkorlát érték</string>
     <string name="new_timezone" maxLength="41">Új időzóna kezelés</string>
     <string name="day_offset_with_description" maxLength="41">Nap kezdete</string>
-    <string name="day_offset_summary">%s órával éjfél után</string>
+    <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
+        <item quantity="one">%d hour past midnight</item>
+        <item quantity="other">%d hours past midnight</item>
+    </plurals>
     <string name="pref_keep_screen_on" maxLength="41">Ne kapcsolja ki a képernyőt</string>
     <string name="pref_keep_screen_on_summ">Képernyő időtúllépésének kikapcsolása</string>
     <string name="enable_api_title" maxLength="41">Engedélyezze az AnkiDroid API-t</string>

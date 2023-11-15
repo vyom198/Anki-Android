@@ -76,7 +76,7 @@ open class Scheduler(val col: Collection) {
         val queue = queuedCards
         return queue.cardsList.firstOrNull()?.let {
             CurrentQueueState(
-                topCard = Card(col, it.card),
+                topCard = Card(col, it.card).apply { startTimer() },
                 countsIndex = when (it.queue) {
                     QueuedCards.Queue.NEW -> Counts.Queue.NEW
                     QueuedCards.Queue.LEARNING -> Counts.Queue.LRN
@@ -636,9 +636,6 @@ open class Scheduler(val col: Collection) {
                     revTime = cur.getDouble(3)
                     relrnRate = cur.getDouble(4)
                     relrnTime = cur.getDouble(5)
-                    if (!cur.isClosed()) {
-                        cur.close()
-                    }
                 }
 
             // If the collection has no revlog data to work with, assume a 20 second average rep for that type

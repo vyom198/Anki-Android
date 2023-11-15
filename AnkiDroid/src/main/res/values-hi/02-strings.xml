@@ -100,8 +100,6 @@
         <item>बनाया गया</item>
         <item>नोट संशोधित किया गया</item>
     </string-array>
-    <!-- Filter Sheet -->
-    <string name="apply_filter">लागू करें</string>
     <string name="filter_by_flags">झंडे</string>
     <!-- Custom study options -->
     <string name="custom_study_increase_new_limit">आज की नई कार्ड सीमा को संशोधित करें</string>
@@ -257,7 +255,6 @@
     <string name="card_viewer_could_not_find_image">कार्ड सामग्री त्रुटि: ‘%s’ लोड करने में विफल</string>
     <string name="card_viewer_media_relative_protocol">कार्ड सामग्री त्रुटि: मीडिया अद्यतन की आवश्यकता है</string>
     <!-- Deck Picker -->
-    <string name="deck_picker_failed_deck_load">डेक को लोड करने में विफल  ‘%s’</string>
     <string name="search_decks">खोज डेक</string>
     <string name="show_migration_progress" comment="Title for a button in deck picker\'s toolbar that shows ongoing migration progress.         Usually shown as a tooltip. The button opens a dialog with a more detailed progress information.">माइग्रेशन प्रगति दिखाएं</string>
     <string name="ankidroid_init_failed_webview_title">फ़ॉन्ट आकार</string>
@@ -362,4 +359,5 @@
     <string name="storage_migration_sync_notification" comment="Appears on a notification after the user has opted into a storage migration and provided consent to sync         and AnkiDroid was minimised when the sync completed">संग्रहण माइग्रेशन प्रारंभ करने के लिए टैप करें</string>
     <string name="media_sync_required_title">मीडिया सिंक आवश्यक</string>
     <string name="media_sync_unavailable_message">सेटिंग्स में मीडिया सिंक अक्षम है। जारी रखने से पहले जो भी मीडिया सिंक नहीं हुआ है उसे सिंक और बैकअप करें</string>
+    <string name="audio_saved">Recording saved</string>
 </resources>

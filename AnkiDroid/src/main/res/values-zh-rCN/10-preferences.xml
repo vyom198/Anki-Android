@@ -133,8 +133,8 @@
     <string name="sync_status_badge_summ">当更改可被上传时改变同步图标</string>
     <string name="metered_sync_title" maxLength="41">允许通过按流量计费连接同步</string>
     <string name="metered_sync_summary">禁用后，当您尝试通过流量进行同步时，将收到提醒</string>
-    <string name="backup_limits_frequency">Frequency</string>
-    <string name="backup_limits_lifetime">Lifetime</string>
+    <string name="backup_limits_frequency">频率</string>
+    <string name="backup_limits_lifetime">无限期</string>
     <string name="app_theme" maxLength="41">主题</string>
     <string name="day_theme" maxLength="41">白天主题</string>
     <string name="night_theme" maxLength="41">夜间主题</string>
@@ -181,7 +181,9 @@
     <string name="time_limit" maxLength="41">指定时间内的学习卡片数</string>
     <string name="new_timezone" maxLength="41">新时区处理</string>
     <string name="day_offset_with_description" maxLength="41">次日开始时间（0 为午夜，23 为晚上 11 点)</string>
-    <string name="day_offset_summary">午夜过后 %s 小时</string>
+    <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
+        <item quantity="other">午夜过后 %d 小时</item>
+    </plurals>
     <string name="pref_keep_screen_on" maxLength="41">保持屏幕常亮</string>
     <string name="pref_keep_screen_on_summ">禁用屏幕超时</string>
     <string name="enable_api_title" maxLength="41">启用 AnkiDroid API</string>
@@ -291,7 +293,7 @@
         在备份文件生成超过两天后，
         AnkiDroid 会开始删除一些备份释放磁盘空间。
         <br><br>
-        请注意，AnkiFDroid 不会备份媒体文件。
+        请注意，AnkiDroid 不会备份媒体文件。
         为了安全起见，请定期同步您的牌组集合，或备份集合的导出文件。
         <br><br>
         您可以通过牌组列表菜单恢复备份和导出您的牌组集合。
