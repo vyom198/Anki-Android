@@ -59,18 +59,17 @@
     <!-- DeckPicker.kt -->
     <string name="expand">Uitklappen</string>
     <string name="collapse">Inklappen</string>
-    <string name="study_more">Studeer meer</string>
     <plurals name="reviewer_window_title">
         <item quantity="one">%d minuut over</item>
-        <item quantity="other">%d minuten over</item>
+        <item quantity="other">%d minuten resterend</item>
     </plurals>
     <plurals name="reviewer_window_title_hours_new">
-        <item quantity="one">%1$d Uur %2$d Over</item>
-        <item quantity="other">%1$d Uren %2$d over</item>
+        <item quantity="one">%1$d hour %2$d left</item>
+        <item quantity="other">%1$d hours %2$d left</item>
     </plurals>
     <plurals name="reviewer_window_title_days_new">
-        <item quantity="one">%1$d Dag %2$d over</item>
-        <item quantity="other">%1$d Dagen %2$d Over</item>
+        <item quantity="one">%1$d day %2$d left</item>
+        <item quantity="other">%1$d days %2$d left</item>
     </plurals>
     <string name="no_cards_placeholder_title">Collectie is leeg</string>
     <string name="no_cards_placeholder_description">Begin kaarten toe te voegen\nmet het + icoon.</string>
@@ -85,12 +84,14 @@
     <string name="ease_button_easy">Makkelijk</string>
     <string name="menu_import">Kaarten importeren</string>
     <string name="undo">Ongedaan maken</string>
+    <string name="redo">Opnieuw</string>
     <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in Reviewer. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)">Maak streek ongedaan</string>
     <string name="move_all_to_deck">Alles verplaatsen naar leerset</string>
     <string name="unbury">Opgraven</string>
     <string name="rename_deck">hernoem dek</string>
     <string name="create_shortcut">Snelkoppeling maken</string>
     <string name="browse_cards">Blader door kaarten</string>
+    <string name="edit_deck_description" comment="edit the deck description">Edit description</string>
     <string name="menu_add" comment="A generic add button. Please inform us if you need more specific strings">Toevoegen</string>
     <string name="menu_add_note">Memo toevoegen</string>
     <string name="menu_my_account" comment="Label of the window in which the user should enter their account. This text can\'t be found in AnkiDroid directly.">Account synchroniseren</string>
@@ -104,14 +105,6 @@
     <string name="menu_delete_note">Notitie verwijderen</string>
     <string name="menu_flag">Vlag</string>
     <string name="menu_flag_card">Markeer kaart</string>
-    <string name="menu_flag_card_zero">Geen vlag</string>
-    <string name="menu_flag_card_one">Rode vlag</string>
-    <string name="menu_flag_card_two">Oranje vlag</string>
-    <string name="menu_flag_card_three">Groene vlag</string>
-    <string name="menu_flag_card_four">Blauwe vlag</string>
-    <string name="menu_flag_card_five">Roze vlag</string>
-    <string name="menu_flag_card_six">Turquoise vlag</string>
-    <string name="menu_flag_card_seven">Paarse vlag</string>
     <string name="menu_edit_tags">Tags bewerken</string>
     <string name="delete_note_message">Deze memo en al zijn kaarten verwijderen?\n%s</string>
     <string name="menu_search">Opzoeken in %1$s</string>
@@ -133,14 +126,11 @@
     <string name="empty_filtered_deck">Gefilterde set wordt leeggemaakt&#8230;</string>
     <string name="custom_study_deck_name">Aangepaste studiesessie</string>
     <string name="custom_study_deck_exists">Gelieve eerst de bestaande aangepaste studieset te hernoemen.</string>
-    <string name="empty_deck">Deze leerset is leeg</string>
     <string name="search_deck" comment="Deck search for selecting it">Leerset zoeken</string>
+    <string name="empty_deck">Deze leerset is leeg</string>
     <string name="search_for_download_deck" comment="Deck search value for downloading deck">Set doorzoeken</string>
     <string name="invalid_deck_name">Ongeldige setnaam</string>
-    <string name="studyoptions_empty">Deze leerset is leeg. Druk op de + knop om nieuwe inhoud toe te voegen.</string>
-    <string name="studyoptions_limit_reached">De dagelijkse studielimiet is bereikt</string>
-    <string name="studyoptions_empty_schedule">Er zijn geen kaarten gepland om te studeren</string>
-    <string name="studyoptions_congrats_finished">Gefeliciteerd! Je bent nu klaar.</string>
+    <string name="studyoptions_congrats_finished">Congratulations! You have finished for now.</string>
     <string name="studyoptions_no_cards_due">Nog geen kaarten te doen.</string>
     <string name="sd_card_not_mounted">Apparaatopslag niet aangesloten</string>
     <string name="button_sync" comment="Text of the sync button">Synchroniseer</string>
@@ -149,8 +139,7 @@
     <string name="continue_sync" tools:ignore="UnusedResources">Synchronisatie hervatten</string>
     <string name="sync_cancelled" tools:ignore="UnusedResources">Synchronisatie geannuleerd</string>
     <string name="sync_cancel_message" tools:ignore="UnusedResources">Annuleren&#8230;\nDit kan enige tijd duren.</string>
-    <string name="export">Exporteren</string>
-    <string name="export_collection">Verzameling exporteren</string>
+    <string name="syncing_media">Syncing media</string>
     <string name="export_deck">Leerset exporteren</string>
     <string name="nothing">Niets</string>
     <!-- Card template editor -->
@@ -171,7 +160,6 @@
         <item quantity="one">Verwijder het “%2$s” kaarttype, en zijn %1$d kaart?</item>
         <item quantity="other">Verwijder het “%2$s” kaarttype, en zijn %1$d kaarten?</item>
     </plurals>
-    <string name="invalid_template">De kaart kon niet worden aangemaakt</string>
     <string name="card_template_editor_would_delete_note">Het verwijderen van dit kaarttype zou er voor zorgen dat een of meer notities worden verwijderd. Gelieve een nieuw kaarttype eerst te maken en op te slaan.</string>
     <string name="card_template_editor_save_error">Kan de wijzigingen aan het kaartsjabloon niet opslaan: %s</string>
     <string name="template_for_current_card_deleted">Het kaarttype voor de huidige kaart is verwijderd.</string>
@@ -243,6 +231,7 @@
     <string name="migration__resume_after_failed_dialog__button_positive">Migratie hervatten</string>
     <string name="directory_inaccessible_after_uninstall" comment="Dialog title if AnkiDroid can\'t access the collection once the app is installed">Ontoegankelijke collectie</string>
     <string name="directory_inaccessible_after_uninstall_summary" comment="the parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">We are unable to access your collection after AnkiDroid is uninstalled due to a change in Play Store Policy\n\nYour data is safe and can be restored. It is located at\n%s\n\nSelect an option below to restore:</string>
+    <string name="directory_revoked_after_inactivity" comment="the first parameter is WRITE_EXTERNAL_STORAGE the second parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">Android has removed AnkiDroid\'s %1$s permission due to app inactivity.\n\nYour data is safe and can be restored. It is located at\n%2$s\n\nSelect an option below to restore:</string>
     <string name="restore_data_from_ankiweb">Herstel vanaf AnkiWeb (aanbevolen)</string>
     <string name="install_non_play_store_ankidroid_recommended">Herstel toegang tot map (aanbevolen)</string>
     <string name="install_non_play_store_ankidroid">Herstel toegang tot map (geavanceerd)</string>
@@ -250,8 +239,10 @@
     <string name="create_new_collection">Nieuwe collectie aanmaken</string>
     <string name="new_unsafe_collection">De nieuwe collectie wordt verwijderd van uw telefoon als u AnkiDroid verwijdert</string>
     <!-- Permissions screen -->
-    <string name="permissions_screen_headline">AnkiDroid needs some permissions to work</string>
-    <string name="storage_access_title">Storage access</string>
-    <string name="storage_access_summary">Saves your collection in a safe place that will not be deleted if the app is uninstalled</string>
-    <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">All files access</string>
+    <string name="permissions_screen_headline">AnkiDroid heeft wat machtigingen nodig om te werken</string>
+    <string name="storage_access_title">Toegang tot opslag</string>
+    <string name="storage_access_summary">Slaat uw collectie op een veilige plaats die niet zal worden verwijderd als de app is verwijderd</string>
+    <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">Toegang tot alle bestanden</string>
+    <string name="image_occlusion">Image Occlusion</string>
+    <string name="remove_account" comment="open a website to start the deletion of an AnkiWeb account">Remove account</string>
 </resources>

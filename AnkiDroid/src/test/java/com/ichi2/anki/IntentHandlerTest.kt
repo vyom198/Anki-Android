@@ -34,9 +34,13 @@ class IntentHandlerTest {
     // higher-level tests at a later date when we better extract dependencies
     @Test
     fun viewIntentReturnsView() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("content://invalid"))
+        var intent = Intent(Intent.ACTION_VIEW, Uri.parse("content://invalid"))
+        var expected = getLaunchType(intent)
 
-        val expected = getLaunchType(intent)
+        assertThat(expected, equalTo(LaunchType.FILE_IMPORT))
+
+        intent = Intent(Intent.ACTION_SEND, Uri.parse("content://invalid"))
+        expected = getLaunchType(intent)
 
         assertThat(expected, equalTo(LaunchType.FILE_IMPORT))
     }
@@ -66,6 +70,43 @@ class IntentHandlerTest {
         val expected = getLaunchType(intent)
 
         assertThat(expected, equalTo(LaunchType.DEFAULT_START_APP_IF_NEW))
+    }
+
+    @Test
+    fun imageOcclusionIntent() {
+        val mimeTypes = listOf("image/jpeg", "image/png")
+
+        for (mimeType in mimeTypes) {
+            var intent = Intent(Intent.ACTION_VIEW)
+            intent.setDataAndType(Uri.parse("content://valid"), mimeType)
+            var expected = getLaunchType(intent)
+
+            assertThat(expected, equalTo(LaunchType.IMAGE_IMPORT))
+
+            intent = Intent(Intent.ACTION_SEND)
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("content://valid"))
+            intent.type = mimeType
+            expected = getLaunchType(intent)
+
+            assertThat(expected, equalTo(LaunchType.IMAGE_IMPORT))
+        }
+    }
+
+    @Test
+    fun textImportIntentReturnsTextImport() {
+        testIntentType("content://valid", "text/tab-separated-values", LaunchType.TEXT_IMPORT)
+        testIntentType("content://valid", "text/comma-separated-values", LaunchType.TEXT_IMPORT)
+
+        // Test for ACTION_SEND
+        testIntentType("content://valid", "text/tab-separated-values", LaunchType.TEXT_IMPORT, Intent.ACTION_SEND)
+        testIntentType("content://valid", "text/comma-separated-values", LaunchType.TEXT_IMPORT, Intent.ACTION_SEND)
+    }
+
+    private fun testIntentType(data: String, type: String, expected: LaunchType, action: String = Intent.ACTION_VIEW) {
+        val intent = Intent(action)
+        intent.setDataAndType(Uri.parse(data), type)
+        val actual = getLaunchType(intent)
+        assertThat(actual, equalTo(expected))
     }
 
     @Test

@@ -16,6 +16,7 @@
 package com.ichi2.libanki
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import anki.notes.NoteFieldsCheckResponse
 import com.ichi2.testutils.JvmTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
@@ -34,17 +35,26 @@ class CollectionTest : JvmTest() {
         // Technically, editing a card with conditional fields can also cause this, but cloze cards are much more common
         val n = addNoteUsingModelName("Cloze", "{{c1::Hello}} {{c2::World}}", "Extra")
         val did = addDeck("Testing")
-        for (c in n.cards()) {
-            c.did = did
-            c.flush()
-        }
+        n.updateCards { this.did = did }
         assertThat("two cloze notes should be generated", n.numberOfCards(), equalTo(2))
 
         // create card 3
-        n.setField(0, n.fields[0].toString() + "{{c3::third}}")
+        n.setField(0, n.fields[0] + "{{c3::third}}")
         n.flush()
         assertThat("A new card should be generated", n.numberOfCards(), equalTo(3))
         assertThat("The new card should have the same did as the previous cards", n.cards()[2].did, equalTo(did))
+    }
+
+    @Test
+    fun `clozeNumbersInNote is deterministic`() {
+        val cloze = col.notetypes.byName("Cloze")!!
+        val note = col.newNote(cloze).apply {
+            setField(0, "{{c1::Hello}} {{c3::World}}")
+        }
+
+        repeat(5) {
+            assertThat(col.clozeNumbersInNote(note)[0], equalTo(1))
+        }
     }
 
     /*******************
@@ -85,7 +95,6 @@ class CollectionTest : JvmTest() {
       } */
     @Test
     fun test_noteAddDelete() {
-        val col = col
         // add a note
         var note = col.newNote()
         note.setItem("Front", "one")
@@ -99,7 +108,7 @@ class CollectionTest : JvmTest() {
         t.put("qfmt", "{{Back}}")
         t.put("afmt", "{{Front}}")
         mm.addTemplateModChanged(m, t)
-        mm.save(m, true) // todo: remove true which is not upstream
+        mm.save(m)
         assertEquals(2, col.cardCount())
         // creating new notes should use both cards
         note = col.newNote()
@@ -110,23 +119,22 @@ class CollectionTest : JvmTest() {
         assertEquals(4, col.cardCount())
         // check q/a generation
         val c0 = note.cards()[0]
-        assertThat(c0.q(), Matchers.containsString("three"))
+        assertThat(c0.question(), Matchers.containsString("three"))
         // it should not be a duplicate
-        assertEquals(note.dupeOrEmpty(), Note.DupeOrEmpty.CORRECT)
+        assertEquals(note.fieldsCheck(col), NoteFieldsCheckResponse.State.NORMAL)
         // now let's make a duplicate
         val note2 = col.newNote()
         note2.setItem("Front", "one")
         note2.setItem("Back", "")
-        assertNotEquals(note2.dupeOrEmpty(), Note.DupeOrEmpty.CORRECT)
+        assertNotEquals(note2.fieldsCheck(col), NoteFieldsCheckResponse.State.NORMAL)
         // empty first field should not be permitted either
         note2.setItem("Front", " ")
-        assertNotEquals(note2.dupeOrEmpty(), Note.DupeOrEmpty.CORRECT)
+        assertNotEquals(note2.fieldsCheck(col), NoteFieldsCheckResponse.State.NORMAL)
     }
 
     @Test
     @Ignore("I don't understand this csum")
     fun test_fieldChecksum() {
-        val col = col
         val note = col.newNote()
         note.setItem("Front", "new")
         note.setItem("Back", "new2")
@@ -140,7 +148,6 @@ class CollectionTest : JvmTest() {
 
     @Test
     fun test_addDelTags() {
-        val col = col
         val note = col.newNote()
         note.setItem("Front", "1")
         col.addNote(note)
@@ -162,7 +169,6 @@ class CollectionTest : JvmTest() {
 
     @Test
     fun test_timestamps() {
-        val col = col
         val stdModelSize = StdModels.STD_MODELS.size
         assertEquals(col.notetypes.all().size, stdModelSize)
         for (i in 0..99) {
@@ -174,7 +180,6 @@ class CollectionTest : JvmTest() {
     @Test
     @Ignore("Pending port of media search from Rust code")
     fun test_furigana() {
-        val col = col
         val mm = col.notetypes
         val m = mm.current()
         // filter should work
@@ -184,21 +189,20 @@ class CollectionTest : JvmTest() {
         n.setItem("Front", "foo[abc]")
         col.addNote(n)
         val c = n.cards()[0]
-        assertTrue(c.q().endsWith("abc"))
+        assertTrue(c.question().endsWith("abc"))
         // and should avoid sound
         n.setItem("Front", "foo[sound:abc.mp3]")
         n.flush()
-        val question = c.q(true)
+        val question = c.question(true)
         assertThat("Question «$question» does not contains «anki:play».", question, Matchers.containsString("anki:play"))
         // it shouldn't throw an error while people are editing
         m.getJSONArray("tmpls").getJSONObject(0).put("qfmt", "{{kana:}}")
         mm.save(m)
-        c.q(true)
+        c.question(true)
     }
 
     @Test
     fun test_filterToValidCards() {
-        val col = col
         val cid = addNoteUsingBasicModel("foo", "bar").firstCard().id
         assertEquals(ArrayList(setOf(cid)), col.filterToValidCards(longArrayOf(cid, cid + 1)))
     }

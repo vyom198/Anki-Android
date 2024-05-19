@@ -8,10 +8,10 @@ import android.content.Intent
 import android.os.Build
 import android.webkit.RenderProcessGoneDetail
 import androidx.annotation.CheckResult
-import androidx.annotation.RequiresApi
 import androidx.core.content.IntentCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import anki.config.ConfigKey
 import com.ichi2.anim.ActivityTransitionAnimation
 import com.ichi2.anki.AbstractFlashcardViewer.WebViewSignalParserUtils.ANSWER_ORDINAL_1
@@ -32,7 +32,10 @@ import com.ichi2.anki.reviewer.AutomaticAnswerAction
 import com.ichi2.anki.reviewer.AutomaticAnswerSettings
 import com.ichi2.anki.servicelayer.LanguageHintService
 import com.ichi2.libanki.StdModels
+import com.ichi2.libanki.undoableOp
 import com.ichi2.testutils.AnkiAssert.assertDoesNotThrow
+import com.ichi2.testutils.Flaky
+import com.ichi2.testutils.OS
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Assert.*
@@ -45,22 +48,23 @@ import org.mockito.Mockito.*
 import org.robolectric.Robolectric
 import org.robolectric.Shadows
 import org.robolectric.android.controller.ActivityController
-import org.robolectric.shadows.ShadowToast
+import timber.log.Timber
 import java.util.*
 import java.util.stream.Stream
 import com.ichi2.anim.ActivityTransitionAnimation.Direction as Direction
 
-@RequiresApi(api = Build.VERSION_CODES.O) // getImeHintLocales, toLanguageTags, onRenderProcessGone, RenderProcessGoneDetail
+@Suppress("SameParameterValue")
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.O) // getImeHintLocales, toLanguageTags, onRenderProcessGone, RenderProcessGoneDetail
 @RunWith(AndroidJUnit4::class)
 class AbstractFlashcardViewerTest : RobolectricTest() {
     class NonAbstractFlashcardViewer : AbstractFlashcardViewer() {
         var answered: Int? = null
-        private var mLastTime = 0
+        private var lastTime = 0
         override fun performReload() {
             // intentionally blank
         }
 
-        val typedInput get() = super.typedInputText
+        val typedInput get() = typedInputText
 
         override fun answerCard(ease: Int) {
             super.answerCard(ease)
@@ -69,9 +73,9 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
 
         override val elapsedRealTime: Long
             get() {
-                mLastTime += baseContext.sharedPrefs()
+                lastTime += baseContext.sharedPrefs()
                     .getInt(DOUBLE_TAP_TIME_INTERVAL, DEFAULT_DOUBLE_TAP_TIME_INTERVAL)
-                return mLastTime.toLong()
+                return lastTime.toLong()
             }
         val hintLocale: String?
             get() {
@@ -81,6 +85,34 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
 
         fun hasAutomaticAnswerQueued(): Boolean {
             return automaticAnswer.timeoutHandler.hasMessages(0)
+        }
+
+        /**
+         * Fixes an issue with noAutomaticAnswerAfterRenderProcessGoneAndPaused_issue9632
+         * where [onSoundGroupCompleted] executed AFTER [executeCommand] completed
+         * this lead to an assertion which sometimes occurred before [onSoundGroupCompleted] had
+         * been called, which failed
+         *
+         * This is fine in real life, as we have sounds to play
+         */
+        private var soundGroupCompleted = false
+
+        override fun onSoundGroupCompleted() {
+            super.onSoundGroupCompleted()
+            soundGroupCompleted = true
+        }
+
+        override fun executeCommand(which: ViewerCommand, fromGesture: Gesture?): Boolean {
+            soundGroupCompleted = false
+            return super.executeCommand(which, fromGesture).also {
+                if (which != ViewerCommand.SHOW_ANSWER) return@also
+                Timber.v("waiting for onSoundGroupCompleted")
+                for (i in 0..100) {
+                    if (soundGroupCompleted) break
+                    Thread.sleep(10)
+                }
+                require(soundGroupCompleted) { "soundGroupCompleted never occurred" }
+            }
         }
     }
 
@@ -102,7 +134,7 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
     @Test
     fun validEncodingSetsAnswerCorrectly() {
         // 你好%
-        val url = "typeblurtext:%E4%BD%A0%E5%A5%BD%25"
+        val url = "typechangetext:%E4%BD%A0%E5%A5%BD%25"
         val viewer: NonAbstractFlashcardViewer = getViewer(true)
 
         viewer.handleUrlFromJavascript(url)
@@ -121,12 +153,9 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
 
         waitForAsyncTasksToComplete()
 
-        AbstractFlashcardViewer.editorCard = viewer.currentCard
-
         val note = viewer.currentCard!!.note()
         note.setField(1, "David")
-
-        viewer.saveEditedCard()
+        undoableOp { updateNote(note) }
 
         waitForAsyncTasksToComplete()
 
@@ -148,12 +177,9 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
 
         waitForAsyncTasksToComplete()
 
-        AbstractFlashcardViewer.editorCard = viewer.currentCard
-
         val note = viewer.currentCard!!.note()
         note.setField(1, "David")
-
-        viewer.saveEditedCard()
+        undoableOp { updateNote(note) }
 
         waitForAsyncTasksToComplete()
 
@@ -209,6 +235,7 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
     }
 
     @Test
+    @Flaky(OS.ALL, "executeCommand(FLIP_OR_ANSWER_EASE4) cannot be awaited")
     fun typedLanguageIsSet() = runTest {
         val withLanguage = StdModels.BASIC_TYPING_MODEL.add(col, "a")
         val normal = StdModels.BASIC_TYPING_MODEL.add(col, "b")
@@ -222,14 +249,15 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
 
         assertThat("A model with a language hint (japanese) should use it", viewer.hintLocale, equalTo("ja"))
 
-        showNextCard(viewer)
+        viewer.executeCommand(ViewerCommand.FLIP_OR_ANSWER_EASE4)
+        viewer.executeCommand(ViewerCommand.FLIP_OR_ANSWER_EASE4)
 
         assertThat("A default model should have no preference", viewer.hintLocale, nullValue())
     }
 
     @Test
     fun automaticAnswerDisabledProperty() {
-        val controller = getViewerController(true, false)
+        val controller = getViewerController(addCard = true, startedWithShortcut = false)
         val viewer = controller.get()
         assertThat("not disabled initially", viewer.automaticAnswer.isDisabled, equalTo(false))
         controller.pause()
@@ -239,25 +267,17 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
     }
 
     @Test
-    fun noAutomaticAnswerAfterRenderProcessGoneAndPaused_issue9632() {
-        val controller = getViewerController(true, false)
+    fun noAutomaticAnswerAfterRenderProcessGoneAndPaused_issue9632() = runTest {
+        val controller = getViewerController(addCard = true, startedWithShortcut = false)
         val viewer = controller.get()
-        viewer.automaticAnswer = AutomaticAnswer(viewer, AutomaticAnswerSettings(AutomaticAnswerAction.BURY_CARD, true, 5, 5))
+        viewer.automaticAnswer = AutomaticAnswer(viewer, AutomaticAnswerSettings(AutomaticAnswerAction.BURY_CARD, true, 5.0, 5.0))
         viewer.executeCommand(ViewerCommand.SHOW_ANSWER)
         assertThat("messages after flipping card", viewer.hasAutomaticAnswerQueued(), equalTo(true))
         controller.pause()
         assertThat("disabled after pause", viewer.automaticAnswer.isDisabled, equalTo(true))
         assertThat("no auto answer after pause", viewer.hasAutomaticAnswerQueued(), equalTo(false))
-        viewer.mOnRenderProcessGoneDelegate.onRenderProcessGone(viewer.webView!!, mock(RenderProcessGoneDetail::class.java))
+        viewer.onRenderProcessGoneDelegate.onRenderProcessGone(viewer.webView!!, mock(RenderProcessGoneDetail::class.java))
         assertThat("no auto answer after onRenderProcessGone when paused", viewer.hasAutomaticAnswerQueued(), equalTo(false))
-    }
-
-    @Test
-    fun shortcutShowsToastOnFinish() = runTest {
-        val viewer: NonAbstractFlashcardViewer = getViewer(true, true)
-        viewer.executeCommand(ViewerCommand.FLIP_OR_ANSWER_EASE4)
-        viewer.executeCommand(ViewerCommand.FLIP_OR_ANSWER_EASE4)
-        assertEquals(getResourceString(R.string.studyoptions_congrats_finished), ShadowToast.getTextOfLatestToast())
     }
 
     @Test
@@ -303,11 +323,6 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
     private fun getViewerContent(): String? {
         // PERF: Optimise this to not create a new viewer each time
         return getViewer(addCard = false).cardContent
-    }
-
-    private fun showNextCard(viewer: NonAbstractFlashcardViewer) {
-        viewer.executeCommand(ViewerCommand.FLIP_OR_ANSWER_EASE4)
-        viewer.executeCommand(ViewerCommand.FLIP_OR_ANSWER_EASE4)
     }
 
     @get:CheckResult
@@ -363,3 +378,8 @@ class AbstractFlashcardViewerTest : RobolectricTest() {
         }
     }
 }
+
+fun AbstractFlashcardViewer.loadInitialCard() = launchCatchingTask { updateCardAndRedraw() }
+
+val AbstractFlashcardViewer.typedInputText get() = typeAnswer!!.input
+val AbstractFlashcardViewer.correctTypedAnswer get() = typeAnswer!!.correct

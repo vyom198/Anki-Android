@@ -26,10 +26,9 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import androidx.annotation.WorkerThread
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.ichi2.anki.CollectionHelper
+import com.ichi2.anki.CollectionManager
 import com.ichi2.anki.CrashReportService.sendExceptionReport
 import com.ichi2.anki.dialogs.DatabaseErrorDialog
-import com.ichi2.utils.DatabaseChangeDecorator
 import com.ichi2.utils.KotlinCleanup
 import net.ankiweb.rsdroid.Backend
 import net.ankiweb.rsdroid.database.AnkiSupportSQLiteDatabase
@@ -39,14 +38,12 @@ import timber.log.Timber
 /**
  * Database layer for AnkiDroid. Wraps an SupportSQLiteDatabase (provided by either the Rust backend
  * or the Android framework), and provides some helpers on top.
+ *
+ * @param database The collection, which is actually a SQLite database.
  */
 @KotlinCleanup("Improve documentation")
 @WorkerThread
-class DB(db: SupportSQLiteDatabase) {
-    /**
-     * The collection, which is actually an SQLite database.
-     */
-    val database: SupportSQLiteDatabase = DatabaseChangeDecorator(db)
+class DB(val database: SupportSQLiteDatabase) {
     var mod = false
 
     /**
@@ -73,7 +70,8 @@ class DB(db: SupportSQLiteDatabase) {
                 "DB.MyDbErrorHandler.onCorruption",
                 "Db has been corrupted: " + db.path
             )
-            CollectionHelper.instance.closeCollection("Database corrupted")
+            Timber.i("closeCollection: %s", "Database corrupted")
+            CollectionManager.closeCollectionBlocking()
             DatabaseErrorDialog.databaseCorruptFlag = true
         }
     }
@@ -185,7 +183,6 @@ class DB(db: SupportSQLiteDatabase) {
      */
     @KotlinCleanup("""Use Kotlin string. Change split so that there is no empty string after last ";".""")
     fun executeScript(@Language("SQL") sql: String) {
-        @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
         val queries = java.lang.String(sql).split(";")
         for (query in queries) {
             database.execSQL(query)

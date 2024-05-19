@@ -30,13 +30,16 @@ package com.ichi2.libanki
 import androidx.annotation.VisibleForTesting
 import anki.collection.OpChanges
 import anki.collection.OpChangesAfterUndo
+import anki.collection.OpChangesOnly
 import anki.collection.OpChangesWithCount
 import anki.collection.OpChangesWithId
 import anki.import_export.ImportResponse
 import com.ichi2.anki.CollectionManager.withCol
+import com.ichi2.anki.CrashReportService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
+import java.util.concurrent.CopyOnWriteArrayList
 
 object ChangeManager {
     interface Subscriber {
@@ -48,7 +51,8 @@ object ChangeManager {
         fun opExecuted(changes: OpChanges, handler: Any?)
     }
 
-    private val subscribers = mutableListOf<WeakReference<Subscriber>>()
+    // Maybe fixes #16217 - CopyOnWriteArrayList makes this object thread-safe
+    private val subscribers = CopyOnWriteArrayList(mutableListOf<WeakReference<Subscriber>>())
 
     fun subscribe(subscriber: Subscriber) {
         subscribers.add(WeakReference(subscriber))
@@ -57,7 +61,12 @@ object ChangeManager {
     private fun notifySubscribers(changes: OpChanges, handler: Any?) {
         val expired = mutableListOf<WeakReference<Subscriber>>()
         for (subscriber in subscribers) {
-            val ref = subscriber.get()
+            val ref = try {
+                subscriber.get()
+            } catch (e: Exception) {
+                CrashReportService.sendExceptionReport(e, "notifySubscribers", "16217: invalid subscriber")
+                null
+            }
             if (ref == null) {
                 expired.add(subscriber)
             } else {
@@ -80,6 +89,7 @@ object ChangeManager {
             is OpChangesWithCount -> changes.changes
             is OpChangesWithId -> changes.changes
             is OpChangesAfterUndo -> changes.changes
+            is OpChangesOnly -> changes.changes
             is ImportResponse -> changes.changes
             else -> TODO("unhandled change type")
         }

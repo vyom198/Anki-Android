@@ -49,10 +49,8 @@
     <string name="contextmenu_deckpicker_delete_deck">Delete deck</string>
     <string name="delete_deck_title">Delete deck?</string>
     <string name="no_tts_available_message">No text-to-speech language available</string>
-    <string name="initializing_tts">Initializing TTS&#8230;</string>
     <string name="tts_no_tts">Don’t speak</string>
     <string name="unused_strings">\n\nUnused files:\n</string>
-    <string name="preview_title" comment="Title of the window allowing to preview card(s)">Preview</string>
     <string name="reposition_card_dialog_title">Reposition new card</string>
     <string name="reposition_card_dialog_message">Start position:</string>
     <string name="reposition_card_not_new_error">Only new cards can be repositioned</string>
@@ -61,28 +59,15 @@
         <item quantity="other">%d cards repositioned</item>
     </plurals>
     <string name="reset_card_dialog_title">Reset card progress</string>
-    <string name="reset_card_dialog_message">This card will be placed at the end of the new card queue</string>
     <plurals name="reset_cards_dialog_acknowledge">
         <item quantity="one">%d card reset</item>
         <item quantity="other">%d cards reset</item>
     </plurals>
     <!-- Reschedule Card Dialog -->
-    <plurals name="reschedule_cards_dialog_title_new">
-        <item quantity="one">Reschedule %d card</item>
-        <item quantity="other">Reschedule %d cards</item>
-    </plurals>
-    <plurals name="reschedule_card_dialog_interval">
-        <item quantity="one">Current interval: %d day</item>
-        <item quantity="other">Current interval: %d days</item>
-    </plurals>
-    <string name="reschedule_card_dialog_message">Reschedule for review in x days</string>
     <plurals name="reschedule_cards_dialog_acknowledge">
         <item quantity="one">%d card rescheduled</item>
         <item quantity="other">%d cards rescheduled</item>
     </plurals>
-    <string name="reschedule_card_dialog_new_card_warning">A new card is being rescheduled. Rescheduling also turns new cards into review cards. Use the ‘reposition card’ option to change a new card\'s position within the new queue</string>
-    <string name="reschedule_card_dialog_warning_ease_reset">Rescheduling also resets how the scheduler treats the card in the future (ease will be set to %d%%)</string>
-    <string name="firefox_workaround_launched_reviewer_opening_deck">Select the deck in your file manager or visit the about:downloads page to import it</string>
     <string name="answering_error_title">Database error</string>
     <string name="answering_error_message">Writing to the collection failed. The database could be corrupt or there may not to be enough empty space on disk.\n\nIf this happens more often, try checking the database, repairing the collection or restoring it from a backup. Touch “options” for that.\n\Or it could be an AnkiDroid bug as well; please report the error so that we can check this.</string>
     <string name="answering_error_report">Report error</string>
@@ -111,8 +96,10 @@
     <string name="dialog_confirm" tools:ignore="UnusedResources">Confirm</string>
     <string name="dialog_no">No</string>
     <string name="dialog_yes">ஆம்</string>
+    <string name="dialog_keep">Keep</string>
+    <string name="dialog_remove">Remove</string>
     <string name="dialog_continue">Continue</string>
-    <string name="dialog_processing">Processing...</string>
+    <string name="dialog_processing">Processing&#8230;</string>
     <string name="dialog_positive_create" comment="Create a new collection, probably erasing the previous one, may be necessary in case of error.">Create</string>
     <string name="dialog_positive_delete">Delete</string>
     <!-- Currently unsued, should be useful in the future -->
@@ -177,6 +164,7 @@
     <string name="failed_to_apply_background_image">Failed to apply background image %s</string>
     <string name="background_image_too_large">Deck Picker background too large</string>
     <string name="image_max_size_allowed">Maximum image size %d MB allowed</string>
+    <string name="image_dimensions_too_large">Image dimensions are too large (%1$d × %2$d)</string>
     <!-- Global Intent handler -->
     <!-- Also used by Card Browser, not renaming to save translators effort -->
     <string name="intent_handler_failed_no_storage_permission">Missing required storage permission. Please grant storage permission then retry your action.</string>
@@ -186,7 +174,7 @@
     <string name="boot_service_failed_to_schedule_notifications">Failed to schedule reminders</string>
     <string name="boot_service_too_many_notifications">Too many reminders scheduled. Some will not appear</string>
     <!-- Locale Selection Dialog -->
-    <string name="locale_selection_dialog_title">Keyboard Language Selection</string>
+    <string name="locale_selection_dialog_title_new">Set Language</string>
     <string name="locale_selection_dialog_summary">Some multilingual keyboards, such as GBoard support changing language when editing text\n\nPlease request the “setImeHintLocales” feature from your keyboard manufacturer if your keyboard does not change language.</string>
     <!-- Help Dialog -->
     <string name="help_title_using_ankidroid">Using AnkiDroid</string>
@@ -214,12 +202,13 @@
     <string name="help_item_ankiweb_terms_and_conditions">AnkiWeb Terms and Conditions</string>
     <string name="help_title_send_exception">Send troubleshooting report</string>
     <string name="help_dialog_exception_report_debounce">Report already submitted</string>
+    <string name="help_dialog_exception_report_sent">Report was sent!</string>
     <!--Sync-->
     <plurals name="sync_automatic_sync_needs_more_time">
         <item quantity="one">An automatic sync may be triggered in %d second</item>
         <item quantity="other">An automatic sync may be triggered in %d seconds</item>
     </plurals>
-    <string name="metered_sync_warning">Your connection is metered. Data transfer may cost money</string>
+    <string name="metered_sync_data_warning">Your internet provider may charge money for data use</string>
     <string name="deck_picker_new">Number of new cards to see today in this deck.</string>
     <string name="deck_picker_rev">Number of cards due today in this deck.</string>
     <string name="deck_picker_lrn">Number of cards in learning in this deck.</string>
@@ -244,4 +233,23 @@
     </string>
     <string name="dismiss_backup_warning_upgrade">        Due to Android privacy changes, your data and automated backups will be inaccessible if the app is uninstalled
     </string>
+    <string name="deck_already_exists">Deck already exists</string>
+    <string name="create_deck_numeric_hint">If you have deck ordering issues (e.g. ‘10’ appears before ‘2’), replace ‘2’ with ‘02’</string>
+    <!-- Set Due Date -->
+    <string name="set_due_date_match_interval" comment="when setting a card\'s due date, this checkbox also changes the interval of the card">Set interval to same value</string>
+    <plurals name="set_due_date_single_day_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in</item>
+        <item quantity="other">Show cards in</item>
+    </plurals>
+    <plurals name="set_due_date_range_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in range</item>
+        <item quantity="other">Show cards in range</item>
+    </plurals>
+    <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <string name="range_delimiter" comment="Placed between two input boxes to denote a range">–</string>
+    <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">From</string>
+    <string name="set_due_date_range_end" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'maximum\' value of this range (inclusive)">To</string>
 </resources>

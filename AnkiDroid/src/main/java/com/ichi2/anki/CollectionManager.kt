@@ -28,13 +28,19 @@ import com.ichi2.libanki.Storage.collection
 import com.ichi2.libanki.importCollectionPackage
 import com.ichi2.utils.Threads
 import com.ichi2.utils.isRobolectric
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import net.ankiweb.rsdroid.Backend
 import net.ankiweb.rsdroid.BackendException
 import net.ankiweb.rsdroid.BackendFactory
 import net.ankiweb.rsdroid.Translations
+import okio.withLock
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 object CollectionManager {
     /**
@@ -59,6 +65,8 @@ object CollectionManager {
     @VisibleForTesting
     var emulateOpenFailure = false
 
+    private val testMutex = ReentrantLock()
+
     /**
      * Execute the provided block on a serial background queue, to ensure
      * concurrent access does not happen.
@@ -82,6 +90,12 @@ object CollectionManager {
      *       context(Queue) suspend fun canOnlyBeRunInWithQueue()
      */
     private suspend fun<T> withQueue(@WorkerThread block: CollectionManager.() -> T): T {
+        if (isRobolectric) {
+            // #16253 Robolectric Windows: `withContext(queue)` is insufficient for serial execution
+            return testMutex.withLock {
+                this@CollectionManager.block()
+            }
+        }
         return withContext(queue) {
             this@CollectionManager.block()
         }
@@ -145,7 +159,7 @@ object CollectionManager {
         }
 
     fun compareAnswer(expected: String, given: String): String {
-        // bypass the lock, as the type answer code is heavily nested in non-suspend funs
+        // bypass the lock, as the type answer code is heavily nested in non-suspend functions
         return getBackend().compareAnswer(expected, given)
     }
 
@@ -227,7 +241,7 @@ object CollectionManager {
         if (collection == null || collection!!.dbClosed) {
             val path = collectionPathInValidFolder()
             collection =
-                collection(path, log = true, backend)
+                collection(path, backend)
         }
     }
 
@@ -239,7 +253,8 @@ object CollectionManager {
     }
 
     fun getCollectionDirectory() =
-        File(CollectionHelper.getCurrentAnkiDroidDirectory(AnkiDroidApp.instance))
+        // Allow execution if AnkiDroidApp.instance is not initialized
+        File(CollectionHelper.getCurrentAnkiDroidDirectoryOptionalContext(AnkiDroidApp.sharedPrefs()) { AnkiDroidApp.instance })
 
     /** Ensures the AnkiDroid directory is created, then returns the path to the collection file
      * inside it. */
@@ -252,13 +267,14 @@ object CollectionManager {
     /**
      * Like [withQueue], but can be used in a synchronous context.
      *
-     * Note: Because [runBlocking] inside `RobolectricTest.runTest` will lead to
-     * deadlocks, this will not block when run under Robolectric,
-     * and there is no guarantee about concurrent access.
+     * Note: [runBlocking] inside `RobolectricTest.runTest` will lead to deadlocks, so
+     * under Robolectric, this uses a mutex
      */
     private fun <T> blockForQueue(block: CollectionManager.() -> T): T {
         return if (isRobolectric) {
-            block(this)
+            testMutex.withLock {
+                block(this)
+            }
         } else {
             runBlocking {
                 withQueue(block)

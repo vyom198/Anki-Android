@@ -18,16 +18,29 @@
 
 package com.ichi2.utils
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
+import android.text.InputFilter
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ListView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.doOnTextChanged
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputLayout
 import com.ichi2.anki.R
 import com.ichi2.themes.Themes
+import com.ichi2.ui.FixedTextView
 
 /** Wraps [DialogInterface.OnClickListener] as we don't need the `which` parameter */
 typealias DialogInterfaceListener = (DialogInterface) -> Unit
@@ -124,9 +137,24 @@ fun AlertDialog.Builder.cancelable(cancelable: Boolean): AlertDialog.Builder {
  * Executes the provided block, then creates an [AlertDialog] with the arguments supplied
  * and immediately displays the dialog
  */
-inline fun AlertDialog.Builder.show(block: AlertDialog.Builder.() -> Unit): AlertDialog.Builder = apply {
-    this.block()
-    this.show()
+inline fun AlertDialog.Builder.show(block: AlertDialog.Builder.() -> Unit): AlertDialog {
+    this.apply { block() }
+    return this.show()
+}
+
+/**
+ * Creates an [AlertDialog] from the [AlertDialog.Builder] instance, then executes [block] with it.
+ */
+fun AlertDialog.Builder.createAndApply(block: AlertDialog.() -> Unit): AlertDialog = create().apply {
+    block()
+}
+
+/**
+ * Executes [block] on the [AlertDialog.Builder] instance and returns the initialized [AlertDialog].
+ */
+fun AlertDialog.Builder.create(block: AlertDialog.Builder.() -> Unit): AlertDialog {
+    block()
+    return create()
 }
 
 /**
@@ -159,6 +187,11 @@ fun AlertDialog.Builder.checkBoxPrompt(
     return this.setView(checkBoxView)
 }
 
+fun AlertDialog.getCheckBoxPrompt(): CheckBox =
+    requireNotNull(findViewById(R.id.checkbox)) {
+        "CheckBox prompt is not available. Forgot to call AlertDialog.Builder.checkBoxPrompt()?"
+    }
+
 fun AlertDialog.Builder.customView(
     view: View,
     paddingTop: Int = 0,
@@ -178,4 +211,145 @@ fun AlertDialog.Builder.customView(
     setView(container)
 
     return this
+}
+
+fun AlertDialog.Builder.customListAdapter(adapter: RecyclerView.Adapter<*>) {
+    val recyclerView = LayoutInflater.from(context).inflate(R.layout.dialog_generic_recycler_view, null, false) as RecyclerView
+    recyclerView.adapter = adapter
+    recyclerView.layoutManager = LinearLayoutManager(context)
+    this.setView(recyclerView)
+}
+
+/**
+ * Adds a RecyclerView with a custom adapter and decoration to the AlertDialog.
+ * @param adapter The adapter for the RecyclerView.
+ * @param context The context used to access resources and LayoutInflater.
+ */
+fun AlertDialog.Builder.customListAdapterWithDecoration(adapter: RecyclerView.Adapter<*>, context: Context) {
+    val recyclerView = LayoutInflater.from(context).inflate(R.layout.dialog_generic_recycler_view, null, false) as RecyclerView
+    recyclerView.adapter = adapter
+    recyclerView.layoutManager = LinearLayoutManager(context)
+    val dividerItemDecoration = DividerItemDecoration(recyclerView.context, LinearLayoutManager.VERTICAL)
+    recyclerView.addItemDecoration(dividerItemDecoration)
+    this.setView(recyclerView)
+}
+
+/**
+ * @param hint The hint text to be displayed to the user
+ * @param prefill The text to initially appear in the [EditText]
+ * @param allowEmpty If true, [DialogInterface.BUTTON_POSITIVE] is disabled if the [EditText] is empty
+ * @param displayKeyboard Whether to open the keyboard when the dialog appears
+ * @param callback if [waitForPositiveButton], called when [positiveButton] is pressed, otherwise
+ *  called whenever the text is changed
+ * @param maxLength if set, the user may not enter more than the supplied number of digits
+ * @param inputType see [EditText.setInputType]
+ * @param waitForPositiveButton MaterialDialog compat: if `false` [callback] is called on input
+ * if `true` [callback] is called when [positiveButton] is pressed
+ */
+fun AlertDialog.input(
+    hint: String? = null,
+    inputType: Int? = null,
+    prefill: CharSequence? = null,
+    allowEmpty: Boolean = false,
+    maxLength: Int? = null,
+    displayKeyboard: Boolean = false,
+    waitForPositiveButton: Boolean = true,
+    callback: (AlertDialog, CharSequence) -> Unit
+): AlertDialog {
+    // Builder.setView() may not be called before show()
+    if (!this.isShowing) throw IllegalStateException("input() requires .show()")
+
+    getInputTextLayout().hint = hint
+
+    getInputField().apply {
+        if (displayKeyboard) {
+            AndroidUiUtils.setFocusAndOpenKeyboard(this, window!!)
+        }
+
+        inputType?.let { this.inputType = it }
+
+        if (!waitForPositiveButton) {
+            doOnTextChanged { text, _, _, _ ->
+                callback(this@input, text ?: "")
+            }
+        } else {
+            positiveButton.setOnClickListener { callback(this@input, this.text.toString()) }
+        }
+
+        if (!allowEmpty) {
+            // this is called after callback() so allowEmpty takes priority
+            doOnTextChanged { text, _, _, _ ->
+                if (waitForPositiveButton) {
+                    // this is the only validation filter we apply - toggle on or off
+                    this@input.positiveButton.isEnabled = !text.isNullOrEmpty()
+                } else if (text.isNullOrEmpty()) {
+                    // potentially other filters in `waitForPositiveButton`.
+                    // WARN: this could be buggy as it does not toggle the button back on
+                    this@input.positiveButton.isEnabled = false
+                }
+            }
+        }
+
+        maxLength?.let { filters += InputFilter.LengthFilter(it) }
+
+        requestFocus()
+        // this calls callback(this, prefill). positiveButton may be disabled if there's no prefill
+        setText(prefill)
+        moveCursorToEnd()
+    }
+    return this
+}
+
+/**
+ * @return the layout for the input text of the dialog
+ * @throws IllegalArgumentException if the dialog does not contain [R.id.dialog_text_input_layout]]
+ */
+fun AlertDialog.getInputTextLayout() =
+    requireNotNull(findViewById<TextInputLayout>(R.id.dialog_text_input_layout)) {
+        "view must be dialog_generic_text_input"
+    }
+
+/**
+ * @return the [EditText] of the dialog
+ * @throws IllegalArgumentException if the dialog does not contain [R.id.dialog_text_input_layout]]
+ */
+fun AlertDialog.getInputField() = getInputTextLayout().editText!!
+
+/** @see AlertDialog.getButton */
+val AlertDialog.positiveButton: Button
+    get() = getButton(DialogInterface.BUTTON_POSITIVE)
+
+/**
+ * Extension function for AlertDialog.Builder to set a list of items.
+ * Items are not displayed if [AlertDialog.Builder.setMessage] has been called
+ *
+ * @param items The items to display in the list.
+ * @param onClick A lambda function that is invoked when an item is clicked.
+ */
+fun AlertDialog.Builder.listItems(items: List<CharSequence>, onClick: (dialog: DialogInterface, index: Int) -> Unit): AlertDialog.Builder {
+    return this.setItems(items.toTypedArray()) { dialog, which ->
+        onClick(dialog, which)
+    }
+}
+
+/**
+ * Extension workaround for Displaying ListView & Message Together
+ * Alert Dialog Doesn't allow message and listview together so a customView is used.
+ *
+ * @param message The message which you want to display in the dialog
+ * @param items The items to display in the list.
+ * @param onClick A lambda function that is invoked when an item is clicked.
+ */
+fun AlertDialog.Builder.listItemsAndMessage(message: String?, items: List<CharSequence>, onClick: (dialog: DialogInterface, index: Int) -> Unit): AlertDialog.Builder {
+    val dialogView = View.inflate(this.context, R.layout.dialog_listview_message, null)
+    dialogView.findViewById<FixedTextView>(R.id.dialog_message).text = message
+
+    val listView = dialogView.findViewById<ListView>(R.id.dialog_list_view)
+    listView.adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, items)
+
+    val dialog = this.create()
+    listView.setOnItemClickListener { _, _, index, _ ->
+        onClick(dialog, index)
+    }
+    return this.setView(dialogView)
 }

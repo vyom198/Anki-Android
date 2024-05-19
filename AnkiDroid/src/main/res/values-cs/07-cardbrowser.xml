@@ -58,12 +58,19 @@
         <item quantity="other">zobrazeno %d poznámek</item>
     </plurals>
     <string name="card_browser_all_decks">Všechny balíčky</string>
-    <string name="card_browser_delete_card">Odstranit poznámky</string>
-    <string name="card_browser_suspend_card">Vyřadit karty</string>
+    <plurals name="card_browser_delete_cards">
+        <item quantity="one">Odstranit kartu</item>
+        <item quantity="few">Odstranit karty</item>
+        <item quantity="many">Odstranit karty</item>
+        <item quantity="other">Odstranit karty</item>
+    </plurals>
+    <plurals name="card_browser_delete_notes">
+        <item quantity="one">Odstranit poznámku</item>
+        <item quantity="few">Odstranit poznámky</item>
+        <item quantity="many">Odstranit poznámky</item>
+        <item quantity="other">Odstranit poznámky</item>
+    </plurals>
     <string name="card_browser_change_deck">Změnit balíček</string>
-    <string name="card_browser_unsuspend_card">Zrušit vyřazení karet</string>
-    <string name="card_browser_mark_card">Označit poznámky</string>
-    <string name="card_browser_unmark_card">Odznačit poznámky</string>
     <string name="delete_card_title">Odstranit poznámku?</string>
     <string name="card_browser_show_marked">Filtrovat označené</string>
     <string name="card_browser_show_suspended">Filtrovat vyřazené</string>
@@ -74,7 +81,7 @@
     <string name="card_browser_list_my_searches_title">Zvolte uložené hledání</string>
     <string name="card_browser_list_my_searches_new_name">Název aktuálního hledání</string>
     <string name="card_browser_list_my_searches_new_search_error_empty_name">Nelze uložit hledání bez názvu.</string>
-    <string name="card_browser_list_my_searches_new_search_error_dup">Název již existuje!</string>
+    <string name="card_browser_list_my_searches_new_search_error_dup">Název již existuje</string>
     <string name="card_browser_list_my_searches_remove_content">Odstranit „%1$s“?</string>
     <string name="card_browser_change_display_order">Změnit řazení</string>
     <string name="card_browser_change_display_order_title">Zvolte řazení</string>
@@ -100,6 +107,7 @@
     <string name="card_browser_search_all_decks">Prohledat všechny balíčky</string>
     <string name="card_browser_unknown_deck_name">Neznámý</string>
     <string name="card_browser_truncate" comment="allows users to show less of a field value">Zkrácený obsah</string>
+    <string name="set_due_date_hintText" comment="plural set_due_date_label_suffix is used for parameters, parameter 1 is the plural for 0, parameter 2 is the plural for 1">Dnes je ‘0 %1$s’, zítra je ‘1 %2$s’, atd&#8230;</string>
     <plurals name="card_browser_export_cards">
         <item quantity="one">Exportovat kartu</item>
         <item quantity="few">Exportovat karty</item>
@@ -118,5 +126,4 @@
         <item quantity="many">%d karty odstraněno</item>
         <item quantity="other">%d karet odstraněno</item>
     </plurals>
-    <!-- Card Info subscreen -->
 </resources>

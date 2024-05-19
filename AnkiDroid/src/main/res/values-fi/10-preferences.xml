@@ -46,9 +46,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- generic strings -->
     <string name="disabled">Ei käytössä</string>
-    <string name="pref_summary_seconds">%s s</string>
-    <string name="pref_summary_minutes">%s min</string>
-    <string comment="Percentage value of a preference. %s represents the number to be replaced. Use \%% to represent a single percent sign (%)" name="pref_summary_percentage">%s \%%</string>
+    <plurals name="pref_summ_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <string name="pref_milliseconds">%s ms</string>
+    <!-- TODO: move to 20-search-preference so we can contribute upstream (searchpreference_no_results)-->
     <string name="pref_search_no_results">Ei tuloksia</string>
     <!-- preferences.xml categories-->
     <string name="pref_cat_general" comment="name of the general preference category" maxLength="41">Yleiset</string>
@@ -60,7 +63,6 @@
     <string name="pref_cat_whiteboard" maxLength="41">Valkotaulu</string>
     <string name="pref_cat_appearance" maxLength="41">Ulkoasu</string>
     <string name="pref_cat_themes" maxLength="41">Teemat</string>
-    <string name="pref_cat_fonts" maxLength="41">Fontit</string>
     <string name="pref_cat_gestures" maxLength="41">Eleet</string>
     <string name="pref_cat_controls" maxLength="41">Ohjauskomennot</string>
     <string name="pref_cat_advanced" maxLength="41">Lisäasetukset</string>
@@ -113,6 +115,7 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">Kosketa ylös keskelle</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">Kosketa alavasemmalle</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">Kosketa alaoikealle</string>
+    <string name="gestures_shake" maxLength="41">Ravista laitetta</string>
     <string name="card_browser_enable_external_context_menu">\"%s\" -valikko</string>
     <string name="card_browser_enable_external_context_menu_summary">Ota \"%s\" -valikko käyttöön koko sovelluksessa</string>
     <string name="double_scrolling_gap" maxLength="41">Kaksoisvieritys</string>
@@ -148,10 +151,7 @@
     <string name="notification_minimum_cards_due_vibrate" maxLength="41">Värinä</string>
     <string name="notification_minimum_cards_due_blink" maxLength="41">Vilkkuvalo</string>
     <string name="timeout_answer_text" maxLength="41">Näytä vastaukset automaattisesti</string>
-    <string name="timeout_answer" maxLength="41">Vastauksen aikakatkaisu</string>
-    <string name="timeout_answer_summ">Näytä vastaus automaattisesti ilman käyttäjän komentoa. Viive sisältää ajan automaattisesti toistetaville äänitiedostoille.</string>
-    <string name="timeout_answer_seconds" maxLength="41">Aika ennen vastauksen näyttämistä</string>
-    <string name="timeout_question_seconds" maxLength="41">Aika ennen seuraavan kysymyksen näyttämistä</string>
+    <string name="timeout_answer_summ2">Näytä vastaus automaattisesti ilman käyttäjän syötettä. Määritä pakan asetuksista.</string>
     <string name="select_locale_title">Valitse kieli</string>
     <string name="software_render" maxLength="41">Poista korttien laitteistokiihdytetty renderöinti käytöstä</string>
     <string name="software_render_summ">Laitteistokiihdytetty renderöinti on nopeampaa, mutta siinä voi esiintyä ongelmia, erityisesti Android 8/8.1 -käyttöjärjestelmässä. Jos et näe korttien kertauskäyttöliittymää kokonaan, kokeile tätä asetusta.</string>
@@ -164,8 +164,8 @@
     <string name="vertical_centering_summ">Keskitä korttien sisältö pystysuunnassa</string>
     <string name="pref_double_tap_time_interval" maxLength="41">Kaksoisnapautuksen aikaväli (millisekuntia)</string>
     <string name="pref_double_tap_time_interval_summary">Toista vastauspainikkeiden napauttamista ei oteta huomioon, jos näin kauan ei ole kulunut. Tämä estää vahingossa tapahtuvat kaksoisnapautukset</string>
-    <string name="pref_show_answer_long_press" maxLength="41">Näytä vastaus: pitkän painalluksen aika (ms)</string>
-    <string name="pref_show_answer_long_press_summary">Minimi pitkän painalluksen aika, ennen kuin näytä vastaus -painike rekisteröi kosketuksen. Voi vähentää vahingossa tapahtuvien ylimääräisten painallusten mahdollisuutta. Oletusarvo on 0 ms</string>
+    <string name="pref_show_answer_long_press_time" maxLength="41">Show answer long-press time</string>
+    <string name="pref_show_answer_long_press_time_summary">Minimum pressing time before the show answer button registers a touch.</string>
     <string name="show_estimates" maxLength="41">Näytä aika painikkeissa</string>
     <string name="show_estimates_summ">Näytä seuraava kertausaika vastauspainikkeissa</string>
     <string name="show_large_answer_buttons" maxLength="41">Näytä suuret vastauspainikkeet</string>
@@ -174,16 +174,15 @@
     <string name="show_top_bar_summ">Näytä korttien lukumäärät, liput ja merkinnät yläpalkissa</string>
     <string name="show_progress" maxLength="41">Näytä jäljelläoleva</string>
     <string name="show_progress_summ">Näytä jäljelläolevien korttien määrä</string>
-    <string name="show_eta" maxLength="41">Näytä ETA</string>
-    <string name="show_eta_summ">Näytä jäljellä oleva aika</string>
+    <string name="show_eta" maxLength="41">Show ETA</string>
+    <string name="show_eta_summ">Show remaining time</string>
     <string name="use_current" maxLength="41">Pakka uusille korteille</string>
     <string name="learn_cutoff" maxLength="41">Ennalta oppimisen aikaraja</string>
     <string name="time_limit" maxLength="41">Edistymisen näyttämisen aikaväli</string>
-    <string name="new_timezone" maxLength="41">Uusi aikavyöhykkeiden käsittely</string>
     <string name="day_offset_with_description" maxLength="41">Seuraava päivä alkaa</string>
     <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
-        <item quantity="one">%d hour past midnight</item>
-        <item quantity="other">%d hours past midnight</item>
+        <item quantity="one">%d tunti keskiyön jälkeen</item>
+        <item quantity="other">%d tuntia keskiyön jälkeen</item>
     </plurals>
     <string name="pref_keep_screen_on" maxLength="41">Pidä näyttö päällä</string>
     <string name="pref_keep_screen_on_summ">Poista näytön aikakatkaisu</string>
@@ -199,10 +198,9 @@
     <string name="reset">Palauta</string>
     <string name="thirdparty_apps_title" maxLength="41">Kolmannen osapuolen API-sovellukset</string>
     <string name="thirdparty_apps_summary">Listaa sovellukset jotka käyttävät AnkiDroid API:ta, kuten kansioita ja työkaluja.</string>
-    <string name="html_javascript_debugging" maxLength="41">HTML / Javascript vianmääritys</string>
-    <string name="html_javascript_debugging_summ">Salli WebView-etäyhteydet ja tallenna kortin HTML AnkiDroid-hakemistoon</string>
     <!-- Appearance settings -->
     <string name="pref_cat_reviewer" maxLength="41">Kertaaminen</string>
+    <string name="show_deck_title" maxLength="41">Show deck title</string>
     <string name="accessibility" maxLength="41">Esteettömyys</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">Liitä leikepöydän kuvat PNG:nä</string>
@@ -242,16 +240,15 @@
     <string name="deck_conf_cram_reschedule" maxLength="41" comment="Title of the box labelled by deck_conf_cram_reschedule_summ">Aikatauluta uudelleen</string>
     <string name="deck_conf_cram_reschedule_summ">Aikatauluta kortit tämän pakan vastausten perusteella</string>
     <string name="deck_conf_cram_filter_2_check">Ota käyttöön toinen suodatin</string>
-    <string name="deck_conf_cram_steps" maxLength="41">Muokatut oppimisaskeleet (minuuteissa)</string>
     <string name="deck_conf_cram_steps_summ" maxLength="41">Määritä mukautetut oppimisaskeleet</string>
+    <string name="deck_conf_cram_preview_delays" maxLength="41">Preview delays</string>
+    <string name="deck_conf_cram_preview_delays_summ">Delays are in seconds. 0 returns card to original deck.</string>
     <!-- analytics options -->
     <string name="analytics_dialog_title">Auta parantamaan AnkiDroidia!</string>
     <string name="analytics_title" maxLength="41">Jaa tietoja käyttämistäsi ominaisuuksista</string>
     <string name="analytics_summ">Voit auttaa AnkiDroidin kehitystiimiä ymmärtämään, mitä sovelluksen ominaisuuksia oikeasti käytetään</string>
     <string name="note_editor_replace_newlines" maxLength="41">Korvaa rivinvaihdot HTML:llä</string>
     <string name="note_editor_replace_newlines_summ">Muunna muistiinpanoeditorissa kaikki &lt;br&gt; -merkit rivinvaihdoiksi korttia muokattaessa.</string>
-    <string name="no_code_formatting" maxLength="41">Yksinkertainen kirjoitettavien vastausten muotoilu</string>
-    <string name="no_code_formatting_summ">Korjaa ongelman, jossa \"􏿾\" näkyy kirjoitettujen vastausten tuloksissa</string>
     <string name="type_in_answer_focus" maxLength="41">Kohdista \"kirjoita vastaus\" -kenttään</string>
     <string name="type_in_answer_focus_summ">Siirtää kohdistuksen automaattisesti \"kirjoita vastaus\" -kenttään kerrattaessa</string>
     <!-- About -->
@@ -268,6 +265,19 @@
     <string name="binding_add_key">Lisää näppäin</string>
     <string name="binding_replace_key">Korvaa näppäin</string>
     <string name="key_picker_default_press_key">Paina näppäintä</string>
+    <string name="binding_add_axis">Lisää peliohjain tai liikeohjain</string>
+    <string name="axis_picker_move_joystick">Liikuta peli- tai liikeohjainta</string>
+    <string name="user_actions" maxLength="41">User actions</string>
+    <string name="user_actions_summary" maxLength="41">Trigger JavaScript from the review screen</string>
+    <string name="user_action_1" maxLength="41">User action 1</string>
+    <string name="user_action_2" maxLength="41">User action 2</string>
+    <string name="user_action_3" maxLength="41">User action 3</string>
+    <string name="user_action_4" maxLength="41">User action 4</string>
+    <string name="user_action_5" maxLength="41">User action 5</string>
+    <string name="user_action_6" maxLength="41">User action 6</string>
+    <string name="user_action_7" maxLength="41">User action 7</string>
+    <string name="user_action_8" maxLength="41">User action 8</string>
+    <string name="user_action_9" maxLength="41">User action 9</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">Valitse kortin puoli</string>
     <string name="card_side_question">Kysymys</string>
@@ -281,6 +291,8 @@
     <string name="bindings_already_bound">Jo käytössä kohteessa \"%s\"</string>
     <!-- Advanced -->
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">Kokeellinen</string>
+    <string name="readtext_deprecation_warn">AnkiDroid has introduced a better TTS mechanism which is compatible with other Anki clients and includes more voices and improvements to language playback!\n\nPlease upgrade as soon as possible, as this setting will be removed soon</string>
+    <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">Please upgrade to the new text to speech format</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">Kehittäjän asetukset</string>
     <string name="dev_options_enabled_pref" maxLength="41">Ota kehittäjän asetukset käyttöön</string>
@@ -309,7 +321,7 @@
     <string name="pref__manage_space__screen_title">Hallitse tallennustilaa</string>
     <!-- TextWidgetPreference widget text -->
     <string name="pref__widget_text__error" comment="Text in a small box on the end of a preference, indicating a generic error.         Must be VERY short. Can be one or two lines.">Virhe</string>
-    <string name="pref__widget_text__calculating" comment="Text in a small box on the end of a preference,         indicating that the value, such as folder size on disk, is being calculated.         Must be VERY short. Can be one or two lines.">Hetki...</string>
+    <string name="pref__widget_text__calculating" comment="Text in a small box on the end of a preference,         indicating that the value, such as folder size on disk, is being calculated.         Must be VERY short. Can be one or two lines.">Hetki&#8230;</string>
     <plurals name="pref__widget_text__n_files_n_bytes" comment="Text in a small box on the end of a preference,         showing some statistics about a folder on disk if a form of “12 files\n26 MB”.         Must be VERY short. Can be one or two lines.">
         <item quantity="one">%1$d tiedosto\n%2$s</item>
         <item quantity="other">%1$d tiedostoa\n%2$s</item>
@@ -327,7 +339,7 @@
     <string name="pref__delete_collection__summary">Poista kokoelma, mediatiedostot ja varmuuskopiot. Sovellusasetuksia ei poisteta</string>
     <string name="dialog__delete_collection__title" comment="Confirmation dialog title">Poista kokoelma</string>
     <string name="dialog__delete_collection__message" comment="“Close the window” here refers to the activity that the user is currently seeing.        When the collection is deleted, we exit the process, which closes the activity without animation.         On some devices the entire settings app may be closed.         User might not realize that this activity comes directly from AnkiDroid,         so it might be wise to avoid words such as “AnkiDroid or “app”.">Haluatko varmasti poistaa kokoelman, mediatiedostot ja varmuuskopiot?\n\nHuomautus: tämä toiminto sulkee ikkunan.</string>
-    <string name="progress__deleting_collection">Poistetaan kokoelmaa...</string>
+    <string name="progress__deleting_collection">Poistetaan kokoelmaa&#8230;</string>
     <!-- Delete everything -->
     <string name="pref__delete_everything__title" maxLength="41" comment="Preference title">Poista kaikki</string>
     <string name="pref__delete_everything__summary">Poista kokoelma, mediatiedostot, varmuuskopiot ja asetukset</string>

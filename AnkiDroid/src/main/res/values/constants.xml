@@ -115,6 +115,7 @@
     <string name="link_contribution">https://github.com/ankidroid/Anki-Android/wiki/Contributing</string>
     <string name="link_contributors">https://github.com/ankidroid/Anki-Android#credits</string>
     <string name="link_help">https://docs.ankidroid.org/help.html</string>
+    <string name="link_tts">https://docs.ankiweb.net/templates/fields.html#text-to-speech-for-individual-fields</string>
     <string name="link_manual">https://docs.ankidroid.org/manual.html</string>
     <string name="link_help_ja">https://docs.ankidroid.org/help-ja.html</string>
     <string name="link_manual_ja">https://docs.ankidroid.org/manual-ja.html</string>
@@ -123,14 +124,17 @@
     <string name="link_help_ar">https://docs.ankidroid.org/help-ar.html</string>
     <string name="link_manual_ar">https://docs.ankidroid.org/manual-ar.html</string>
     <string name="link_manual_note_format_toolbar">https://docs.ankidroid.org/manual.html#noteFormattingToolbar</string>
+    <string name="link_user_actions_help">https://ankidroid.org/#userActions</string>
     <string name="link_faq_tts">https://github.com/ankidroid/Anki-Android/wiki/FAQ#tts--text-to-speech-is-not-speaking</string>
     <string name="link_faq_missing_media" tools:ignore="Typos">https://github.com/ankidroid/Anki-Android/wiki/FAQ#why-doesnt-my-sound-or-image-work-on-ankidroid</string>
     <string name="link_third_party_api_apps">https://github.com/ankidroid/Anki-Android/wiki/Third-Party-Apps</string>
-    <string name="link_faq_invalid_protocol_relative">https://github.com/ankidroid/Anki-Android/wiki/FAQ#why-do-my-images-need-a-protocol</string>
     <string name="shared_decks_url">https://ankiweb.net/shared/decks/</string>
+    <string name="shared_decks_login_url">https://ankiweb.net/account/login</string>
+    <string name="shared_decks_sign_up_url">https://ankiweb.net/account/signup</string>
     <string name="repair_deck">https://docs.ankiweb.net/#/files?id=corrupt-collections</string>
     <string name="resetpw_url">https://ankiweb.net/account/resetpw</string>
     <string name="register_url">https://ankiweb.net/account/register</string>
+    <string name="remove_account_url">https://ankiweb.net/account/remove-account</string>
     <string name="link_reddit">https://www.reddit.com/r/Anki/</string>
     <string name="link_ankidroid_privacy_policy">https://github.com/ankidroid/Anki-Android/wiki/Privacy-Policy</string>
     <string name="link_ankiweb_privacy_policy">https://ankiweb.net/account/privacy</string>
@@ -148,6 +152,7 @@
     <string name="link_install_non_play_store_install">https://github.com/ankidroid/Anki-Android/wiki/Full-Storage-Access</string>
     <string name="link_custom_sync_server_help_learn_more_en">https://docs.ankidroid.org/#_custom_sync_server</string>
     <string name="link_migration_failed_dialog_learn_more_en">https://docs.ankidroid.org/storage-migration-error.html</string>
+    <string name="link_set_due_date_help">https://docs.ankiweb.net/browsing.html#cards</string>
     <string name="migration_failed_help_url">https://docs.ankidroid.org/storage-migration-error.html</string>
 
     <string-array name="cram_deck_conf_order_values">
@@ -164,20 +169,6 @@
     <string-array name="add_to_cur_values">
         <item>0</item>
         <item>1</item>
-    </string-array>
-    <string-array name="automatic_answer_options">
-        <item>@string/menu_bury_card</item>
-        <item>@string/ease_button_again</item>
-        <item>@string/automatic_answer_option_2</item>
-        <item>@string/ease_button_good</item>
-        <item>@string/automatic_answer_option_4</item>
-    </string-array>
-    <string-array name="automatic_answer_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
     </string-array>
     <string-array name="full_screen_mode_values">
         <item>0</item>
@@ -260,7 +251,6 @@
 
     <string-array name="appearance_summary_entries">
         <item>@string/pref_cat_themes</item>
-        <item>@string/pref_cat_fonts</item>
         <item>@string/pref_cat_reviewer</item>
     </string-array>
 

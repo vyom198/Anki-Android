@@ -40,6 +40,8 @@
     <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" android:maxSdkVersion="25" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Disabled on Play Store -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
     <permission android:name="${applicationId}.permission.READ_WRITE_DATABASE"
@@ -70,6 +72,9 @@
             <action android:name="android.intent.action.PROCESS_TEXT" />
             <data android:mimeType="text/plain" />
         </intent>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
     </queries>
 
     <!--
@@ -99,18 +104,12 @@
         the full package path is needed for manageSpaceActivity -->
         <activity
             android:name="com.ichi2.anki.ui.windows.managespace.ManageSpaceActivity"
-            android:exported="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+            android:exported="true"/>
         <activity android:name=".DrawingActivity"
             android:label="@string/drawing"
             android:exported="false"
             android:configChanges="keyboardHidden|orientation|screenSize"
             />
-        <activity
-            android:name="com.ichi2.anki.pages.PagesActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <activity
             android:name="com.ichi2.anki.IntentHandler"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -177,19 +176,85 @@
                     android:pathPattern=".*\\.colpkg"
                     android:scheme="file"
                     />
-
+                <!-- tsv files -->
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.tsv"
+                    android:scheme="http"
+                    />
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.tsv"
+                    android:scheme="https"
+                    />
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.tsv"
+                    android:scheme="content"
+                    />
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.tsv"
+                    android:scheme="file"
+                    />
+                <!-- csv files -->
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.csv"
+                    android:scheme="http"
+                    />
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.csv"
+                    android:scheme="https"
+                    />
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.csv"
+                    android:scheme="content"
+                    />
+                <data
+                    android:host="*"
+                    android:mimeType="*/*"
+                    android:pathPattern=".*\\.csv"
+                    android:scheme="file"
+                    />
             </intent-filter>
             <!-- MIME type matcher for .apkg files coming from providers like gmail which hide the file extension -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.SEND"/>
                 <data android:mimeType="application/apkg"/>
                 <data android:mimeType="application/colpkg"/>
                 <data android:mimeType="application/vnd.anki"/>
                 <data android:mimeType="application/x-apkg"/>
                 <data android:mimeType="application/x-colpkg"/>
                 <data android:mimeType="application/octet-stream"/>
-                <data android:mimeType="application/zip"/>
+                <data android:mimeType="text/tab-separated-values"/>
+                <data android:mimeType="text/comma-separated-values"/>
+            </intent-filter>
+
+            <!-- Keep it separate as when sharing image AnkiDroid would be shown with Image Occlusion label -->
+            <intent-filter android:label="@string/image_occlusion">
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/jpg" />
+                <data android:mimeType="image/jpeg" />
+                <data android:mimeType="image/png" />
+                <data android:mimeType="image/ico" />
+                <data android:mimeType="image/webp" />
+                <data android:mimeType="image/tiff" />
+                <data android:mimeType="image/gif" />
+                <data android:mimeType="image/svg" />
             </intent-filter>
 
             <!-- Tasker DO_SYNC intent -->
@@ -326,6 +391,20 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
+            <!-- Keep it separate as when sharing image AnkiDroid would be shown with Add Image label -->
+            <intent-filter android:label="@string/multimedia_editor_popup_image">
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/jpg" />
+                <data android:mimeType="image/jpeg" />
+                <data android:mimeType="image/png" />
+                <data android:mimeType="image/ico" />
+                <data android:mimeType="image/webp" />
+                <data android:mimeType="image/tiff" />
+                <data android:mimeType="image/gif" />
+                <data android:mimeType="image/svg" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.canhub.cropper.CropImageActivity"
@@ -341,14 +420,18 @@
             android:finishOnTaskLaunch="true"
             />
         <activity
-            android:name="com.ichi2.anki.Previewer"
-            android:label="@string/preview_title"
+            android:name="com.ichi2.anki.SingleFragmentActivity"
             android:exported="false"
             />
         <activity
-            android:name="com.ichi2.anki.CardTemplatePreviewer"
-            android:label="@string/preview_title"
+            android:name="com.ichi2.anki.ImageOcclusionActivity"
             android:exported="false"
+            android:configChanges="orientation|screenSize"
+            />
+        <activity
+            android:name="com.ichi2.anki.previewer.CardViewerActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize"
             />
         <activity
             android:name=".multimediacard.activity.MultimediaEditFieldActivity"
@@ -362,7 +445,7 @@
             android:label="@string/title_activity_template_editor"
             android:exported="false"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             >
         </activity>
         <activity
@@ -388,7 +471,10 @@
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:configChanges="keyboardHidden|screenSize" />
 
-
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
             android:enabled="false"
@@ -405,6 +491,7 @@
             android:foregroundServiceType="dataSync"
             />
 
+        <!-- Don't disable/enable the widgets here until min API>=31, see issue #15747 & https://issuetracker.google.com/issues/36914010 -->
         <!-- small widget -->
         <receiver
             android:name="com.ichi2.widget.AnkiDroidWidgetSmall"
@@ -434,6 +521,13 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_provider_add_note"
                 />
+        </receiver>
+
+        <receiver android:name="com.ichi2.widget.WidgetPermissionReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.ichi2.widget.UPDATE_WIDGET" />
+            </intent-filter>
         </receiver>
 
         <receiver
@@ -507,7 +601,16 @@
             >
             <meta-data android:name="com.ichi2.anki.provider.spec" android:value="2" />
         </provider>
-
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="remove">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.apkgfileprovider"

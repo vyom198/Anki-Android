@@ -59,21 +59,20 @@
     <!-- DeckPicker.kt -->
     <string name="expand">Paplašināt</string>
     <string name="collapse">Sakļaut</string>
-    <string name="study_more">Mācīties vairāk</string>
     <plurals name="reviewer_window_title">
-        <item quantity="zero">%d minūtes atlikušas</item>
-        <item quantity="one">%d minūte atlikusi</item>
-        <item quantity="other">%d minūtes atlikušas</item>
+        <item quantity="zero">%d minutes left</item>
+        <item quantity="one">%d minute left</item>
+        <item quantity="other">%d minutes left</item>
     </plurals>
     <plurals name="reviewer_window_title_hours_new">
-        <item quantity="zero">%1$d stundas %2$d atlikušas</item>
-        <item quantity="one">%1$d stunda %2$d atlikusi</item>
-        <item quantity="other">%1$d stundas %2$d atlikušas</item>
+        <item quantity="zero">%1$d hours %2$d left</item>
+        <item quantity="one">%1$d hour %2$d left</item>
+        <item quantity="other">%1$d hours %2$d left</item>
     </plurals>
     <plurals name="reviewer_window_title_days_new">
-        <item quantity="zero">%1$d dienas %2$d atlikušas</item>
-        <item quantity="one">%1$d diena %2$d atlikusi</item>
-        <item quantity="other">%1$d dienas %2$d atlikušas</item>
+        <item quantity="zero">%1$d days %2$d left</item>
+        <item quantity="one">%1$d day %2$d left</item>
+        <item quantity="other">%1$d days %2$d left</item>
     </plurals>
     <string name="no_cards_placeholder_title">Nekā te nav</string>
     <string name="no_cards_placeholder_description">Sāc pievienot jaunas kārtis, n\spiežot + pogu</string>
@@ -88,12 +87,14 @@
     <string name="ease_button_easy">Viegli</string>
     <string name="menu_import">Ienest</string>
     <string name="undo">Atsaukt</string>
+    <string name="redo">Redo</string>
     <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in Reviewer. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)">Atsaukt vilkumu</string>
     <string name="move_all_to_deck">Pārnest visu uz kavu</string>
     <string name="unbury">Atklāt</string>
     <string name="rename_deck">Pārdēvēt kavu</string>
     <string name="create_shortcut">Izveidot saīsni</string>
     <string name="browse_cards">Pārlūkot kārtis</string>
+    <string name="edit_deck_description" comment="edit the deck description">Edit description</string>
     <string name="menu_add" comment="A generic add button. Please inform us if you need more specific strings">Pievienot</string>
     <string name="menu_add_note">Pievienot rakstu</string>
     <string name="menu_my_account" comment="Label of the window in which the user should enter their account. This text can\'t be found in AnkiDroid directly.">Saskaņot kóntu</string>
@@ -107,14 +108,6 @@
     <string name="menu_delete_note">Dzēst piezīmi</string>
     <string name="menu_flag">Karogs</string>
     <string name="menu_flag_card">Uzliekt karogu</string>
-    <string name="menu_flag_card_zero">Bez karoga</string>
-    <string name="menu_flag_card_one">Sarkans karogs</string>
-    <string name="menu_flag_card_two">Oranžais karogs</string>
-    <string name="menu_flag_card_three">Zaļš karogs</string>
-    <string name="menu_flag_card_four">Zils karogs</string>
-    <string name="menu_flag_card_five">Rozs karogs</string>
-    <string name="menu_flag_card_six">Tirkīz karogs</string>
-    <string name="menu_flag_card_seven">Violets karogs</string>
     <string name="menu_edit_tags">Mainīt tegus</string>
     <string name="delete_note_message">Tiešām dzēst šo piezīmi un visas pievienotās kārtis?\n%s</string>
     <string name="menu_search">Meklēt iekš %1$s</string>
@@ -136,14 +129,11 @@
     <string name="empty_filtered_deck">Iztukšo pielāgoto kavu</string>
     <string name="custom_study_deck_name">Pielāgota mācība</string>
     <string name="custom_study_deck_exists">Vispirms pārsauciet esošo pielāgoto kavu</string>
-    <string name="empty_deck">Šī kava ir tukša</string>
     <string name="search_deck" comment="Deck search for selecting it">Kavu pārlūks</string>
+    <string name="empty_deck">Šī kava ir tukša</string>
     <string name="search_for_download_deck" comment="Deck search value for downloading deck">Kavu meklētājs</string>
     <string name="invalid_deck_name">Nederīgs kavas nosaukums</string>
-    <string name="studyoptions_empty">Šī kava ir tukša. Spied +, lai pievienotu kārtis</string>
-    <string name="studyoptions_limit_reached">Ikdienas ierobežojums sasniegts</string>
-    <string name="studyoptions_empty_schedule">Nav nekas paredzēts</string>
-    <string name="studyoptions_congrats_finished">Apsveicu! Pagaidām viss pabeigts</string>
+    <string name="studyoptions_congrats_finished">Congratulations! You have finished for now.</string>
     <string name="studyoptions_no_cards_due">Nav gaidāmu kāršu</string>
     <string name="sd_card_not_mounted">Ierīces krātuve nav uzstādīta</string>
     <string name="button_sync" comment="Text of the sync button">Saskaņošana</string>
@@ -152,8 +142,7 @@
     <string name="continue_sync" tools:ignore="UnusedResources">Turpināt</string>
     <string name="sync_cancelled" tools:ignore="UnusedResources">Saskaņošana atcelta</string>
     <string name="sync_cancel_message" tools:ignore="UnusedResources">Pārtrauc&#8230;\nTas var aizņemt labu laiku.</string>
-    <string name="export">Izrakstīt</string>
-    <string name="export_collection">Izrakstīt krājumu</string>
+    <string name="syncing_media">Syncing media</string>
     <string name="export_deck">izrakstīt kavu</string>
     <string name="nothing">Nekā</string>
     <!-- Card template editor -->
@@ -176,7 +165,6 @@
         <item quantity="one">Izdzēst “%2$s” veidu un tā %1$d kārti?</item>
         <item quantity="other">Izdzēst “%2$s” veidu un tā %1$d kārtis?</item>
     </plurals>
-    <string name="invalid_template">Neizdevās izveidot</string>
     <string name="card_template_editor_would_delete_note">Izdzēšot šo kāršu veidu, daži raksti var tikt dzēsti līdzi. Lūdzu, vispirms izveidojiet jaunu kāršu veidu.</string>
     <string name="card_template_editor_save_error">Neizdevās saglabāt veidnes izmaiņas: %s</string>
     <string name="template_for_current_card_deleted">Šīs kārts veids tika izdzēsts</string>
@@ -250,6 +238,7 @@
     <string name="migration__resume_after_failed_dialog__button_positive">Resume migration</string>
     <string name="directory_inaccessible_after_uninstall" comment="Dialog title if AnkiDroid can\'t access the collection once the app is installed">Nepieejams krājums</string>
     <string name="directory_inaccessible_after_uninstall_summary" comment="the parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">Mēs nespējam piekļūt jūsu krājumam pēc  AnkiDroid atstādīšanas dēļ Play Store noteikumiem\n\nTavi dati ir drošībā un var tikt atgūti. Tie atrodas\n%s\n\nIzvēlies atgūšanas veidu:</string>
+    <string name="directory_revoked_after_inactivity" comment="the first parameter is WRITE_EXTERNAL_STORAGE the second parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">Android has removed AnkiDroid\'s %1$s permission due to app inactivity.\n\nYour data is safe and can be restored. It is located at\n%2$s\n\nSelect an option below to restore:</string>
     <string name="restore_data_from_ankiweb">Atgūt no AnkiWeb (ieteikts)</string>
     <string name="install_non_play_store_ankidroid_recommended">Atgūt dotņu pieeju (ieteikts)</string>
     <string name="install_non_play_store_ankidroid">Atgūt dotņu pieeju (sarežģīti)</string>
@@ -261,4 +250,6 @@
     <string name="storage_access_title">Storage access</string>
     <string name="storage_access_summary">Saves your collection in a safe place that will not be deleted if the app is uninstalled</string>
     <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">All files access</string>
+    <string name="image_occlusion">Image Occlusion</string>
+    <string name="remove_account" comment="open a website to start the deletion of an AnkiWeb account">Remove account</string>
 </resources>

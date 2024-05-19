@@ -15,16 +15,19 @@
  */
 package com.ichi2.anki.pages
 
+import android.view.WindowManager
 import android.webkit.JsResult
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.appcompat.app.AlertDialog
+import com.ichi2.anki.CrashReportService
 import com.ichi2.anki.R
 import com.ichi2.utils.cancelable
 import com.ichi2.utils.message
 import com.ichi2.utils.negativeButton
 import com.ichi2.utils.positiveButton
 import com.ichi2.utils.show
+import timber.log.Timber
 
 open class PageChromeClient : WebChromeClient() {
     override fun onJsAlert(
@@ -33,11 +36,23 @@ open class PageChromeClient : WebChromeClient() {
         message: String?,
         result: JsResult?
     ): Boolean {
-        AlertDialog.Builder(view.context).show {
-            message?.let { message(text = message) }
-            positiveButton(R.string.dialog_ok) { result?.confirm() }
-            setOnCancelListener { result?.cancel() }
+        try {
+            AlertDialog.Builder(view.context).show {
+                message?.let { message(text = message) }
+                positiveButton(R.string.dialog_ok) { result?.confirm() }
+                setOnCancelListener { result?.cancel() }
+            }
+        } catch (e: IllegalStateException) {
+            // window count is over max!!
+            Timber.w(e, "onJsAlert: message ignored")
+            // we want to know what went wrong
+            CrashReportService.sendExceptionReport("$url: $message", "onJsAlert:windowCount")
+            return false
+        } catch (e: WindowManager.BadTokenException) {
+            Timber.w(e, "onJsAlert")
+            return false
         }
+
         return true
     }
 
@@ -47,11 +62,16 @@ open class PageChromeClient : WebChromeClient() {
         message: String?,
         result: JsResult?
     ): Boolean {
-        AlertDialog.Builder(view.context).show {
-            message?.let { message(text = message) }
-            positiveButton(R.string.dialog_ok) { result?.confirm() }
-            negativeButton(R.string.dialog_cancel) { result?.cancel() }
-            cancelable(false)
+        try {
+            AlertDialog.Builder(view.context).show {
+                message?.let { message(text = message) }
+                positiveButton(R.string.dialog_ok) { result?.confirm() }
+                negativeButton(R.string.dialog_cancel) { result?.cancel() }
+                cancelable(false)
+            }
+        } catch (e: WindowManager.BadTokenException) {
+            Timber.w("onJsConfirm", e)
+            return false // unhandled - shown in WebView
         }
         return true
     }

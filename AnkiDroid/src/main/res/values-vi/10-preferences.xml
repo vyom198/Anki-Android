@@ -46,9 +46,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- generic strings -->
     <string name="disabled">Đã tắt</string>
-    <string name="pref_summary_seconds">%s giây</string>
-    <string name="pref_summary_minutes">%s phút</string>
-    <string comment="Percentage value of a preference. %s represents the number to be replaced. Use \%% to represent a single percent sign (%)" name="pref_summary_percentage">%s\%%</string>
+    <plurals name="pref_summ_minutes">
+        <item quantity="other">%d phút</item>
+    </plurals>
+    <string name="pref_milliseconds">%s ms</string>
+    <!-- TODO: move to 20-search-preference so we can contribute upstream (searchpreference_no_results)-->
     <string name="pref_search_no_results">Không có kết quả</string>
     <!-- preferences.xml categories-->
     <string name="pref_cat_general" comment="name of the general preference category" maxLength="41">Chung</string>
@@ -60,7 +62,6 @@
     <string name="pref_cat_whiteboard" maxLength="41">Bảng viết</string>
     <string name="pref_cat_appearance" maxLength="41">Giao diện</string>
     <string name="pref_cat_themes" maxLength="41">Chủ đề</string>
-    <string name="pref_cat_fonts" maxLength="41">Phông chữ</string>
     <string name="pref_cat_gestures" maxLength="41">Cử Chỉ/ Điều Hướng</string>
     <string name="pref_cat_controls" maxLength="41">Controls</string>
     <string name="pref_cat_advanced" maxLength="41">Tuỳ chọn nâng cao</string>
@@ -113,6 +114,7 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">Chạm vào chính giữa</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">Chạm vào dưới cùng bên trái</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">Chạm vào dưới cùng bên phải</string>
+    <string name="gestures_shake" maxLength="41">Lắc thiết bị</string>
     <string name="card_browser_enable_external_context_menu">Menu ‘%s’</string>
     <string name="card_browser_enable_external_context_menu_summary">Bật menu ngữ cảnh ‘%s’ trên toàn cầu</string>
     <string name="double_scrolling_gap" maxLength="41">Bấm phím scrolling (chuột giữa) hai lần</string>
@@ -148,10 +150,7 @@
     <string name="notification_minimum_cards_due_vibrate" maxLength="41">Báo rung</string>
     <string name="notification_minimum_cards_due_blink" maxLength="41">Nhấp nháy ánh sáng</string>
     <string name="timeout_answer_text" maxLength="41">Tự động hiển thị trả lời</string>
-    <string name="timeout_answer" maxLength="41">Timeout answer</string>
-    <string name="timeout_answer_summ">Hiển thị câu trả lời tự động mà không cần người dùng nhập. Độ trễ bao gồm thời gian cho các tệp âm thanh được phát tự động.</string>
-    <string name="timeout_answer_seconds" maxLength="41">Thời gian để hiển thị câu trả lời</string>
-    <string name="timeout_question_seconds" maxLength="41">Thời gian để hiển thị câu hỏi tiếp theo</string>
+    <string name="timeout_answer_summ2">Show answer automatically without user input. Configure from deck options.</string>
     <string name="select_locale_title">Chọn ngôn ngữ</string>
     <string name="software_render" maxLength="41">Tắt kết xuất phần cứng thẻ</string>
     <string name="software_render_summ">Kết xuất phần cứng nhanh hơn nhưng có thể gặp sự cố, cụ thể là trên Android 8 / 8.1. Nếu bạn không thể thấy các phần của giao diện người dùng xem xét thẻ, hãy thử cài đặt này.</string>
@@ -164,8 +163,8 @@
     <string name="vertical_centering_summ">Thiết lập nội dung chính của thẻ theo chiều dọc</string>
     <string name="pref_double_tap_time_interval" maxLength="41">Double tap time interval (milliseconds)</string>
     <string name="pref_double_tap_time_interval_summary">A second tap of the answer buttons will be ignored if this time has not elapsed. This prevents accidental double taps</string>
-    <string name="pref_show_answer_long_press" maxLength="41">Hiển thị thời gian nhấn và giữ câu trả lời (ms)</string>
-    <string name="pref_show_answer_long_press_summary">Thời gian nhấn và giữ tối thiểu trước khi hiển thị nút câu trả lời sẽ tiếp nhận thao tác bấm. Có thể giảm nguy cơ nhấn nhầm thêm các nút. Mặc định là 0ms</string>
+    <string name="pref_show_answer_long_press_time" maxLength="41">Show answer long-press time</string>
+    <string name="pref_show_answer_long_press_time_summary">Thời gian nhấn tối thiểu trước khi nút hiển thị câu trả lời đăng ký một thao tác chạm.</string>
     <string name="show_estimates" maxLength="41">Hiển thị nút thời gian</string>
     <string name="show_estimates_summ">Hiển thị thời gian đánh giá tiếp theo trên các nút trả lời</string>
     <string name="show_large_answer_buttons" maxLength="41">Show large answer buttons</string>
@@ -179,10 +178,9 @@
     <string name="use_current" maxLength="41">Bộ thẻ cho thẻ mới</string>
     <string name="learn_cutoff" maxLength="41">Tìm hiểu trước giới hạn</string>
     <string name="time_limit" maxLength="41">Giới hạn thời gian của hộp thời gian</string>
-    <string name="new_timezone" maxLength="41">Xử lý múi giờ mới</string>
     <string name="day_offset_with_description" maxLength="41">Bắt đầu ngày hôm sau (0 là nửa đêm, 23 là 11 giờ tối)</string>
     <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
-        <item quantity="other">%d hours past midnight</item>
+        <item quantity="other">%d giờ đã qua nửa đêm</item>
     </plurals>
     <string name="pref_keep_screen_on" maxLength="41">Luôn bật màn hình</string>
     <string name="pref_keep_screen_on_summ">Tắt thời gian chờ của màn hình</string>
@@ -198,10 +196,9 @@
     <string name="reset">Thiết lập lại</string>
     <string name="thirdparty_apps_title" maxLength="41">Ứng dụng API của bên thứ ba</string>
     <string name="thirdparty_apps_summary">Xem danh sách các ứng dụng sử dụng AnkiDroid API như từ điển, tiện ích.</string>
-    <string name="html_javascript_debugging" maxLength="41">Gỡ lỗi HTML / Javascript</string>
-    <string name="html_javascript_debugging_summ">Bật kết nối WebView từ xa và lưu HTML thẻ vào thư mục AnkiDroid</string>
     <!-- Appearance settings -->
     <string name="pref_cat_reviewer" maxLength="41">Người xem xét</string>
+    <string name="show_deck_title" maxLength="41">Hiển thị tiêu đề bộ thẻ</string>
     <string name="accessibility" maxLength="41">Trợ năng</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">Paste clipboard images as PNG</string>
@@ -240,16 +237,15 @@
     <string name="deck_conf_cram_reschedule" maxLength="41" comment="Title of the box labelled by deck_conf_cram_reschedule_summ">Lên lịch lại</string>
     <string name="deck_conf_cram_reschedule_summ">Lên lịch lại thẻ dựa trên câu trả lời của tôi trong chủ đề này</string>
     <string name="deck_conf_cram_filter_2_check">Enable second filter</string>
-    <string name="deck_conf_cram_steps" maxLength="41">Các bước tùy chỉnh (tính bằng phút)</string>
     <string name="deck_conf_cram_steps_summ" maxLength="41">Xác định các bước tùy chỉnh</string>
+    <string name="deck_conf_cram_preview_delays" maxLength="41">Preview delays</string>
+    <string name="deck_conf_cram_preview_delays_summ">Delays are in seconds. 0 returns card to original deck.</string>
     <!-- analytics options -->
     <string name="analytics_dialog_title">Giúp cải thiện AnkiDroid!</string>
     <string name="analytics_title" maxLength="41">Chia sẻ việc sử dụng tính năng</string>
     <string name="analytics_summ">Bạn có thể đóng góp cho AnkiDroid bằng cách giúp nhóm phát triển xem mọi người sử dụng những tính năng nào</string>
     <string name="note_editor_replace_newlines" maxLength="41">Thay thế dòng mới bằng HTML</string>
     <string name="note_editor_replace_newlines_summ">Trong Trình chỉnh sửa ghi chú, chuyển đổi thẻ &lt;br&gt; thành dòng mới khi chỉnh sửa thẻ.</string>
-    <string name="no_code_formatting" maxLength="41">Định dạng câu trả lời đã nhập đơn giản</string>
-    <string name="no_code_formatting_summ">Sửa lỗi ‘􏿾’ xuất hiện trong kết quả câu trả lời đã nhập</string>
     <string name="type_in_answer_focus" maxLength="41">Tập trung \'Nhập câu trả lời\'</string>
     <string name="type_in_answer_focus_summ">Tự động tập trung vào trường \"nhập câu trả lời\" trong trình đánh giá</string>
     <!-- About -->
@@ -266,6 +262,19 @@
     <string name="binding_add_key">Add key</string>
     <string name="binding_replace_key">Thay thế khoá</string>
     <string name="key_picker_default_press_key">Press a key</string>
+    <string name="binding_add_axis">Add joystick/motion controller</string>
+    <string name="axis_picker_move_joystick">Move a joystick/motion controller</string>
+    <string name="user_actions" maxLength="41">Thao tác người dùng</string>
+    <string name="user_actions_summary" maxLength="41">Kích hoạt JavaScript từ màn hình đánh giá</string>
+    <string name="user_action_1" maxLength="41">Hành động người dùng 1</string>
+    <string name="user_action_2" maxLength="41">Thao tác người dùng 2</string>
+    <string name="user_action_3" maxLength="41">Thao tác người dùng 3</string>
+    <string name="user_action_4" maxLength="41">Thao tác người dùng 4</string>
+    <string name="user_action_5" maxLength="41">Thao tác người dùng 5</string>
+    <string name="user_action_6" maxLength="41">Thao tác người dùng 6</string>
+    <string name="user_action_7" maxLength="41">Thao tác người dùng 7</string>
+    <string name="user_action_8" maxLength="41">Thao tác người dùng 8</string>
+    <string name="user_action_9" maxLength="41">Thao tác người dùng 9</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">Select card side</string>
     <string name="card_side_question">Question</string>
@@ -279,6 +288,8 @@
     <string name="bindings_already_bound">Already bound to %s</string>
     <!-- Advanced -->
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">Tính năng thử nghiệm</string>
+    <string name="readtext_deprecation_warn">AnkiDroid đã giới thiệu cơ chế TTS tốt hơn, tương thích với các ứng dụng khách Anki khác và bao gồm nhiều giọng nói hơn cũng như cải tiến về phát lại ngôn ngữ!\n\nVui lòng nâng cấp càng sớm càng tốt vì cài đặt này sẽ sớm bị xóa</string>
+    <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">Vui lòng nâng cấp lên định dạng văn bản thành giọng nói mới</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">Tùy chọn nhà phát triển</string>
     <string name="dev_options_enabled_pref" maxLength="41">Bật tùy chọn nhà phát triển</string>

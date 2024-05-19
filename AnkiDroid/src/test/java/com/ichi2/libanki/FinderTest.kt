@@ -108,7 +108,6 @@ class FinderTest : JvmTest() {
     @Test
     fun test_findCards() {
         TimeManager.reset()
-        val col = col
         var note = col.newNote()
         note.setItem("Front", "dog")
         note.setItem("Back", "cat")
@@ -171,22 +170,23 @@ class FinderTest : JvmTest() {
         assertEquals(0, col.findCards("\"are goats\"").size)
         assertEquals(1, col.findCards("\"goats are\"").size)
         // card states
-        var c = note.cards()[0]
-        c.due = 999999
-        c.queue = QUEUE_TYPE_REV
-        c.type = CARD_TYPE_REV
+        var c = note.cards()[0].apply {
+            due = 999999
+            queue = QUEUE_TYPE_REV
+            type = CARD_TYPE_REV
+        }
         assertEquals(0, col.findCards("is:review").size)
-        c.flush()
+        col.updateCard(c, skipUndoEntry = true)
         AnkiAssert.assertEqualsArrayList(arrayOf(c.id), col.findCards("is:review"))
         assertEquals(0, col.findCards("is:due").size)
-        c.due = 0
-        c.queue = QUEUE_TYPE_REV
-        c.flush()
+        c.update {
+            due = 0
+            queue = QUEUE_TYPE_REV
+        }
         AnkiAssert.assertEqualsArrayList(arrayOf(c.id), col.findCards("is:due"))
         assertEquals(4, col.findCards("-is:due").size)
-        c.queue = QUEUE_TYPE_SUSPENDED
         // ensure this card gets a later mod time
-        c.flush()
+        c.update { queue = QUEUE_TYPE_SUSPENDED }
         col.db.execute("update cards set mod = mod + 1 where id = ?", c.id)
         AnkiAssert.assertEqualsArrayList(arrayOf(c.id), col.findCards("is:suspended"))
         // nids
@@ -357,7 +357,6 @@ class FinderTest : JvmTest() {
 
     @Test
     fun test_findCardsHierarchyTag() {
-        val col = col
         var note = col.newNote()
         note.setItem("Front", "foo")
         note.setItem("Back", "bar")
@@ -395,7 +394,6 @@ class FinderTest : JvmTest() {
 
     @Test
     fun test_findReplace() {
-        val col = col
         val note = col.newNote()
         note.setItem("Front", "foo")
         note.setItem("Back", "bar")

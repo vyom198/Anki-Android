@@ -40,12 +40,12 @@ import java.util.stream.Collectors
 class ActivityStartupUnderBackupTest : RobolectricTest() {
     @ParameterizedRobolectricTestRunner.Parameter
     @JvmField // required for Parameter
-    var mLauncher: ActivityLaunchParam? = null
+    var launcher: ActivityLaunchParam? = null
 
     // Only used for display, but needs to be defined
     @ParameterizedRobolectricTestRunner.Parameter(1)
     @JvmField // required for Parameter
-    var mActivityName: String? = null
+    var activityName: String? = null
 
     @Before
     fun before() {
@@ -53,6 +53,7 @@ class ActivityStartupUnderBackupTest : RobolectricTest() {
         notYetHandled(IntentHandler::class.java.simpleName, "Not working (or implemented) - inherits from Activity")
         notYetHandled(Preferences::class.java.simpleName, "Not working (or implemented) - inherits from AppCompatPreferenceActivity")
         notYetHandled(FilteredDeckOptions::class.java.simpleName, "Not working (or implemented) - inherits from AppCompatPreferenceActivity")
+        notYetHandled(SingleFragmentActivity::class.java.simpleName, "Implemented, but the test fails because the activity throws if a specific intent extra isn't set")
     }
 
     /**
@@ -71,7 +72,7 @@ class ActivityStartupUnderBackupTest : RobolectricTest() {
     fun activityHandlesRestoreBackup() {
         AnkiDroidApp.simulateRestoreFromBackup()
         val controller: ActivityController<out Activity?> = try {
-            mLauncher!!.build(targetContext).create()
+            launcher!!.build(targetContext).create()
         } catch (npe: Exception) {
             val stackTrace = getFullStackTrace(npe)
             Assert.fail(
@@ -95,7 +96,7 @@ $stackTrace"""
     }
 
     private fun notYetHandled(activityName: String, reason: String) {
-        if (mLauncher!!.simpleName == activityName) {
+        if (launcher!!.simpleName == activityName) {
             assumeThat("$activityName $reason", true, equalTo(false))
         }
     }

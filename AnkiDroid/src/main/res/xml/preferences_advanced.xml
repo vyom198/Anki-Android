@@ -22,9 +22,7 @@
 
 <!-- Advanced Preferences -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://arbitrary.app.namespace/com.ichi2.anki"
     xmlns:app1="http://schemas.android.com/apk/res-auto"
-    xmlns:search="http://schemas.android.com/apk/com.bytehamster.lib.preferencesearch"
     android:title="@string/pref_cat_advanced"
     android:key="@string/pref_advanced_screen_key">
         <EditTextPreference
@@ -32,11 +30,6 @@
             android:key="@string/pref_ankidroid_directory_key"
             android:title="@string/col_path"
             app1:useSimpleSummaryProvider="true"/>
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="@string/tts_key"
-            android:summary="@string/tts_summ"
-            android:title="@string/tts" />
         <Preference
             android:summary="@string/reset_languages_summ"
             android:title="@string/reset_languages"
@@ -77,13 +70,6 @@
                 android:summary="@string/note_editor_replace_newlines_summ"
                 android:title="@string/note_editor_replace_newlines"
                 />
-            <!-- #7896 - Workaround for old webviews which could not render some characters in a <code> block
-            due to problems with the default monospace font handling -->
-            <SwitchPreferenceCompat
-                android:defaultValue="false"
-                android:key="@string/no_code_formatting_key"
-                android:summary="@string/no_code_formatting_summ"
-                android:title="@string/no_code_formatting" />
             <!-- #8424 - allow users to decide if they want to focus the EditText
                 Note: this functionality is already disabled if useInputTag is enabled
                 UseInputTag: has had `disableDependentsState` set, so this is disabled
@@ -93,7 +79,6 @@
                 android:defaultValue="true"
                 android:key="@string/type_in_answer_focus_key"
                 android:summary="@string/type_in_answer_focus_summ"
-                android:dependency="@string/use_input_tag_key"
                 android:title="@string/type_in_answer_focus" />
             <!-- #9639 - allow all files in media selection dialog - .opus is application/octet-stream
             in older versions of Android (fixed between API 26 and API 30)
@@ -118,4 +103,10 @@
                 android:title="@string/thirdparty_apps_title">
             </Preference>
         </PreferenceCategory>
+    <SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:icon="@drawable/ic_warning"
+        android:key="@string/tts_key"
+        android:summary="@string/tts_summ"
+        android:title="@string/tts" />
 </PreferenceScreen>

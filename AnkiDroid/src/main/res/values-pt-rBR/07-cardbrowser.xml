@@ -54,12 +54,15 @@
         <item quantity="other">%d notas exibidas</item>
     </plurals>
     <string name="card_browser_all_decks">Todos os baralhos</string>
-    <string name="card_browser_delete_card">Excluir notas</string>
-    <string name="card_browser_suspend_card">Suspender cartões</string>
+    <plurals name="card_browser_delete_cards">
+        <item quantity="one">Excluir cartão</item>
+        <item quantity="other">Excluir cartões</item>
+    </plurals>
+    <plurals name="card_browser_delete_notes">
+        <item quantity="one">Excluir nota</item>
+        <item quantity="other">Excluir notas</item>
+    </plurals>
     <string name="card_browser_change_deck">Mudar Baralho</string>
-    <string name="card_browser_unsuspend_card">Cancelar suspensão dos cartões</string>
-    <string name="card_browser_mark_card">Marcar notas</string>
-    <string name="card_browser_unmark_card">Desmarcar notas</string>
     <string name="delete_card_title">Excluir nota?</string>
     <string name="card_browser_show_marked">Filtrar marcadas</string>
     <string name="card_browser_show_suspended">Filtrar suspenso</string>
@@ -96,6 +99,7 @@
     <string name="card_browser_search_all_decks">Pesquisar em todos os baralhos</string>
     <string name="card_browser_unknown_deck_name">Desconhecido</string>
     <string name="card_browser_truncate" comment="allows users to show less of a field value">Mostrar menos</string>
+    <string name="set_due_date_hintText" comment="plural set_due_date_label_suffix is used for parameters, parameter 1 is the plural for 0, parameter 2 is the plural for 1">Hoje é \'0 %1$s\', amanhã é \'1 %2$s\', etc.</string>
     <plurals name="card_browser_export_cards">
         <item quantity="one">Exportar cartão</item>
         <item quantity="other">Exportar cartões</item>
@@ -108,5 +112,4 @@
         <item quantity="one">%d card deletado</item>
         <item quantity="other">%d cards deletados</item>
     </plurals>
-    <!-- Card Info subscreen -->
 </resources>

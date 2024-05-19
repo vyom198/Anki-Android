@@ -24,11 +24,14 @@ import android.speech.tts.UtteranceProgressListener
 import android.view.WindowManager.BadTokenException
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
-import com.ichi2.anki.UIUtils.showThemedToast
+import com.ichi2.anki.cardviewer.SingleCardSide
+import com.ichi2.anki.provider.pureAnswer
+import com.ichi2.anki.reviewer.CardSide
 import com.ichi2.anki.snackbar.showSnackbar
 import com.ichi2.annotations.NeedsTest
+import com.ichi2.libanki.Card
+import com.ichi2.libanki.Collection
 import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.Sound.SoundSide
 import com.ichi2.libanki.TTSTag
 import com.ichi2.utils.HandlerUtils.postDelayedOnNewHandler
 import com.ichi2.utils.message
@@ -36,7 +39,6 @@ import com.ichi2.utils.positiveButton
 import com.ichi2.utils.title
 import timber.log.Timber
 import java.lang.ref.WeakReference
-import java.util.*
 
 object ReadText {
     @get:VisibleForTesting(otherwise = VisibleForTesting.NONE)
@@ -49,7 +51,7 @@ object ReadText {
     private lateinit var flashCardViewer: WeakReference<Context>
     private var mDid: DeckId = 0
     private var mOrd = 0
-    var questionAnswer: SoundSide? = null
+    var questionAnswer: CardSide? = null
         private set
     const val NO_TTS = "0"
     private val mTtsParams = Bundle()
@@ -69,14 +71,13 @@ object ReadText {
             if (textToSpeech!!.isSpeaking && queueMode == TextToSpeech.QUEUE_FLUSH) {
                 Timber.d("tts engine appears to be busy... clearing queue")
                 stopTts()
-                // sTextQueue.add(new String[] { text, loc });
             }
             Timber.d("tts text '%s' to be played for locale (%s)", text, loc)
             textToSpeech!!.speak(textToSpeak, queueMode, mTtsParams, "stringId")
         }
     }
 
-    private fun getLanguage(did: DeckId, ord: Int, qa: SoundSide): String {
+    private fun getLanguage(did: DeckId, ord: Int, qa: CardSide): String {
         return MetaDB.getLanguage(flashCardViewer.get()!!, did, ord, qa)
     }
 
@@ -90,7 +91,7 @@ object ReadText {
      */
     @SuppressLint("CheckResult")
     @NeedsTest("ensure languages are sorted alphabetically in the dialog")
-    fun selectTts(text: String?, did: DeckId, ord: Int, qa: SoundSide?) {
+    fun selectTts(text: String?, did: DeckId, ord: Int, qa: CardSide?) {
         // TODO: Consolidate with ReadText.readCardSide
         textToSpeak = text
         questionAnswer = qa
@@ -129,7 +130,7 @@ object ReadText {
         showDialogAfterDelay(dialog, 500)
     }
 
-    internal fun showDialogAfterDelay(dialog: AlertDialog.Builder, delayMillis: Int) {
+    private fun showDialogAfterDelay(dialog: AlertDialog.Builder, delayMillis: Int) {
         postDelayedOnNewHandler({
             try {
                 dialog.show()
@@ -147,7 +148,7 @@ object ReadText {
      * @param did              Index of the deck containing the card.
      * @param ord              The card template ordinal.
      */
-    fun readCardSide(textsToRead: List<TTSTag>, cardSide: SoundSide, did: DeckId, ord: Int) {
+    fun readCardSide(textsToRead: List<TTSTag>, cardSide: CardSide, did: DeckId, ord: Int) {
         var isFirstText = true
         var playedSound = false
         for (textToRead in textsToRead) {
@@ -189,7 +190,7 @@ object ReadText {
      * @param queueMode TextToSpeech.QUEUE_ADD or TextToSpeech.QUEUE_FLUSH.
      * @return false if a sound was not played
      */
-    private fun textToSpeech(tag: TTSTag, did: DeckId, ord: Int, qa: SoundSide, queueMode: Int): Boolean {
+    private fun textToSpeech(tag: TTSTag, did: DeckId, ord: Int, qa: CardSide, queueMode: Int): Boolean {
         textToSpeak = tag.fieldText
         questionAnswer = qa
         mDid = did
@@ -197,7 +198,7 @@ object ReadText {
         Timber.d("ReadText.textToSpeech() method started for string '%s', locale '%s'", tag.fieldText, tag.lang)
         var localeCode = tag.lang
         val originalLocaleCode = localeCode
-        if (!localeCode.isEmpty()) {
+        if (localeCode.isNotEmpty()) {
             if (!isLanguageAvailable(localeCode)) {
                 localeCode = ""
             }
@@ -211,13 +212,13 @@ object ReadText {
             // user has chosen not to read the text
             return false
         }
-        if (!localeCode.isEmpty() && isLanguageAvailable(localeCode)) {
+        if (localeCode.isNotEmpty() && isLanguageAvailable(localeCode)) {
             speak(textToSpeak, localeCode, queueMode)
             return true
         }
 
         // Otherwise ask the user what language they want to use
-        if (!originalLocaleCode.isEmpty()) {
+        if (originalLocaleCode.isNotEmpty()) {
             // (after notifying them first that no TTS voice was found for the locale
             // they originally requested)
             showThemedToast(
@@ -244,6 +245,7 @@ object ReadText {
         // Store weak reference to Activity to prevent memory leak
         flashCardViewer = WeakReference(context)
         mCompletionListener = listener
+        val ankiActivityContext = context as? AnkiActivity
         // Create new TTS object and setup its onInit Listener
         textToSpeech = TextToSpeech(context) { status: Int ->
             if (status == TextToSpeech.SUCCESS) {
@@ -252,26 +254,12 @@ object ReadText {
                     Timber.d("TTS initialized and available languages found")
                     (context as AbstractFlashcardViewer).ttsInitialized()
                 } else {
-                    showThemedToast(context, context.getString(R.string.no_tts_available_message), false)
+                    ankiActivityContext?.showSnackbar(R.string.no_tts_available_message)
                     Timber.w("TTS initialized but no available languages found")
                 }
                 textToSpeech!!.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onDone(arg0: String) {
                         listener.onDone(questionAnswer)
-                    }
-
-                    fun errorToDeveloperString(errorCode: Int): String {
-                        return when (errorCode) {
-                            TextToSpeech.ERROR -> "Generic failure"
-                            TextToSpeech.ERROR_SYNTHESIS -> "TTS engine failed to synthesize input"
-                            TextToSpeech.ERROR_INVALID_REQUEST -> "Invalid request"
-                            TextToSpeech.ERROR_NETWORK -> "Network connectivity problem"
-                            TextToSpeech.ERROR_NETWORK_TIMEOUT -> "Network timeout"
-                            TextToSpeech.ERROR_NOT_INSTALLED_YET -> "Unfinished download of the voice data"
-                            TextToSpeech.ERROR_OUTPUT -> "Output error (audio device or a file)"
-                            TextToSpeech.ERROR_SERVICE -> "TTS service"
-                            else -> "Unhandled Error [$errorCode]"
-                        }
                     }
 
                     override fun onError(utteranceId: String?, errorCode: Int) {
@@ -300,11 +288,23 @@ object ReadText {
                 Timber.w("TTS not successfully initialized")
             }
         }
-        // Show toast that it's getting initialized, as it can take a while before the sound plays the first time
-        showThemedToast(context, context.getString(R.string.initializing_tts), false)
     }
 
-    private fun openTtsHelpUrl(helpUrl: Uri) {
+    fun errorToDeveloperString(errorCode: Int): String {
+        return when (errorCode) {
+            TextToSpeech.ERROR -> "Generic failure"
+            TextToSpeech.ERROR_SYNTHESIS -> "TTS engine failed to synthesize input"
+            TextToSpeech.ERROR_INVALID_REQUEST -> "Invalid request"
+            TextToSpeech.ERROR_NETWORK -> "Network connectivity problem"
+            TextToSpeech.ERROR_NETWORK_TIMEOUT -> "Network timeout"
+            TextToSpeech.ERROR_NOT_INSTALLED_YET -> "Unfinished download of the voice data"
+            TextToSpeech.ERROR_OUTPUT -> "Output error (audio device or a file)"
+            TextToSpeech.ERROR_SERVICE -> "TTS service"
+            else -> "Unhandled Error [$errorCode]"
+        }
+    }
+
+    fun openTtsHelpUrl(helpUrl: Uri) {
         val activity = flashCardViewer.get() as AnkiActivity?
         activity!!.openUrl(helpUrl)
     }
@@ -341,6 +341,14 @@ object ReadText {
     private fun availableLocales() = TtsVoices.availableLocalesBlocking()
 
     interface ReadTextListener {
-        fun onDone(playedSide: SoundSide?)
+        fun onDone(playedSide: CardSide?)
     }
+}
+
+fun legacyGetTtsTags(col: Collection, card: Card, cardSide: SingleCardSide, context: Context): List<TTSTag> {
+    val cardSideContent: String = when (cardSide) {
+        SingleCardSide.FRONT -> card.question(col)
+        SingleCardSide.BACK -> card.pureAnswer(col)
+    }
+    return TtsParser.getTextsToRead(cardSideContent, context.getString(R.string.reviewer_tts_cloze_spoken_replacement))
 }

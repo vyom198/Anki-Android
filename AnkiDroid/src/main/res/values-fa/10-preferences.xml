@@ -46,13 +46,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- generic strings -->
     <string name="disabled">غیر فعال شده</string>
-    <string name="pref_summary_seconds">%s ثانیه</string>
-    <string name="pref_summary_minutes">%s دقیقه</string>
-    <string comment="Percentage value of a preference. %s represents the number to be replaced. Use \%% to represent a single percent sign (%)" name="pref_summary_percentage">%s\%%</string>
+    <plurals name="pref_summ_minutes">
+        <item quantity="one">%d دقیقه</item>
+        <item quantity="other">%d دقیقه</item>
+    </plurals>
+    <string name="pref_milliseconds">%s ms</string>
+    <!-- TODO: move to 20-search-preference so we can contribute upstream (searchpreference_no_results)-->
     <string name="pref_search_no_results">بدون نتیجه</string>
     <!-- preferences.xml categories-->
     <string name="pref_cat_general" comment="name of the general preference category" maxLength="41">عمومی</string>
-    <string name="pref_cat_studying" maxLength="41">Play</string>
+    <string name="pref_cat_studying" maxLength="41">مطالعه کردن</string>
     <string name="pref_cat_system_wide" maxLength="41">در کل سیستم</string>
     <string name="pref_cat_reviewing" maxLength="41">مرور</string>
     <string name="pref_cat_sync" comment="title of the sync preferences category" maxLength="41">همگام سازی</string>
@@ -60,7 +63,6 @@
     <string name="pref_cat_whiteboard" maxLength="41">تخته سفید</string>
     <string name="pref_cat_appearance" maxLength="41">ظاهر</string>
     <string name="pref_cat_themes" maxLength="41">پوسته ها</string>
-    <string name="pref_cat_fonts" maxLength="41">نوع خط</string>
     <string name="pref_cat_gestures" maxLength="41">حرکات دست</string>
     <string name="pref_cat_controls" maxLength="41">کنترل ها</string>
     <string name="pref_cat_advanced" maxLength="41">پیشرفته</string>
@@ -113,6 +115,7 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">لمس بالای وسط</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">لمس پایین سمت چپ</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">لمس پایین سمت راست</string>
+    <string name="gestures_shake" maxLength="41">لرزش دستگاه</string>
     <string name="card_browser_enable_external_context_menu">منوی \'%s\'</string>
     <string name="card_browser_enable_external_context_menu_summary">\'%s\' را در لیست به صورت عمومی فعال می‌کند</string>
     <string name="double_scrolling_gap" maxLength="41">پیمایش دو برابری</string>
@@ -133,8 +136,8 @@
     <string name="sync_status_badge_summ">علامت همگام سازی را تغییر بده وقتی تغییرات در حال آپلود شدن هستند</string>
     <string name="metered_sync_title" maxLength="41">مجاز بر روی ارتباطات دارای محدودیت</string>
     <string name="metered_sync_summary">اگر غیرفعال شود، چنانچه شبکه شما دارای محدودیت ارتباطی باشد، هنگام سینک کردن پیغام هشدار دریافت می‌کنید</string>
-    <string name="backup_limits_frequency">Frequency</string>
-    <string name="backup_limits_lifetime">Lifetime</string>
+    <string name="backup_limits_frequency">فرکانس</string>
+    <string name="backup_limits_lifetime">برای همیشه</string>
     <string name="app_theme" maxLength="41">تِم</string>
     <string name="day_theme" maxLength="41">پس زمینه روز</string>
     <string name="night_theme" maxLength="41">پس زمینه شب</string>
@@ -148,10 +151,7 @@
     <string name="notification_minimum_cards_due_vibrate" maxLength="41">لرزش</string>
     <string name="notification_minimum_cards_due_blink" maxLength="41">چشمک زدن نور</string>
     <string name="timeout_answer_text" maxLength="41">نمایش پاسخ بصورت خودکار</string>
-    <string name="timeout_answer" maxLength="41">جواب اگر وقت تمام شد</string>
-    <string name="timeout_answer_summ">نمایش خودکار پاسخ بدون درخواست کاربر. تأخیر شامل زمان پخش فایل صوتی نیز می‌شود.</string>
-    <string name="timeout_answer_seconds" maxLength="41">زمان نمایش پاسخ</string>
-    <string name="timeout_question_seconds" maxLength="41">زمان نمایش پرسش بعدی</string>
+    <string name="timeout_answer_summ2">Show answer automatically without user input. Configure from deck options.</string>
     <string name="select_locale_title">زبان را انتخاب کنید</string>
     <string name="software_render" maxLength="41">غیر فعال کردن رندر سخت‌افزار کارت</string>
     <string name="software_render_summ">رندر سخت افزاری سریع تر است ولی ممکن است مشکل داشته باشد، مخصوصا روی اندروید 8 یا 8.1. اگر بعضی از دکمه های مرور کارت ها را نمیبینید، این تنظیمات را امتحان کنید.</string>
@@ -164,26 +164,25 @@
     <string name="vertical_centering_summ">تراز کردن محتوای کارت‌ها بصورت عمودی در وسط</string>
     <string name="pref_double_tap_time_interval" maxLength="41">فاصله زمانی دو بار زدن (میلی ثانیه)</string>
     <string name="pref_double_tap_time_interval_summary">ضربه دوم به دکمه های پاسخ صرف نظر می شود اگر این مدت زمان سپری نشده باشد. این عمل از دوبار ضربه های تصادفی جلوگیری میکند</string>
-    <string name="pref_show_answer_long_press" maxLength="41">Show answer long-press time (ms)</string>
-    <string name="pref_show_answer_long_press_summary">Minimum long-press time before the show answer button will register a touch. May reduce the chance of accidental extra button presses. Default is 0ms</string>
+    <string name="pref_show_answer_long_press_time" maxLength="41">Show answer long-press time</string>
+    <string name="pref_show_answer_long_press_time_summary">Minimum pressing time before the show answer button registers a touch.</string>
     <string name="show_estimates" maxLength="41">نمایش  دکمه زمان</string>
     <string name="show_estimates_summ">نمایش زمان مرور بعدی در بالای دکمه پاسخ</string>
     <string name="show_large_answer_buttons" maxLength="41">دکمه های بزرگ جواب نشان بده</string>
     <string name="show_large_answer_buttons_summ">دکمه ی جواب را در 2 ردیف نشان بده</string>
     <string name="show_top_bar" maxLength="41">نمایش نوار بالا</string>
-    <string name="show_top_bar_summ">نمایش تعداد کارت‌ها، پرچم‌ها و نشان‌ها در نوار بالا</string>
+    <string name="show_top_bar_summ">نمایش تعداد کارت‌ها، پرچم‌ها و علامت‌ها در نوار بالا</string>
     <string name="show_progress" maxLength="41">نمایش باقیمانده</string>
     <string name="show_progress_summ">نمایش تعداد کارت‌های باقیمانده</string>
-    <string name="show_eta" maxLength="41">نمایش زمان تخمینی</string>
-    <string name="show_eta_summ">نمایش زمان باقیمانده</string>
+    <string name="show_eta" maxLength="41">Show ETA</string>
+    <string name="show_eta_summ">Show remaining time</string>
     <string name="use_current" maxLength="41">دسته برای کارتهای جدید</string>
     <string name="learn_cutoff" maxLength="41">محدودیت های پیش رو را یاد بگیرید</string>
     <string name="time_limit" maxLength="41">محدوده زمانی جعبه زمان</string>
-    <string name="new_timezone" maxLength="41">مدیریت منطقه زمانی جدید</string>
     <string name="day_offset_with_description" maxLength="41">شروع روز بعد</string>
     <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
-        <item quantity="one">%d hour past midnight</item>
-        <item quantity="other">%d hours past midnight</item>
+        <item quantity="one">%d ساعت پس از نیمه شب</item>
+        <item quantity="other">%d ساعت پس از نیمه شب</item>
     </plurals>
     <string name="pref_keep_screen_on" maxLength="41">روشن نگه‌داشتن صفحه</string>
     <string name="pref_keep_screen_on_summ">غیرفعال کردن زمان خاموش شدن صفحه نمایش</string>
@@ -199,10 +198,9 @@
     <string name="reset">تنظیم مجدد</string>
     <string name="thirdparty_apps_title" maxLength="41">ای پی آی سایر نرم‌افزارها</string>
     <string name="thirdparty_apps_summary">نمایش لیست کامل از همۀ نرم‌افزارهایی که از ای پی آی آنکی‌دروید استفاده می‌کنند. (برای مثال نرم‌افزارهای فرهنگ لغت و ...)</string>
-    <string name="html_javascript_debugging" maxLength="41">دیباگ کردن HTML / Javascript</string>
-    <string name="html_javascript_debugging_summ">فعال‌سازی اتصالات از بیرونی و ذخیرۀ اچ تی ام ال کارت‌ها در مسیر آنکی‌دروید</string>
     <!-- Appearance settings -->
     <string name="pref_cat_reviewer" maxLength="41">مرور کننده</string>
+    <string name="show_deck_title" maxLength="41">Show deck title</string>
     <string name="accessibility" maxLength="41">قابلیت دسترسی</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">عکس های کلیپبورد را به عنوان PNG پِیست کن</string>
@@ -224,12 +222,12 @@
     <!-- Key Bindings -->
     <string name="keyboard">کیبورد</string>
     <string name="bluetooth">بلوتوث</string>
-    <string name="answer_buttons" maxLength="41">Answer buttons</string>
-    <string name="card" maxLength="41">Card</string>
-    <string name="note" maxLength="41">Note</string>
-    <string name="navigation" maxLength="41">Navigation</string>
-    <string name="media" maxLength="41">Media</string>
-    <string name="misc" maxLength="41">Misc</string>
+    <string name="answer_buttons" maxLength="41">دکمه های پاسخ</string>
+    <string name="card" maxLength="41">کارت</string>
+    <string name="note" maxLength="41">یادداشت</string>
+    <string name="navigation" maxLength="41">هدایت</string>
+    <string name="media" maxLength="41">رسانه</string>
+    <string name="misc" maxLength="41">سایر</string>
     <!-- studyoptions -->
     <string name="studyoptions_limit_select_tags">انتخاب برچسبها</string>
     <!-- Deck configurations -->
@@ -242,16 +240,15 @@
     <string name="deck_conf_cram_reschedule" maxLength="41" comment="Title of the box labelled by deck_conf_cram_reschedule_summ">برنا مه ریزی مجدد</string>
     <string name="deck_conf_cram_reschedule_summ">برنامه ریزی مجدد کارتها براساس جوابهای من در این دسته</string>
     <string name="deck_conf_cram_filter_2_check">فیلتر دوم را فعال کن</string>
-    <string name="deck_conf_cram_steps" maxLength="41">قدم‌های سفارشی (به دقیقه)</string>
     <string name="deck_conf_cram_steps_summ" maxLength="41">تعریف مراحل سفارشی</string>
+    <string name="deck_conf_cram_preview_delays" maxLength="41">Preview delays</string>
+    <string name="deck_conf_cram_preview_delays_summ">Delays are in seconds. 0 returns card to original deck.</string>
     <!-- analytics options -->
     <string name="analytics_dialog_title">کمک به بهتر شدن AnkiDroid!</string>
     <string name="analytics_title" maxLength="41">به اشتراک گذاشتن ویژگی‌های مورد استفاده</string>
     <string name="analytics_summ">شما می‌توانید با به اشتراک گذاشتن ویژگی‌هایی که استفاده می‌کنید می‌توانید به توسعۀ آنکی‌دروید کمک کنید</string>
     <string name="note_editor_replace_newlines" maxLength="41">خط های جدید را با HTML جایگذین کن</string>
     <string name="note_editor_replace_newlines_summ">در ویرایشگر یادداشت، همه &lt;br&gt; را به خط جدید تبدیل کن موقع ویرایش کارت</string>
-    <string name="no_code_formatting" maxLength="41">قالب‌بندی پاسخ تایپ شده ی ساده</string>
-    <string name="no_code_formatting_summ">مشکل پدید آمدن ‘􏿾’ در نتایج جواب تایپ شده را درست میکند</string>
     <string name="type_in_answer_focus" maxLength="41">روی ‘تایپ کردن در جای جواب’ تمرکز کن</string>
     <string name="type_in_answer_focus_summ">به صورت خودکار روی فیلد \'تایپ کردن در جای جواب\' در مرورگر تمرکز میکند</string>
     <!-- About -->
@@ -268,6 +265,19 @@
     <string name="binding_add_key">کلید اضافه کن</string>
     <string name="binding_replace_key">کلید را جایگذین کن</string>
     <string name="key_picker_default_press_key">یک کلید را انتخاب کنید</string>
+    <string name="binding_add_axis">اضافه کردن اهرمک/تنظیم کننده حرکات</string>
+    <string name="axis_picker_move_joystick">یک اهرمک/تنظیم کننده حرکات را حرکت دهید</string>
+    <string name="user_actions" maxLength="41">User actions</string>
+    <string name="user_actions_summary" maxLength="41">Trigger JavaScript from the review screen</string>
+    <string name="user_action_1" maxLength="41">User action 1</string>
+    <string name="user_action_2" maxLength="41">User action 2</string>
+    <string name="user_action_3" maxLength="41">User action 3</string>
+    <string name="user_action_4" maxLength="41">User action 4</string>
+    <string name="user_action_5" maxLength="41">User action 5</string>
+    <string name="user_action_6" maxLength="41">User action 6</string>
+    <string name="user_action_7" maxLength="41">User action 7</string>
+    <string name="user_action_8" maxLength="41">User action 8</string>
+    <string name="user_action_9" maxLength="41">User action 9</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">طرف کارت را انتخاب کنید</string>
     <string name="card_side_question">سوال</string>
@@ -281,6 +291,8 @@
     <string name="bindings_already_bound">قبلا به ‘%s’ وابسته بود</string>
     <!-- Advanced -->
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">آزمایشی</string>
+    <string name="readtext_deprecation_warn">AnkiDroid has introduced a better TTS mechanism which is compatible with other Anki clients and includes more voices and improvements to language playback!\n\nPlease upgrade as soon as possible, as this setting will be removed soon</string>
+    <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">Please upgrade to the new text to speech format</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">گزینه های توسعه دهنده</string>
     <string name="dev_options_enabled_pref" maxLength="41">فعال‌سازی گزینه های توسعه دهنده</string>

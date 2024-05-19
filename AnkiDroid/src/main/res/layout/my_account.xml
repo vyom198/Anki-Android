@@ -31,10 +31,9 @@
                     android:id="@+id/ankidroid_logo"
                     android:layout_width="200dp"
                     app:srcCompat="@drawable/ankidroid_logo"
-                    android:layout_marginBottom="0dp"
+                    android:layout_marginBottom="@dimen/input_layout_padding"
                     android:layout_gravity="center"
-                    android:layout_height="200dp"
-                    />
+                    android:layout_height="200dp" />
 
                 <!--<com.ichi2.ui.FixedTextView-->
                 <!--android:id="@+id/sign_in"-->
@@ -49,10 +48,13 @@
                 <!--&lt;!&ndash; TODO JS - move into strings.xml &ndash;&gt;-->
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/username_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/username"
-                    android:layout_margin="@dimen/content_vertical_padding">
+                    app:endIconMode="clear_text"
+                    app:errorEnabled="true"
+                    android:layout_marginHorizontal="@dimen/input_layout_padding">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/username"
@@ -60,6 +62,7 @@
                         android:layout_height="wrap_content"
                         android:drawableStart="@drawable/ic_baseline_email_24"
                         android:drawablePadding="8dp"
+                        android:nextFocusForward="@id/password_layout"
                         android:inputType="textNoSuggestions|textEmailAddress"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -69,8 +72,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/password"
-                    app:passwordToggleEnabled="true"
-                    android:layout_margin="@dimen/content_vertical_padding">
+                    app:endIconMode="password_toggle"
+                    app:errorEnabled="true"
+                    android:layout_marginHorizontal="@dimen/input_layout_padding">
 
                     <com.ichi2.ui.TextInputEditField
                         android:id="@+id/password"
@@ -89,6 +93,7 @@
                     android:minWidth="200dp"
                     android:layout_gravity="center"
                     android:text="@string/log_in"
+                    android:enabled="false"
                     android:layout_margin="@dimen/content_vertical_padding"/>
 
                 <com.google.android.material.button.MaterialButton
@@ -133,6 +138,19 @@
                     android:layout_gravity="center"
                     android:singleLine="true"
                     android:text="@string/sign_up" />
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/privacy_policy_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:textSize="@dimen/abc_text_size_button_material"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:padding="3dp"
+                    android:layout_gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/help_title_privacy" />
 
                 <!-- Added new button for lost email -->
                 <com.google.android.material.button.MaterialButton

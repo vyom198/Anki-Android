@@ -1,5 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ankidroid="http://schemas.android.com/apk/res-auto" >
+    xmlns:ankidroid="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
         ankidroid:showAsAction="never"
@@ -11,7 +12,7 @@
     <item
         android:id="@+id/action_delete_card"
         android:icon="@drawable/ic_delete_white"
-        android:title="@string/card_browser_delete_card" />
+        tools:title="Delete card" />
 
     <item
         android:id="@+id/action_view_card_info"
@@ -26,50 +27,56 @@
       <menu>
         <item
             android:id="@+id/action_flag_zero"
-            android:title="@string/menu_flag_card_zero"/>
+            tools:title="No Flag"/>
         <item
             android:id="@+id/action_flag_one"
-            android:title="@string/menu_flag_card_one"
+            tools:title="Red"
             android:icon="@drawable/ic_flag_red"/>
         <item
             android:id="@+id/action_flag_two"
-            android:title="@string/menu_flag_card_two"
+            tools:title="Orange"
             android:icon="@drawable/ic_flag_orange"/>
         <item
             android:id="@+id/action_flag_three"
-            android:title="@string/menu_flag_card_three"
+            tools:title="Green"
             android:icon="@drawable/ic_flag_green"/>
         <item
             android:id="@+id/action_flag_four"
-            android:title="@string/menu_flag_card_four"
+            tools:title="Blue"
             android:icon="@drawable/ic_flag_blue"/>
       <item
           android:id="@+id/action_flag_five"
-          android:title="@string/menu_flag_card_five"
+          tools:title="Pink"
           android:icon="@drawable/ic_flag_pink"/>
       <item
           android:id="@+id/action_flag_six"
-          android:title="@string/menu_flag_card_six"
+          tools:title="Turquoise"
           android:icon="@drawable/ic_flag_turquoise"/>
       <item
           android:id="@+id/action_flag_seven"
-          android:title="@string/menu_flag_card_seven"
+          tools:title="Purple"
           android:icon="@drawable/ic_flag_purple"/>
       </menu>
     </item>
 
-	<item
+    <item
         ankidroid:showAsAction="ifRoom"
         android:id="@+id/action_mark_card"
         android:icon="@drawable/ic_star_border_white"
-        android:title="@string/card_browser_mark_card"/>
+        tools:title="Toggle Mark"/>
 
 
     <item
         ankidroid:showAsAction="ifRoom"
         android:id="@+id/action_suspend_card"
-        android:icon="@drawable/ic_pause_circle_outline"
-        android:title="@string/card_browser_suspend_card"/>
+        android:icon="@drawable/ic_suspend"
+        tools:title="Toggle suspend" />
+
+    <item
+        ankidroid:showAsAction="ifRoom"
+        android:id="@+id/action_toggle_bury"
+        android:icon="@drawable/ic_flip_to_back_white"
+        tools:title="Toggle bury" />
 
     <item
         android:id="@+id/action_change_deck"
@@ -81,7 +88,7 @@
 
     <item
         android:id="@+id/action_reschedule_cards"
-        android:title="@string/card_editor_reschedule_card"/>
+        tools:title="Set due date" />
 
     <item
         android:id="@+id/action_edit_tags"
@@ -96,7 +103,8 @@
         android:title="@string/card_editor_preview_card"/>
 
     <item
-        android:id="@+id/action_export_selected" />
+        android:id="@+id/action_export_selected"
+        tools:title="Export cards"/>
 
     <item
         ankidroid:showAsAction="ifRoom"

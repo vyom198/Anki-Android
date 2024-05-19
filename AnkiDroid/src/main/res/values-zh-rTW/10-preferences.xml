@@ -46,9 +46,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- generic strings -->
     <string name="disabled">已停用</string>
-    <string name="pref_summary_seconds">%s 秒</string>
-    <string name="pref_summary_minutes">%s 分鐘</string>
-    <string comment="Percentage value of a preference. %s represents the number to be replaced. Use \%% to represent a single percent sign (%)" name="pref_summary_percentage">%s\%%</string>
+    <plurals name="pref_summ_minutes">
+        <item quantity="other">%d mins</item>
+    </plurals>
+    <string name="pref_milliseconds">%s ms</string>
+    <!-- TODO: move to 20-search-preference so we can contribute upstream (searchpreference_no_results)-->
     <string name="pref_search_no_results">無結果</string>
     <!-- preferences.xml categories-->
     <string name="pref_cat_general" comment="name of the general preference category" maxLength="41">一般</string>
@@ -60,7 +62,6 @@
     <string name="pref_cat_whiteboard" maxLength="41">白板</string>
     <string name="pref_cat_appearance" maxLength="41">外觀</string>
     <string name="pref_cat_themes" maxLength="41">佈景</string>
-    <string name="pref_cat_fonts" maxLength="41">字型</string>
     <string name="pref_cat_gestures" maxLength="41">手勢</string>
     <string name="pref_cat_controls" maxLength="41">控制</string>
     <string name="pref_cat_advanced" maxLength="41">進階設定</string>
@@ -113,6 +114,7 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">輕觸正中間</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">輕觸左下方</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">輕觸右下方</string>
+    <string name="gestures_shake" maxLength="41">Shake device</string>
     <string name="card_browser_enable_external_context_menu">‘%s’ 選單</string>
     <string name="card_browser_enable_external_context_menu_summary">啟用全域性‘%s’內容選單</string>
     <string name="double_scrolling_gap" maxLength="41">加速捲動</string>
@@ -148,10 +150,7 @@
     <string name="notification_minimum_cards_due_vibrate" maxLength="41">震動</string>
     <string name="notification_minimum_cards_due_blink" maxLength="41">提示燈</string>
     <string name="timeout_answer_text" maxLength="41">自動顯示答案</string>
-    <string name="timeout_answer" maxLength="41">逾時回答</string>
-    <string name="timeout_answer_summ">無需用戶輸入自動顯示答案。延遲時間包括自動播放音訊檔案的時間。</string>
-    <string name="timeout_answer_seconds" maxLength="41">顯示答案的時間</string>
-    <string name="timeout_question_seconds" maxLength="41">顯示下一題的時間</string>
+    <string name="timeout_answer_summ2">Show answer automatically without user input. Configure from deck options.</string>
     <string name="select_locale_title">選擇語言</string>
     <string name="software_render" maxLength="41">禁用卡片硬體渲染</string>
     <string name="software_render_summ">硬體渲染速度較快，但可能存在問題，特別是位於 Android 8/8.1 中。如果您看不到部分卡片復習使用者頁面，請嘗試此設定。</string>
@@ -164,8 +163,8 @@
     <string name="vertical_centering_summ">垂直置中卡片內容</string>
     <string name="pref_double_tap_time_interval" maxLength="41">雙擊的時間間隔 (毫秒)</string>
     <string name="pref_double_tap_time_interval_summary">如果時間不到，按二次答案按鍵是無效的，這樣可以避免不小心雙擊按鍵。</string>
-    <string name="pref_show_answer_long_press" maxLength="41">Show answer long-press time (ms)</string>
-    <string name="pref_show_answer_long_press_summary">Minimum long-press time before the show answer button will register a touch. May reduce the chance of accidental extra button presses. Default is 0ms</string>
+    <string name="pref_show_answer_long_press_time" maxLength="41">Show answer long-press time</string>
+    <string name="pref_show_answer_long_press_time_summary">Minimum pressing time before the show answer button registers a touch.</string>
     <string name="show_estimates" maxLength="41">顯示按鈕的時間</string>
     <string name="show_estimates_summ">在答案按鈕上顯示下一次複習的時間</string>
     <string name="show_large_answer_buttons" maxLength="41">顯示大的答案按鍵</string>
@@ -174,12 +173,11 @@
     <string name="show_top_bar_summ">顯示卡片計數，標記和頂部列標識</string>
     <string name="show_progress" maxLength="41">顯示剩餘數量</string>
     <string name="show_progress_summ">顯示剩餘卡片數量</string>
-    <string name="show_eta" maxLength="41">顯示預計完成時間</string>
-    <string name="show_eta_summ">顯示剩餘時間</string>
+    <string name="show_eta" maxLength="41">Show ETA</string>
+    <string name="show_eta_summ">Show remaining time</string>
     <string name="use_current" maxLength="41">存放新卡片的牌組</string>
     <string name="learn_cutoff" maxLength="41">提早學習上限</string>
     <string name="time_limit" maxLength="41">時間盒的時間上限</string>
-    <string name="new_timezone" maxLength="41">時區變更處理</string>
     <string name="day_offset_with_description" maxLength="41">下一天開始的時間</string>
     <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
         <item quantity="other">%d hours past midnight</item>
@@ -198,10 +196,9 @@
     <string name="reset">Reset</string>
     <string name="thirdparty_apps_title" maxLength="41">第三方 API 應用程式</string>
     <string name="thirdparty_apps_summary">查看一系列使用 AnkiDroid API 的應用程式，如字典，實用工具。</string>
-    <string name="html_javascript_debugging" maxLength="41">HTML / Javascript 偵錯</string>
-    <string name="html_javascript_debugging_summ">啟用控制 WebView 連線，並儲存卡片 HTML 到 AnkiDroid 資料夾</string>
     <!-- Appearance settings -->
     <string name="pref_cat_reviewer" maxLength="41">複習介面</string>
+    <string name="show_deck_title" maxLength="41">Show deck title</string>
     <string name="accessibility" maxLength="41">無障礙功能</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">複製PNG格式的圖像到剪貼簿上</string>
@@ -241,16 +238,15 @@
     <string name="deck_conf_cram_reschedule" maxLength="41" comment="Title of the box labelled by deck_conf_cram_reschedule_summ">重新排程</string>
     <string name="deck_conf_cram_reschedule_summ">依據我在本牌組的回答狀況來重新排程卡片</string>
     <string name="deck_conf_cram_filter_2_check">開啟第二個過濾器</string>
-    <string name="deck_conf_cram_steps" maxLength="41">自訂步數 (以分鐘計)</string>
     <string name="deck_conf_cram_steps_summ" maxLength="41">設定自訂步數</string>
+    <string name="deck_conf_cram_preview_delays" maxLength="41">Preview delays</string>
+    <string name="deck_conf_cram_preview_delays_summ">Delays are in seconds. 0 returns card to original deck.</string>
     <!-- analytics options -->
     <string name="analytics_dialog_title">幫助 AnkiDroid 做得更好！</string>
     <string name="analytics_title" maxLength="41">分享功能使用方式</string>
     <string name="analytics_summ">你可以通過幫助開發團隊看看人們在用什麼功能，來為 AnkiDroid 做出貢獻</string>
     <string name="note_editor_replace_newlines" maxLength="41">以HTML取代新列</string>
     <string name="note_editor_replace_newlines_summ">在筆記編輯器中，編輯卡片時將&lt;br&gt;的任何實例轉換至新一列。</string>
-    <string name="no_code_formatting" maxLength="41">簡單輸入的答案模式</string>
-    <string name="no_code_formatting_summ">修復在輸入的答案結果中出現的“􏿾”</string>
     <string name="type_in_answer_focus" maxLength="41">聚焦“輸入答案”</string>
     <string name="type_in_answer_focus_summ">自動聚焦在復習者的“輸入答案”字段</string>
     <!-- About -->
@@ -267,6 +263,19 @@
     <string name="binding_add_key">新增按鍵</string>
     <string name="binding_replace_key">替換按鍵</string>
     <string name="key_picker_default_press_key">按一個按鍵</string>
+    <string name="binding_add_axis">Add joystick/motion controller</string>
+    <string name="axis_picker_move_joystick">Move a joystick/motion controller</string>
+    <string name="user_actions" maxLength="41">User actions</string>
+    <string name="user_actions_summary" maxLength="41">Trigger JavaScript from the review screen</string>
+    <string name="user_action_1" maxLength="41">User action 1</string>
+    <string name="user_action_2" maxLength="41">User action 2</string>
+    <string name="user_action_3" maxLength="41">User action 3</string>
+    <string name="user_action_4" maxLength="41">User action 4</string>
+    <string name="user_action_5" maxLength="41">User action 5</string>
+    <string name="user_action_6" maxLength="41">User action 6</string>
+    <string name="user_action_7" maxLength="41">User action 7</string>
+    <string name="user_action_8" maxLength="41">User action 8</string>
+    <string name="user_action_9" maxLength="41">User action 9</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">選取卡面</string>
     <string name="card_side_question">問題</string>
@@ -280,6 +289,8 @@
     <string name="bindings_already_bound">已經和%s關聯</string>
     <!-- Advanced -->
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">實驗性功能</string>
+    <string name="readtext_deprecation_warn">AnkiDroid has introduced a better TTS mechanism which is compatible with other Anki clients and includes more voices and improvements to language playback!\n\nPlease upgrade as soon as possible, as this setting will be removed soon</string>
+    <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">Please upgrade to the new text to speech format</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">開發人員選項</string>
     <string name="dev_options_enabled_pref" maxLength="41">啟用開發人員選項</string>

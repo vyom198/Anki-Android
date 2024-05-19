@@ -19,17 +19,20 @@ package com.ichi2.anki
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Message
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
+import androidx.core.app.TaskStackBuilder
 import androidx.core.content.FileProvider
-import com.ichi2.anki.UIUtils.showThemedToast
+import androidx.core.content.IntentCompat
 import com.ichi2.anki.dialogs.DialogHandler.Companion.storeMessage
 import com.ichi2.anki.dialogs.DialogHandlerMessage
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.servicelayer.ScopedStorageService
 import com.ichi2.anki.services.ReminderService
+import com.ichi2.anki.worker.SyncWorker
 import com.ichi2.annotations.NeedsTest
 import com.ichi2.themes.Themes
 import com.ichi2.themes.Themes.disableXiaomiForceDarkMode
@@ -37,6 +40,7 @@ import com.ichi2.utils.FileUtil
 import com.ichi2.utils.ImportUtils.handleFileImport
 import com.ichi2.utils.ImportUtils.isInvalidViewIntent
 import com.ichi2.utils.ImportUtils.showImportUnsuccessfulDialog
+import com.ichi2.utils.IntentUtil.resolveMimeType
 import com.ichi2.utils.NetworkUtils
 import com.ichi2.utils.Permissions
 import com.ichi2.utils.Permissions.hasStorageAccessPermission
@@ -44,7 +48,6 @@ import com.ichi2.utils.copyToClipboard
 import com.ichi2.utils.trimToLength
 import timber.log.Timber
 import java.io.File
-import java.util.function.Consumer
 import kotlin.math.max
 import kotlin.math.min
 
@@ -68,11 +71,27 @@ class IntentHandler : Activity() {
         val action = intent.action
         // #6157 - We want to block actions that need permissions we don't have, but not the default case
         // as this requires nothing
-        val runIfStoragePermissions = Consumer { runnable: Runnable -> performActionIfStorageAccessible(runnable, reloadIntent, action) }
-        when (getLaunchType(intent)) {
-            LaunchType.FILE_IMPORT -> runIfStoragePermissions.accept(Runnable { handleFileImport(intent, reloadIntent, action) })
-            LaunchType.SYNC -> runIfStoragePermissions.accept(Runnable { handleSyncIntent(reloadIntent, action) })
-            LaunchType.REVIEW -> runIfStoragePermissions.accept(Runnable { handleReviewIntent(intent) })
+        val runIfStoragePermissions = { runnable: () -> Unit -> performActionIfStorageAccessible(reloadIntent, action) { runnable() } }
+        val launchType = getLaunchType(intent)
+        // TODO block the UI with some kind of ProgressDialog instead of cancelling the sync work
+        if (requiresCollectionAccess(launchType)) {
+            SyncWorker.cancel(this)
+        }
+        when (launchType) {
+            LaunchType.FILE_IMPORT -> runIfStoragePermissions {
+                handleFileImport(fileIntent, reloadIntent, action)
+                finish()
+            }
+            LaunchType.TEXT_IMPORT -> runIfStoragePermissions {
+                onSelectedCsvForImport(fileIntent)
+                finish()
+            }
+            LaunchType.IMAGE_IMPORT -> runIfStoragePermissions {
+                handleImageImport(intent)
+                finish()
+            }
+            LaunchType.SYNC -> runIfStoragePermissions { handleSyncIntent(reloadIntent, action) }
+            LaunchType.REVIEW -> runIfStoragePermissions { handleReviewIntent(intent) }
             LaunchType.DEFAULT_START_APP_IF_NEW -> {
                 Timber.d("onCreate() performing default action")
                 launchDeckPickerIfNoOtherTasks(reloadIntent)
@@ -86,14 +105,21 @@ class IntentHandler : Activity() {
 
     private fun copyDebugInfoToClipboard(intent: Intent) {
         Timber.i("Copying debug info to clipboard")
-        if (!this.copyToClipboard(intent.getStringExtra(CLIPBOARD_INTENT_EXTRA_DATA)!!)) {
-            Timber.w("Failed to obtain ClipboardManager")
-            showThemedToast(this, R.string.something_wrong, true)
-            return
-        }
-
-        showThemedToast(this, R.string.about_ankidroid_successfully_copied_debug_info, true)
+        // null string is handled by copyToClipboard in try-catch
+        this.copyToClipboard(
+            text = (intent.getStringExtra(CLIPBOARD_INTENT_EXTRA_DATA)!!),
+            failureMessageId = R.string.about_ankidroid_error_copy_debug_info
+        )
     }
+
+    private val fileIntent: Intent
+        get() {
+            return if (intent.action == Intent.ACTION_SEND) {
+                IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Intent::class.java) ?: intent
+            } else {
+                intent
+            }
+        }
 
     /**
      * Execute the runnable if one of the two following conditions are satisfied:
@@ -104,13 +130,12 @@ class IntentHandler : Activity() {
      *
      */
     @NeedsTest("clicking a file in 'Files' to import")
-    private fun performActionIfStorageAccessible(runnable: Runnable, reloadIntent: Intent, action: String?) {
-        if (!ScopedStorageService.isLegacyStorage(this) || hasStorageAccessPermission(this) || Permissions.isExternalStorageManagerCompat()) {
+    private fun performActionIfStorageAccessible(reloadIntent: Intent, action: String?, block: () -> Unit) {
+        if (grantedStoragePermissions(this, showToast = true)) {
             Timber.i("User has storage permissions. Running intent: %s", action)
-            runnable.run()
+            block()
         } else {
             Timber.i("No Storage Permission, cancelling intent '%s'", action)
-            showThemedToast(this, getString(R.string.intent_handler_failed_no_storage_permission), false)
             launchDeckPickerIfNoOtherTasks(reloadIntent)
         }
     }
@@ -119,9 +144,9 @@ class IntentHandler : Activity() {
         val deckId = intent.getLongExtra(ReminderService.EXTRA_DECK_ID, 0)
         Timber.i("Handling intent to review deck '%d'", deckId)
         val reviewIntent = Intent(this, Reviewer::class.java)
-        CollectionHelper.instance.getColUnsafe(this)!!.decks.select(deckId)
+        CollectionManager.getColUnsafe().decks.select(deckId)
         startActivity(reviewIntent)
-        AnkiActivity.finishActivityWithFade(this)
+        finish()
     }
 
     private fun handleSyncIntent(reloadIntent: Intent, action: String?) {
@@ -130,54 +155,82 @@ class IntentHandler : Activity() {
         reloadIntent.action = action
         reloadIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(reloadIntent)
-        AnkiActivity.finishActivityWithFade(this)
+        finish()
     }
 
     private fun handleFileImport(intent: Intent, reloadIntent: Intent, action: String?) {
         Timber.i("Handling file import")
+        if (!hasShownAppIntro()) {
+            Timber.i("Trying to import a file when the app was not started at all")
+            showThemedToast(this, R.string.app_not_initialized_new, false)
+            return
+        }
         val importResult = handleFileImport(this, intent)
         // attempt to delete the downloaded deck if it is a shared deck download import
         if (intent.hasExtra(SharedDecksDownloadFragment.EXTRA_IS_SHARED_DOWNLOAD)) {
-            try {
-                val sharedDeckUri = intent.data
-                if (sharedDeckUri != null) {
-                    // TODO move the file deletion on a background thread
-                    contentResolver.delete(intent.data!!, null, null)
-                    Timber.i("onCreate: downloaded shared deck deleted")
-                } else {
-                    Timber.i("onCreate: downloaded a shared deck but uri was null when trying to delete its file")
-                }
-            } catch (e: Exception) {
-                Timber.w(e, "onCreate: failed to delete downloaded shared deck")
-            }
+            deleteDownloadedDeck(intent.data)
         }
 
         // Start DeckPicker if we correctly processed ACTION_VIEW
         if (importResult.isSuccess) {
-            try {
-                val file = File(intent.data!!.path!!)
-                val fileUri = applicationContext?.let {
-                    FileProvider.getUriForFile(
-                        it,
-                        it.applicationContext?.packageName + ".apkgfileprovider",
-                        File(it.getExternalFilesDir(FileUtil.getDownloadDirectory()), file.name)
-                    )
-                }
-                // TODO move the file deletion on a background thread
-                contentResolver.delete(fileUri!!, null, null)
-                Timber.i("onCreate() import successful and downloaded file deleted")
-            } catch (e: Exception) {
-                Timber.w(e, "onCreate() import successful and cannot delete file")
-            }
-
+            deleteImportedDeck(intent.data?.path)
             reloadIntent.action = action
             reloadIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             startActivity(reloadIntent)
-            AnkiActivity.finishActivityWithFade(this)
+            finish()
         } else {
             Timber.i("File import failed")
             // Don't import the file if it didn't load properly or doesn't have apkg extension
             showImportUnsuccessfulDialog(this, importResult.humanReadableMessage, true)
+        }
+    }
+
+    private fun deleteImportedDeck(path: String?) {
+        try {
+            val file = File(path!!)
+            val fileUri = applicationContext?.let {
+                FileProvider.getUriForFile(
+                    it,
+                    it.applicationContext?.packageName + ".apkgfileprovider",
+                    File(it.getExternalFilesDir(FileUtil.getDownloadDirectory()), file.name)
+                )
+            }
+            // TODO move the file deletion on a background thread
+            contentResolver.delete(fileUri!!, null, null)
+            Timber.i("onCreate() import successful and downloaded file deleted")
+        } catch (e: Exception) {
+            Timber.w(e, "onCreate() import successful and cannot delete file")
+        }
+    }
+
+    private fun handleImageImport(data: Intent) {
+        val imageUri = if (intent.action == Intent.ACTION_SEND) {
+            IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
+        } else {
+            data.data
+        }
+
+        val imageOcclusionIntentBuilder = ImageOcclusionIntentBuilder(this)
+        val intentImageOcclusion = imageOcclusionIntentBuilder.buildIntent(imageUri)
+
+        TaskStackBuilder.create(this)
+            .addNextIntentWithParentStack(Intent(this, DeckPicker::class.java))
+            .addNextIntent(intentImageOcclusion)
+            .startActivities()
+    }
+
+    private fun deleteDownloadedDeck(sharedDeckUri: Uri?) {
+        if (sharedDeckUri == null) {
+            Timber.i("onCreate: downloaded a shared deck but uri was null when trying to delete its file")
+            return
+        }
+
+        try {
+            // TODO move the file deletion on a background thread
+            contentResolver.delete(sharedDeckUri, null, null)
+            Timber.i("onCreate: downloaded shared deck deleted")
+        } catch (e: Exception) {
+            Timber.w(e, "onCreate: failed to delete downloaded shared deck")
         }
     }
 
@@ -195,7 +248,18 @@ class IntentHandler : Activity() {
     // COULD_BE_BETTER: Also extract the parameters into here to reduce coupling
     @VisibleForTesting
     enum class LaunchType {
-        DEFAULT_START_APP_IF_NEW, FILE_IMPORT, SYNC, REVIEW, COPY_DEBUG_INFO
+        DEFAULT_START_APP_IF_NEW,
+
+        /** colpkg/apkg/unknown */
+        FILE_IMPORT,
+
+        /** csv/tsv */
+        TEXT_IMPORT,
+
+        /** image */
+        IMAGE_IMPORT,
+
+        SYNC, REVIEW, COPY_DEBUG_INFO
     }
 
     companion object {
@@ -208,12 +272,31 @@ class IntentHandler : Activity() {
             return !isInvalidViewIntent(intent)
         }
 
+        /** Checks whether storage permissions are granted on the device. If the device is not using legacy storage,
+         *  it verifies if the app has been granted the necessary storage access permission.
+         *  @return `true`: if granted, otherwise `false` and shows a missing permission toast
+         */
+        fun grantedStoragePermissions(context: Context, showToast: Boolean): Boolean {
+            val granted = !ScopedStorageService.isLegacyStorage(context) || hasStorageAccessPermission(context) || Permissions.isExternalStorageManagerCompat()
+
+            if (!granted && showToast) {
+                showThemedToast(context, context.getString(R.string.intent_handler_failed_no_storage_permission), false)
+            }
+
+            return granted
+        }
+
         @VisibleForTesting
         @CheckResult
         fun getLaunchType(intent: Intent): LaunchType {
             val action = intent.action
-            return if (Intent.ACTION_VIEW == action && isValidViewIntent(intent)) {
-                LaunchType.FILE_IMPORT
+            return if (action == Intent.ACTION_SEND || Intent.ACTION_VIEW == action && isValidViewIntent(intent)) {
+                val mimeType = intent.resolveMimeType()
+                when {
+                    mimeType?.startsWith("image/") == true -> LaunchType.IMAGE_IMPORT
+                    mimeType == "text/tab-separated-values" || mimeType == "text/comma-separated-values" -> LaunchType.TEXT_IMPORT
+                    else -> LaunchType.FILE_IMPORT
+                }
             } else if ("com.ichi2.anki.DO_SYNC" == action) {
                 LaunchType.SYNC
             } else if (intent.hasExtra(ReminderService.EXTRA_DECK_ID)) {
@@ -240,6 +323,18 @@ class IntentHandler : Activity() {
                 // 25000 * 2 (bytes per char) = 50,000 bytes <<< 500KB
                 it.putExtra(CLIPBOARD_INTENT_EXTRA_DATA, textToCopy.trimToLength(25000))
             }
+
+        fun requiresCollectionAccess(launchType: LaunchType): Boolean {
+            return when (launchType) {
+                LaunchType.SYNC,
+                LaunchType.REVIEW,
+                LaunchType.DEFAULT_START_APP_IF_NEW,
+                LaunchType.FILE_IMPORT,
+                LaunchType.TEXT_IMPORT,
+                LaunchType.IMAGE_IMPORT -> true
+                LaunchType.COPY_DEBUG_INFO -> false
+            }
+        }
 
         class DoSync : DialogHandlerMessage(
             which = WhichDialogHandler.MSG_DO_SYNC,

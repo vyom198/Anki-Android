@@ -22,7 +22,9 @@
 
 package com.ichi2.libanki
 
-data class TtsVoice(
+import java.io.Closeable
+
+open class TtsVoice(
     val name: String,
     val lang: String
 ) {
@@ -35,7 +37,61 @@ data class TtsVoice(
         return out
     }
 
-    fun unavailable(): Boolean = false
+    open fun unavailable(): Boolean = false
 }
 
 data class TtsVoiceMatch(val voice: TtsVoice, val rank: Int)
+
+abstract class TtsPlayer : Closeable {
+    open val defaultRank = 0
+
+    private var availableVoices: List<TtsVoice>? = null
+
+    abstract fun getAvailableVoices(): List<TtsVoice>
+
+    abstract class TtsError
+
+    data class TtsCompletionStatus(val success: Boolean?, val error: TtsError? = null) {
+        companion object {
+            fun success() = TtsCompletionStatus(success = true)
+            fun stopped() = TtsCompletionStatus(success = null)
+            fun failure(errorCode: TtsError) = TtsCompletionStatus(success = false, errorCode)
+        }
+    }
+
+    // libanki uses `AvTag` as `tag`'s parameter type, but it requires `TTSTag` anyway
+    // changed here to get advantage of static typing
+    abstract suspend fun play(tag: TTSTag): TtsCompletionStatus
+
+    fun voices(): List<TtsVoice> {
+        if (availableVoices == null) {
+            availableVoices = getAvailableVoices()
+        }
+        return availableVoices!!
+    }
+
+    fun voiceForTag(tag: TTSTag): TtsVoiceMatch? {
+        val availVoices = voices()
+
+        var rank = defaultRank
+
+        // any requested voices match?
+        for (requestedVoice in tag.voices) {
+            for (avail in availVoices) {
+                if (avail.name == requestedVoice && avail.lang == tag.lang) {
+                    return TtsVoiceMatch(voice = avail, rank = rank)
+                }
+            }
+            rank -= 1
+        }
+
+        // if no preferred voices match, we fall back on language
+        // with a rank of -100
+        for (avail in availVoices) {
+            if (avail.lang == tag.lang) {
+                return TtsVoiceMatch(voice = avail, rank = -100)
+            }
+        }
+        return null
+    }
+}

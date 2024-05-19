@@ -9,7 +9,7 @@
     <color name="theme_dark_drawer_row_current">#33999999</color>
     <color name="theme_dark_drawer_item">#DEFFFFFF</color>
 
-    <style name="Theme_Dark" parent="@style/Theme.Material3.Dark.NoActionBar">
+    <style name="Base.Theme.Dark" parent="@style/Theme.Material3.Dark.NoActionBar">
         <!-- Android colors -->
         <item name="colorPrimary">@color/material_blue_400</item>
         <item name="colorOnPrimary">@color/white</item>
@@ -24,6 +24,11 @@
         <item name="android:textColorSecondary">@color/text_color_secondary_dark</item>
         <item name="android:colorBackground">@color/material_theme_grey</item>
         <item name="android:windowBackground">@color/material_theme_grey</item>
+
+        <item name="colorSurfaceContainerHighest">?attr/colorSurfaceContainer</item>
+        <item name="colorSurfaceContainerHigh">?android:attr/colorBackground</item>
+        <item name="colorSurfaceContainer">#0F42A5F5</item>
+        <item name="colorSurfaceContainerLow">?android:attr/colorBackground</item>
         <!-- Widget colors -->
         <item name="widgetColorActivated">?attr/colorAccent</item>
         <item name="preferenceCategoryTitleTextColor">?attr/colorAccent</item>
@@ -57,6 +62,10 @@
         <item name="reviewCountColor">@color/material_green_200</item>
         <item name="zeroCountColor">#404040</item>
         <!-- Reviewer colors -->
+        <item name="againButtonBackground">@color/material_red_800</item>
+        <item name="hardButtonBackground">@color/material_blue_grey_800</item>
+        <item name="goodButtonBackground">@color/material_green_800</item>
+        <item name="easyButtonBackground">@color/material_light_blue_800</item>
         <item name="topBarColor">@color/theme_dark_primary_light</item>
         <item name="maxTimerColor">@color/material_red_300</item>
         <item name="answerButtonTextColor">@color/white</item>
@@ -64,27 +73,22 @@
         <item name="hardButtonTextColor">@color/white</item>
         <item name="goodButtonTextColor">@color/white</item>
         <item name="easyButtonTextColor">@color/white</item>
+        <item name="alternativeBackgroundColor">#2a2a2a</item>
         <!-- Reviewer button drawables -->
+        <item name="showAnswerColor">@color/material_blue_grey_800</item>
         <item name="againButtonRef">@drawable/footer_button_again_dark</item>
         <item name="hardButtonRef">@drawable/footer_button_hard_dark</item>
         <item name="goodButtonRef">@drawable/footer_button_good_dark</item>
         <item name="easyButtonRef">@drawable/footer_button_easy_dark</item>
-        <item name="againButtonRippleRef">@drawable/footer_button_again_dark_ripple</item>
-        <item name="hardButtonRippleRef">@drawable/footer_button_hard_dark_ripple</item>
-        <item name="goodButtonRippleRef">@drawable/footer_button_good_dark_ripple</item>
-        <item name="easyButtonRippleRef">@drawable/footer_button_easy_dark_ripple</item>
+        <item name="againButtonRippleRef">@drawable/footer_button_ripple</item>
+        <item name="hardButtonRippleRef">@drawable/footer_button_ripple</item>
+        <item name="goodButtonRippleRef">@drawable/footer_button_ripple</item>
+        <item name="easyButtonRippleRef">@drawable/footer_button_ripple</item>
         <!-- Card Browser Colors -->
         <item name="cardBrowserDivider">@color/white</item>
         <!-- Browser colors -->
         <item name="suspendedColor">@color/material_grey_700</item>
         <item name="markedColor">@color/material_deep_purple_400</item>
-        <item name="flagRed">@color/flag_red_dark</item>
-        <item name="flagOrange">@color/flag_orange_dark</item>
-        <item name="flagGreen">@color/flag_green_dark</item>
-        <item name="flagBlue">@color/flag_blue_dark</item>
-        <item name="flagPink">@color/flag_pink_dark</item>
-        <item name="flagTurquoise">@color/flag_turquoise_dark</item>
-        <item name="flagPurple">@color/flag_purple_dark</item>
         <!-- Note editor colors -->
         <item name="duplicateColor">#855</item>
         <item name="editTextBackgroundColor">#EE5C5C5C</item>
@@ -137,5 +141,18 @@
         <item name="switchPreferenceCompatStyle">@style/Preference.SwitchPreferenceCompat.Material3</item>
         <item name="sliderStyle">@style/SliderStyle</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.AnkiDroid</item>
+
+        <!-- ProgressDialog-->
+        <item name="dialogBackground">#ff303030</item>
+        <item name="progressDialogButtonTextColor">@color/material_light_blue_400</item>
+
+        <item name="checkMediaListBackground">@color/material_grey_700</item>
+        <item name="checkMediaListForeground">@color/white</item>
+
+        <!-- AlertDialogTheme-->
+        <item name="alertDialogTheme">@style/AlertDialogStyle</item>
+        <item name="tabStyle">@style/Widget.MaterialComponents.TabLayout</item>
     </style>
+
+    <style name="Theme_Dark" parent="Base.Theme.Dark"/>
 </resources>

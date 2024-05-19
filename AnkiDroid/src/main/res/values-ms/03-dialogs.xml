@@ -49,10 +49,8 @@
     <string name="contextmenu_deckpicker_delete_deck">Padam dek</string>
     <string name="delete_deck_title">Padam dek?</string>
     <string name="no_tts_available_message">Teks-ke-ucapan bahasa tiada</string>
-    <string name="initializing_tts">Memulakan TTS&#8230;</string>
     <string name="tts_no_tts">Jangan bercakap</string>
     <string name="unused_strings">\n\nFail tidak digunakan:\n</string>
-    <string name="preview_title" comment="Title of the window allowing to preview card(s)">Pratonton</string>
     <string name="reposition_card_dialog_title">Alih posisi kad baru</string>
     <string name="reposition_card_dialog_message">Posisi mula:</string>
     <string name="reposition_card_not_new_error">Hanya kad baru boleh alih posisi</string>
@@ -60,24 +58,13 @@
         <item quantity="other">%d kad telah alih posisi</item>
     </plurals>
     <string name="reset_card_dialog_title">Tetap semula kemajuan kad</string>
-    <string name="reset_card_dialog_message">Kad ini akan diletakkan pada hujung aturan kad baru</string>
     <plurals name="reset_cards_dialog_acknowledge">
         <item quantity="other">%d kad ditetap semula</item>
     </plurals>
     <!-- Reschedule Card Dialog -->
-    <plurals name="reschedule_cards_dialog_title_new">
-        <item quantity="other">Jadualkan semula %d kad</item>
-    </plurals>
-    <plurals name="reschedule_card_dialog_interval">
-        <item quantity="other">Selang kini: %d hari</item>
-    </plurals>
-    <string name="reschedule_card_dialog_message">Jadualkan semula untuk semakan dalam x hari</string>
     <plurals name="reschedule_cards_dialog_acknowledge">
         <item quantity="other">%d kad telah dijadual semula</item>
     </plurals>
-    <string name="reschedule_card_dialog_new_card_warning">Kad baru sedang dijadualkan semula. Penjadualan semula juga menukarkan kad baru kepada kad semakan. Guna pilihan \'alih posisi kad\' untuk ubah posisi kad baru dalam aturan baru</string>
-    <string name="reschedule_card_dialog_warning_ease_reset">Penjadualan semula juga tetap semula cara penjadual mengolah kard pada masa hadapan (longgaran akan ditetapkan ke %d%%)</string>
-    <string name="firefox_workaround_launched_reviewer_opening_deck">Pilih dek dalam pengurus fail anda atau lawat halaman about:downloads untuk mengimportnya</string>
     <string name="answering_error_title">Ralat pangkalan data</string>
     <string name="answering_error_message">Menulis ke koleksi gagal. Pangkalan data mungkin rosak atau kehabisan ruang kosong pada cakera.\n\nJika ini berlaku kerap, cuba periksa pangkalan data, baiki koleksi atau pulih dari suatu sandaran. Sentuh \"tetapan\" untuk lakukannya.\n\Atau ia mungkin pepijat AnkiDroid; sila laporkannya agar kami boleh memeriksa ralat tersebut.</string>
     <string name="answering_error_report">Lapor ralat</string>
@@ -106,8 +93,10 @@
     <string name="dialog_confirm" tools:ignore="UnusedResources">Pasti</string>
     <string name="dialog_no">Tidak</string>
     <string name="dialog_yes">Ya</string>
+    <string name="dialog_keep">Keep</string>
+    <string name="dialog_remove">Remove</string>
     <string name="dialog_continue">Teruskan</string>
-    <string name="dialog_processing">Memproses…</string>
+    <string name="dialog_processing">Memproses&#8230;</string>
     <string name="dialog_positive_create" comment="Create a new collection, probably erasing the previous one, may be necessary in case of error.">Cipta</string>
     <string name="dialog_positive_delete">Padam</string>
     <!-- Currently unsued, should be useful in the future -->
@@ -171,6 +160,7 @@
     <string name="failed_to_apply_background_image">Gagal menggunakan gambar latar belakang %s</string>
     <string name="background_image_too_large">Latar belakang Pemilih Dek terlalu besar</string>
     <string name="image_max_size_allowed">Saiz maksimum gambar yang dibenarkan %d MB</string>
+    <string name="image_dimensions_too_large">Image dimensions are too large (%1$d × %2$d)</string>
     <!-- Global Intent handler -->
     <!-- Also used by Card Browser, not renaming to save translators effort -->
     <string name="intent_handler_failed_no_storage_permission">Kebenaran storan diperlukan tiada. Sila beri kebenaran storan kemudian cuba lagi tindakan anda.</string>
@@ -180,7 +170,7 @@
     <string name="boot_service_failed_to_schedule_notifications">Gagal menjadualkan peringatan</string>
     <string name="boot_service_too_many_notifications">Terlalu banyak peringatan dijadualkan. Beberapa peringatan tidak akan muncul</string>
     <!-- Locale Selection Dialog -->
-    <string name="locale_selection_dialog_title">Pemilihan Bahasa Papan Kekunci</string>
+    <string name="locale_selection_dialog_title_new">Set Language</string>
     <string name="locale_selection_dialog_summary">Sesetengah papan kekunci pelbagai bahasa, seperti Gboard menyokong pertukaran bahasa ketika menyunting teks\n\nSila minta ciri “setImeHintLocales” daripada pengusaha papan kekunci jika papan kekunci anda tidak tukar bahasa.</string>
     <!-- Help Dialog -->
     <string name="help_title_using_ankidroid">Menggunakan AnkiDroid</string>
@@ -208,11 +198,12 @@
     <string name="help_item_ankiweb_terms_and_conditions">Terma dan Syarat AnkiWeb</string>
     <string name="help_title_send_exception">Hantar laporan penyelesaian masalah</string>
     <string name="help_dialog_exception_report_debounce">Laporan telah dihantar</string>
+    <string name="help_dialog_exception_report_sent">Report was sent!</string>
     <!--Sync-->
     <plurals name="sync_automatic_sync_needs_more_time">
         <item quantity="other">Penyegerakan automatik mungkin dicetuskan dalam %d saat</item>
     </plurals>
-    <string name="metered_sync_warning">Sambungan anda bermeter. Pemindahan datam mungkin memerlukan wang</string>
+    <string name="metered_sync_data_warning">Your internet provider may charge money for data use</string>
     <string name="deck_picker_new">Bilangan kad baru untuk lihat hari ini dalam dek ini.</string>
     <string name="deck_picker_rev">Bilangan kad tunggakan hari ini dalam dek ini.</string>
     <string name="deck_picker_lrn">Bilangan kad sedang dipelajari hari ini dalam dek ini.</string>
@@ -237,4 +228,20 @@
     </string>
     <string name="dismiss_backup_warning_upgrade">        Akibat perubahan privasi Android, data anda dan sandaran automatik tidak akan dapat dicapai jika aplikasi dinyahpasang
     </string>
+    <string name="deck_already_exists">Deck already exists</string>
+    <string name="create_deck_numeric_hint">If you have deck ordering issues (e.g. ‘10’ appears before ‘2’), replace ‘2’ with ‘02’</string>
+    <!-- Set Due Date -->
+    <string name="set_due_date_match_interval" comment="when setting a card\'s due date, this checkbox also changes the interval of the card">Set interval to same value</string>
+    <plurals name="set_due_date_single_day_label" comment="a date control is provided afterwards">
+        <item quantity="other">Show cards in</item>
+    </plurals>
+    <plurals name="set_due_date_range_label" comment="a date control is provided afterwards">
+        <item quantity="other">Show cards in range</item>
+    </plurals>
+    <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
+        <item quantity="other">days</item>
+    </plurals>
+    <string name="range_delimiter" comment="Placed between two input boxes to denote a range">–</string>
+    <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">From</string>
+    <string name="set_due_date_range_end" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'maximum\' value of this range (inclusive)">To</string>
 </resources>

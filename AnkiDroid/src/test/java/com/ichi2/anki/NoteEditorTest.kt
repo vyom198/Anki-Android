@@ -13,28 +13,32 @@
  You should have received a copy of the GNU General Public License along with
  this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:Suppress("SameParameterValue")
+
 package com.ichi2.anki
 
 import android.app.Activity
 import android.content.ClipData
 import android.content.Intent
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ichi2.anki.AbstractFlashcardViewer.Companion.editorCard
+import com.ichi2.anim.ActivityTransitionAnimation
 import com.ichi2.anki.NoteEditorTest.FromScreen.DECK_LIST
 import com.ichi2.anki.NoteEditorTest.FromScreen.REVIEWER
+import com.ichi2.anki.api.AddContentApi.Companion.DEFAULT_DECK_ID
 import com.ichi2.anki.multimediacard.activity.MultimediaEditFieldActivity
-import com.ichi2.compat.Compat.Companion.ACTION_PROCESS_TEXT
-import com.ichi2.compat.Compat.Companion.EXTRA_PROCESS_TEXT
+import com.ichi2.anki.noteeditor.EditCardDestination
+import com.ichi2.anki.noteeditor.toIntent
+import com.ichi2.anki.utils.ext.isImageOcclusion
 import com.ichi2.libanki.Consts
 import com.ichi2.libanki.Decks.Companion.CURRENT_DECK
 import com.ichi2.libanki.Note
 import com.ichi2.libanki.NotetypeJson
 import com.ichi2.testutils.AnkiAssert.assertDoesNotThrow
-import com.ichi2.utils.KotlinCleanup
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Ignore
@@ -46,30 +50,13 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
-@KotlinCleanup("IDE lint")
 class NoteEditorTest : RobolectricTest() {
     @Test
     @Config(qualifiers = "en")
     fun verifyCardsList() {
         val n = getNoteEditorEditingExistingBasicNote("Test", "Note", DECK_LIST)
         assertThat("Cards list is correct", (n.findViewById<TextView>(R.id.CardEditorCardsButton)).text.toString(), equalTo("Cards: Card 1"))
-    }
-
-    @Test
-    fun verifyPreviewAddingNote() {
-        val n = getNoteEditorAdding(NoteType.BASIC).withFirstField("Preview Test").build()
-        n.performPreview()
-        val intent = shadowOf(n).nextStartedActivityForResult
-        val noteEditorBundle = intent.intent.getBundleExtra("noteEditorBundle")
-        assertThat("Bundle set to add note style", noteEditorBundle!!.getBoolean("addNote"), equalTo(true))
-        val fieldsBundle = noteEditorBundle.getBundle("editFields")
-        assertThat("Bundle has fields", fieldsBundle, notNullValue())
-        assertThat("Bundle has fields edited value", fieldsBundle!!.getString("0"), equalTo("Preview Test"))
-        assertThat("Bundle has empty tag list", noteEditorBundle.getStringArrayList("tags"), equalTo(ArrayList<Any>()))
-        assertThat("Bundle has no ordinal for ephemeral preview", intent.intent.hasExtra("ordinal"), equalTo(false))
-        assertThat("Bundle has a temporary model saved", intent.intent.hasExtra(CardTemplateNotetype.INTENT_MODEL_FILENAME), equalTo(true))
     }
 
     @Test
@@ -194,8 +181,6 @@ class NoteEditorTest : RobolectricTest() {
 
     @Test
     fun copyNoteCopiesDeckId() {
-        // value returned if deck not found
-        val DECK_ID_NOT_FOUND = -404
         val currentDid = addDeck("Basic::Test")
         col.config.set(CURRENT_DECK, currentDid)
         val n = super.addNoteUsingBasicModel("Test", "Note")
@@ -205,7 +190,7 @@ class NoteEditorTest : RobolectricTest() {
         val copyNoteIntent = getCopyNoteIntent(editor)
         val newNoteEditor = super.startActivityNormallyOpenCollectionWithIntent(NoteEditor::class.java, copyNoteIntent)
         assertThat("Selected deck ID should be the current deck id", editor.deckId, equalTo(currentDid))
-        assertThat("Deck ID in the intent should be the selected deck id", copyNoteIntent.getLongExtra(NoteEditor.EXTRA_DID, DECK_ID_NOT_FOUND.toLong()), equalTo(currentDid))
+        assertThat("Deck ID in the intent should be the selected deck id", copyNoteIntent.getLongExtra(NoteEditor.EXTRA_DID, -404L), equalTo(currentDid))
         assertThat("Deck ID in the new note should be the ID provided in the intent", newNoteEditor.deckId, equalTo(currentDid))
     }
 
@@ -238,8 +223,8 @@ class NoteEditorTest : RobolectricTest() {
     fun processTextIntentShouldCopyFirstField() {
         ensureCollectionLoadIsSynchronous()
 
-        val i = Intent(ACTION_PROCESS_TEXT)
-        i.putExtra(EXTRA_PROCESS_TEXT, "hello\nworld")
+        val i = Intent(Intent.ACTION_PROCESS_TEXT)
+        i.putExtra(Intent.EXTRA_PROCESS_TEXT, "hello\nworld")
         val editor = startActivityNormallyOpenCollectionWithIntent(NoteEditor::class.java, i)
         val actual = editor.currentFieldStrings.toList()
 
@@ -250,7 +235,7 @@ class NoteEditorTest : RobolectricTest() {
     fun previewWorksWithNoError() {
         // #6923 regression test - Low value - Could not make this fail as onSaveInstanceState did not crash under Robolectric.
         val editor = getNoteEditorAddingNote(DECK_LIST, NoteEditor::class.java)
-        assertDoesNotThrow { editor.performPreview() }
+        assertDoesNotThrow { runBlocking { editor.performPreview() } }
     }
 
     @Test
@@ -351,10 +336,44 @@ class NoteEditorTest : RobolectricTest() {
         assertEquals(10, field.selectionEnd)
     }
 
+    @Test
+    fun `can open with corrupt current deck - Issue 14096`() {
+        col.config.set(CURRENT_DECK, '"' + "1688546411954" + '"')
+        getNoteEditorAddingNote(DECK_LIST, NoteEditor::class.java).apply {
+            assertThat("current deck is default after corruption", deckId, equalTo(DEFAULT_DECK_ID))
+        }
+    }
+
+    @Test
+    fun `can switch two image occlusion note types 15579`() {
+        val otherOcclusion = getSecondImageOcclusionNoteType()
+        getNoteEditorAdding(NoteType.IMAGE_OCCLUSION).build().apply {
+            val position = requireNotNull(noteTypeSpinner!!.getItemIndex(otherOcclusion.name)) { "could not find ${otherOcclusion.name}" }
+            noteTypeSpinner!!.setSelection(position)
+        }
+    }
+
+    private fun getSecondImageOcclusionNoteType(): NotetypeJson {
+        val imageOcclusionNotes = col.notetypes.filter { it.isImageOcclusion }
+        return if (imageOcclusionNotes.size >= 2) {
+            imageOcclusionNotes.first { it.name != "Image Occlusion" }
+        } else {
+            col.notetypes.byName("Image Occlusion")!!.createClone()
+        }
+    }
+
     private fun getCopyNoteIntent(editor: NoteEditor): Intent {
         val editorShadow = shadowOf(editor)
         editor.copyNote()
         return editorShadow.peekNextStartedActivityForResult().intent
+    }
+
+    private fun Spinner.getItemIndex(toFind: Any): Int? {
+        for (i in 0 until count) {
+            if (this.getItemAtPosition(i) != toFind) continue
+            return i
+        }
+        return null
     }
 
     private val cardCount: Int
@@ -377,6 +396,7 @@ class NoteEditorTest : RobolectricTest() {
                 val name = super.addNonClozeModel("Invalid", arrayOf("Front", "Back", "Side"), "", "")
                 col.notetypes.byName(name)
             }
+            NoteType.IMAGE_OCCLUSION -> col.notetypes.byName("Image Occlusion")
         }
     }
 
@@ -404,11 +424,10 @@ class NoteEditorTest : RobolectricTest() {
     }
 
     private fun <T : NoteEditor?> getNoteEditorEditingExistingBasicNote(n: Note, from: FromScreen, clazz: Class<T>): T {
-        val i = Intent()
+        var i = Intent()
         when (from) {
             REVIEWER -> {
-                i.putExtra(NoteEditor.EXTRA_CALLER, NoteEditor.CALLER_REVIEWER_EDIT)
-                editorCard = n.firstCard()
+                i = EditCardDestination(n.firstCard().id).toIntent(targetContext, ActivityTransitionAnimation.Direction.DEFAULT)
             }
             DECK_LIST -> i.putExtra(NoteEditor.EXTRA_CALLER, NoteEditor.CALLER_DECKPICKER)
         }
@@ -424,14 +443,15 @@ class NoteEditorTest : RobolectricTest() {
         BASIC, CLOZE,
 
         /**Basic, but Back is on the front  */
-        BACK_TO_FRONT, THREE_FIELD_INVALID_TEMPLATE
+        BACK_TO_FRONT, THREE_FIELD_INVALID_TEMPLATE,
+        IMAGE_OCCLUSION
+        ;
     }
 
     inner class NoteEditorTestBuilder(notetype: NotetypeJson?) {
-        private val mNotetype: NotetypeJson
-        private var mFirstField: String? = null
-        private var mSecondField: String? = null
-        private var mThirdField: String? = null
+        private val notetype: NotetypeJson
+        private var firstField: String? = null
+        private var secondField: String? = null
         fun build(): NoteEditor {
             val editor = build(NoteEditor::class.java)
             advanceRobolectricLooper()
@@ -445,15 +465,15 @@ class NoteEditorTest : RobolectricTest() {
         }
 
         fun <T : NoteEditor?> build(clazz: Class<T>): T {
-            col.notetypes.setCurrent(mNotetype)
-            val noteEditor = getNoteEditorAddingNote(REVIEWER, clazz)
+            col.notetypes.setCurrent(notetype)
+            val noteEditor = getNoteEditorAddingNote(REVIEWER, clazz)!!
             advanceRobolectricLooper()
-            noteEditor!!.setFieldValueFromUi(0, mFirstField)
-            if (mSecondField != null) {
-                noteEditor.setFieldValueFromUi(1, mSecondField)
+            // image occlusion does not need a first field
+            if (this.firstField != null) {
+                noteEditor.setFieldValueFromUi(0, firstField)
             }
-            if (mThirdField != null) {
-                noteEditor.setFieldValueFromUi(2, mThirdField)
+            if (secondField != null) {
+                noteEditor.setFieldValueFromUi(1, secondField)
             }
             return noteEditor
         }
@@ -463,23 +483,18 @@ class NoteEditorTest : RobolectricTest() {
         }
 
         fun withFirstField(text: String?): NoteEditorTestBuilder {
-            mFirstField = text
+            firstField = text
             return this
         }
 
         fun withSecondField(text: String?): NoteEditorTestBuilder {
-            mSecondField = text
-            return this
-        }
-
-        fun withThirdField(text: String?): NoteEditorTestBuilder {
-            mThirdField = text
+            secondField = text
             return this
         }
 
         init {
             assertNotNull(notetype) { "model was null" }
-            mNotetype = notetype
+            this.notetype = notetype
         }
     }
 }

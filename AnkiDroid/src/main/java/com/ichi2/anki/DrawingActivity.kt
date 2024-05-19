@@ -26,6 +26,8 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
 import com.ichi2.libanki.utils.TimeManager
+import com.ichi2.themes.Themes
+import com.ichi2.utils.iconAlpha
 import timber.log.Timber
 import java.io.FileNotFoundException
 
@@ -37,8 +39,8 @@ import java.io.FileNotFoundException
  * To access this screen: Add/Edit Note - Attachment - Add Image - Drawing
  */
 class DrawingActivity : AnkiActivity() {
-    private lateinit var mColorPalette: LinearLayout
-    private lateinit var mWhiteboard: Whiteboard
+    private lateinit var colorPalette: LinearLayout
+    private lateinit var whiteboard: Whiteboard
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (showedActivityFailedScreen(savedInstanceState)) {
@@ -48,9 +50,9 @@ class DrawingActivity : AnkiActivity() {
         setTitle(R.string.drawing)
         setContentView(R.layout.activity_drawing)
         enableToolbar()
-        mColorPalette = findViewById(R.id.whiteboard_editor)
-        mWhiteboard = Whiteboard.createInstance(this, true, null)
-        mWhiteboard.setOnTouchListener { _: View?, event: MotionEvent? -> mWhiteboard.handleTouchEvent(event!!) }
+        colorPalette = findViewById(R.id.whiteboard_editor)
+        whiteboard = Whiteboard.createInstance(this, true, null)
+        whiteboard.setOnTouchListener { _: View?, event: MotionEvent? -> whiteboard.handleTouchEvent(event!!) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -63,6 +65,13 @@ class DrawingActivity : AnkiActivity() {
                 R.color.white
             )
         )
+
+        // undo button
+        val undoEnabled: Boolean = !whiteboard.undoEmpty()
+        val alphaUndo = if (undoEnabled) Themes.ALPHA_ICON_ENABLED_LIGHT else Themes.ALPHA_ICON_DISABLED_LIGHT
+        val undoIcon = menu.findItem(R.id.action_undo)
+        undoIcon.setEnabled(undoEnabled).iconAlpha = alphaUndo
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -74,10 +83,16 @@ class DrawingActivity : AnkiActivity() {
             }
             R.id.action_whiteboard_edit -> {
                 Timber.i("Drawing:: Pen Color button pressed")
-                if (mColorPalette.visibility == View.GONE) {
-                    mColorPalette.visibility = View.VISIBLE
+                if (colorPalette.visibility == View.GONE) {
+                    colorPalette.visibility = View.VISIBLE
                 } else {
-                    mColorPalette.visibility = View.GONE
+                    colorPalette.visibility = View.GONE
+                }
+            }
+            R.id.action_undo -> {
+                Timber.i("Drawing:: Undo button pressed")
+                if (!whiteboard.undoEmpty()) {
+                    whiteboard.undo()
                 }
             }
         }
@@ -86,14 +101,14 @@ class DrawingActivity : AnkiActivity() {
 
     private fun finishWithSuccess() {
         try {
-            val savedWhiteboardFileName = mWhiteboard.saveWhiteboard(TimeManager.time)
+            val savedWhiteboardFileName = whiteboard.saveWhiteboard(TimeManager.time)
             val resultData = Intent()
             resultData.putExtra(EXTRA_RESULT_WHITEBOARD, savedWhiteboardFileName)
             setResult(RESULT_OK, resultData)
         } catch (e: FileNotFoundException) {
             Timber.w(e)
         } finally {
-            finishActivityWithFade(this)
+            finish()
         }
     }
 

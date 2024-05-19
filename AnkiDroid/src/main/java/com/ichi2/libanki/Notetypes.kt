@@ -39,6 +39,7 @@ import anki.notetypes.NotetypeNameIdUseCount
 import anki.notetypes.StockNotetype
 import com.google.protobuf.ByteString
 import com.ichi2.anki.CrashReportService
+import com.ichi2.annotations.NeedsTest
 import com.ichi2.libanki.Consts.MODEL_CLOZE
 import com.ichi2.libanki.Utils.checksum
 import com.ichi2.libanki.backend.BackendUtils
@@ -47,7 +48,6 @@ import com.ichi2.libanki.exception.ConfirmModSchemaException
 import com.ichi2.libanki.utils.*
 import com.ichi2.utils.Assert
 import com.ichi2.utils.HashUtil
-import com.ichi2.utils.KotlinCleanup
 import com.ichi2.utils.jsonObjectIterable
 import net.ankiweb.rsdroid.RustCleanup
 import net.ankiweb.rsdroid.exceptions.BackendNotFoundException
@@ -61,7 +61,7 @@ private typealias int = Long
 
 // # types
 private typealias Field = JSONObject // Dict<str, Any>
-private typealias Template = JSONObject // Dict<str, Union3<str, int, Unit>>
+typealias Template = JSONObject // Dict<str, Union3<str, int, Unit>>
 
 class Notetypes(val col: Collection) {
     /*
@@ -76,22 +76,13 @@ class Notetypes(val col: Collection) {
     }
 
     /** Save changes made to provided note type. */
-    @RustCleanup("templates is not needed, m should be non-null")
-    fun save(m: NotetypeJson?, @Suppress("UNUSED_PARAMETER") templates: Boolean = true) {
-        if (m == null) {
-            Timber.w("a null model is no longer supported - data is automatically flushed")
-            return
-        }
+    fun save(m: NotetypeJson) {
         // legacy code expects preserve_usn=false behaviour, but that
         // causes a backup entry to be created, which invalidates the
         // v2 review history. So we manually update the usn/mtime here
         m.put("mod", TimeManager.time.intTime())
         m.put("usn", col.usn())
         update(m, preserve_usn_and_mtime = true)
-    }
-
-    @RustCleanup("not required - java only")
-    fun load(@Suppress("UNUSED_PARAMETER") json: String) {
     }
 
     /*
@@ -112,8 +103,11 @@ class Notetypes(val col: Collection) {
     }
 
     private fun _get_cached(ntid: int): NotetypeJson? {
-        return _cache.get(ntid)
+        return _cache[ntid]
     }
+
+    @NeedsTest("14827: styles are updated after syncing style changes")
+    fun _clear_cache() = _cache.clear()
 
     /*
     # Listing note types
@@ -207,9 +201,6 @@ class Notetypes(val col: Collection) {
         return id?.let { get(it) }
     }
 
-    @RustCleanup("When we're kotlin only, rename to 'new', name existed due to Java compat")
-    fun newModel(name: String): NotetypeJson = new(name)
-
     /** Create a new non-cloze model, and return it. */
     fun new(name: String): NotetypeJson {
         // caller should call save() after modifying
@@ -220,7 +211,7 @@ class Notetypes(val col: Collection) {
         return nt
     }
 
-    private fun newBasicNotetype(): NotetypeJson {
+    fun newBasicNotetype(): NotetypeJson {
         return NotetypeJson(
             BackendUtils.from_json_bytes(
                 col.backend.getStockNotetypeLegacy(StockNotetype.Kind.KIND_BASIC)
@@ -278,8 +269,8 @@ class Notetypes(val col: Collection) {
     ##################################################
      */
 
-    @RustCleanup("use nids(int)")
-    fun nids(m: com.ichi2.libanki.NotetypeJson): List<int> = nids(m.getLong("id"))
+    // not in libanki
+    fun nids(model: NotetypeJson): List<int> = nids(model.getLong("id"))
 
     /** Note ids for M. */
     fun nids(ntid: int): List<int> {
@@ -357,10 +348,6 @@ class Notetypes(val col: Collection) {
         field["name"] = new_name
     }
 
-    /** name exists for compat with java */
-    @RustCleanup("remove - use set_sort_index")
-    fun setSortIdx(m: NotetypeJson, idx: Int) = set_sort_index(m, idx)
-
     /** Modifies schema. */
     fun set_sort_index(nt: NotetypeJson, idx: Int) {
         assert(0 <= idx && idx < len(nt.flds))
@@ -372,9 +359,6 @@ class Notetypes(val col: Collection) {
      */
 
     fun newField(name: String) = new_field(name)
-
-    @RustCleanup("Only exists for interface compatibility")
-    fun getModels(): Map<Long, NotetypeJson> = all().map { Pair(it.id, it) }.toMap()
 
     fun addField(m: NotetypeJson, field: Field) {
         add_field(m, field)
@@ -404,8 +388,8 @@ class Notetypes(val col: Collection) {
      * [ConfirmModSchemaException]
      */
     @RustCleanup("Since Kotlin doesn't have throws, this may not be needed")
-    fun addFieldInNewModel(m: com.ichi2.libanki.NotetypeJson, field: JSONObject) {
-        Assert.that(Notetypes.isModelNew(m), "Model was assumed to be new, but is not")
+    fun addFieldInNewModel(m: NotetypeJson, field: JSONObject) {
+        Assert.that(isModelNew(m), "Model was assumed to be new, but is not")
         try {
             _addField(m, field)
         } catch (e: ConfirmModSchemaException) {
@@ -415,10 +399,10 @@ class Notetypes(val col: Collection) {
         }
     }
 
-    fun addTemplateInNewModel(m: com.ichi2.libanki.NotetypeJson, template: JSONObject) {
+    fun addTemplateInNewModel(m: NotetypeJson, template: JSONObject) {
         // similar to addTemplate, but doesn't throw exception;
         // asserting the model is new.
-        Assert.that(Notetypes.isModelNew(m), "Model was assumed to be new, but is not")
+        Assert.that(isModelNew(m), "Model was assumed to be new, but is not")
 
         try {
             _addTemplate(m, template)
@@ -429,7 +413,7 @@ class Notetypes(val col: Collection) {
         }
     }
 
-    fun addFieldModChanged(m: com.ichi2.libanki.NotetypeJson, field: JSONObject) {
+    fun addFieldModChanged(m: NotetypeJson, field: JSONObject) {
         // similar to Anki's addField; but thanks to assumption that
         // mod is already changed, it never has to throw
         // ConfirmModSchemaException.
@@ -437,7 +421,7 @@ class Notetypes(val col: Collection) {
         _addField(m, field)
     }
 
-    fun addTemplateModChanged(m: com.ichi2.libanki.NotetypeJson, template: JSONObject) {
+    fun addTemplateModChanged(m: NotetypeJson, template: JSONObject) {
         // similar to addTemplate, but doesn't throw exception;
         // asserting the model is new.
         Assert.that(col.schemaChanged(), "Mod was assumed to be already changed, but is not")
@@ -509,7 +493,10 @@ class Notetypes(val col: Collection) {
     # - newModel should be same as m if model is not changing
      */
 
-    /** A compatibility wrapper that converts legacy-style arguments and
+    /**
+     * Modifies the backend schema. Ask the user to confirm schema changes before calling
+     *
+     * A compatibility wrapper that converts legacy-style arguments and
      * feeds them into a backend request, so that AnkiDroid's editor-bound
      * notetype changing can be used. Changing the notetype via the editor is
      * not ideal: it doesn't let users re-order fields in a 2 element note,
@@ -529,8 +516,7 @@ class Notetypes(val col: Collection) {
         newModel: NotetypeJson,
         fmap: Map<Int, Int?>,
         cmap: Map<Int, Int?>
-    ) {
-        col.modSchema()
+    ): OpChanges {
         val fieldMap = convertLegacyMap(fmap, newModel.fieldsNames.size)
         val templateMap =
             if (cmap.isEmpty() || m.type == MODEL_CLOZE || newModel.type == MODEL_CLOZE) {
@@ -539,7 +525,7 @@ class Notetypes(val col: Collection) {
                 convertLegacyMap(cmap, newModel.templatesNames.size)
             }
         val isCloze = newModel.isCloze || m.isCloze
-        col.backend.changeNotetype(
+        return col.backend.changeNotetype(
             noteIds = listOf(nid),
             newFields = fieldMap,
             newTemplates = templateMap,
@@ -553,7 +539,7 @@ class Notetypes(val col: Collection) {
 
     /** Convert old->new map to list of old indexes/nulls */
     private fun convertLegacyMap(map: Map<Int, Int?>, newSize: Int): Iterable<Int> {
-        val newToOld = map.entries.filter({ it.value != null }).associate { (k, v) -> v to k }
+        val newToOld = map.entries.filter { it.value != null }.associate { (k, v) -> v to k }
         val output = mutableListOf<Int>()
         for (idx in 0 until newSize) {
             output.append(newToOld[idx] ?: -1)
@@ -587,11 +573,11 @@ class Notetypes(val col: Collection) {
         return all_names_and_ids().count()
     }
 
-    fun _addTemplate(m: com.ichi2.libanki.NotetypeJson, template: JSONObject) {
+    fun _addTemplate(m: NotetypeJson, template: JSONObject) {
         addTemplate(m, template)
     }
 
-    fun _addField(m: com.ichi2.libanki.NotetypeJson, field: JSONObject) {
+    fun _addField(m: NotetypeJson, field: JSONObject) {
         addField(m, field)
     }
 
@@ -631,11 +617,8 @@ class Notetypes(val col: Collection) {
     companion object {
         const val NOT_FOUND_NOTE_TYPE = -1L
 
-        @KotlinCleanup("direct return and use scope function")
-        fun newTemplate(name: String?): JSONObject {
-            val t = JSONObject(defaultTemplate)
-            t.put("name", name)
-            return t
+        fun newTemplate(name: String): JSONObject = JSONObject(defaultTemplate).also {
+            it.put("name", name)
         }
 
         private const val defaultTemplate =
@@ -646,7 +629,7 @@ class Notetypes(val col: Collection) {
                 )
 
         /** "Mapping of field name -> (ord, field).  */
-        fun fieldMap(m: com.ichi2.libanki.NotetypeJson): Map<String, Pair<Int, JSONObject>> {
+        fun fieldMap(m: NotetypeJson): Map<String, Pair<Int, JSONObject>> {
             val flds = m.getJSONArray("flds")
             // TreeMap<Integer, String> map = new TreeMap<Integer, String>();
             val result: MutableMap<String, Pair<Int, JSONObject>> = HashUtil.hashMapInit(flds.length())
@@ -657,11 +640,11 @@ class Notetypes(val col: Collection) {
         }
 
         // not in anki
-        fun isModelNew(m: com.ichi2.libanki.NotetypeJson): Boolean {
+        fun isModelNew(m: NotetypeJson): Boolean {
             return m.getLong("id") == 0L
         }
 
-        fun _updateTemplOrds(m: com.ichi2.libanki.NotetypeJson) {
+        fun _updateTemplOrds(m: NotetypeJson) {
             val tmpls = m.getJSONArray("tmpls")
             for (i in 0 until tmpls.length()) {
                 val f = tmpls.getJSONObject(i)

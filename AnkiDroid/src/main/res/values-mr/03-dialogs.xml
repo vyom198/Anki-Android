@@ -49,10 +49,8 @@
     <string name="contextmenu_deckpicker_delete_deck">डेक हटवा</string>
     <string name="delete_deck_title">डेक हटवायचा?</string>
     <string name="no_tts_available_message">मजकूर-ते-भाषणाची भाषा उपलब्ध नाही</string>
-    <string name="initializing_tts">टीटीएस प्रारंभ करीत आहे&#8230;</string>
     <string name="tts_no_tts">बोलू नका</string>
     <string name="unused_strings">\n\nUnused files:\n</string>
-    <string name="preview_title" comment="Title of the window allowing to preview card(s)">पूर्वावलोकन</string>
     <string name="reposition_card_dialog_title">नवीन कार्ड पुनर्स्थित करा</string>
     <string name="reposition_card_dialog_message">प्रारंभ स्थितीः</string>
     <string name="reposition_card_not_new_error">केवळ नवीन कार्डे पुनर्स्थित केली जाऊ शकतात</string>
@@ -61,28 +59,15 @@
         <item quantity="other">%d कार्ड पुनर्स्थित केली</item>
     </plurals>
     <string name="reset_card_dialog_title">कार्ड प्रगती रीसेट करा</string>
-    <string name="reset_card_dialog_message">हे कार्ड नवीन कार्ड रांगेच्या शेवटी ठेवले जाईल</string>
     <plurals name="reset_cards_dialog_acknowledge">
         <item quantity="one">%d card reset</item>
         <item quantity="other">%d कार्डे रीसेट केली</item>
     </plurals>
     <!-- Reschedule Card Dialog -->
-    <plurals name="reschedule_cards_dialog_title_new">
-        <item quantity="one">Reschedule %d card</item>
-        <item quantity="other">Reschedule %d cards</item>
-    </plurals>
-    <plurals name="reschedule_card_dialog_interval">
-        <item quantity="one">Current interval: %d day</item>
-        <item quantity="other">वर्तमान मध्यांतर:%d दिवस</item>
-    </plurals>
-    <string name="reschedule_card_dialog_message">एक्स दिवसात पुनरावलोकनासाठी पुन्हा वेळापत्रक</string>
     <plurals name="reschedule_cards_dialog_acknowledge">
         <item quantity="one">%d card rescheduled</item>
         <item quantity="other">%d कार्डे शेड्यूल केली</item>
     </plurals>
-    <string name="reschedule_card_dialog_new_card_warning">नवीन कार्डचे शेड्यूल केले जात आहे. शेड्यूलिंग नवीन कार्ड्सला पुनरावलोकन कार्डमध्ये रूपांतरित करते. नवीन रांगेत नवीन कार्डची स्थिती बदलण्यासाठी ‘रिपोजीशन कार्ड’ पर्याय वापरा</string>
-    <string name="reschedule_card_dialog_warning_ease_reset">शेड्युलिंग भविष्यात अनुसूचक कार्डशी कसे वागते हे देखील रीसेट करते (सोपी%d%% वर सेट केली जाईल)</string>
-    <string name="firefox_workaround_launched_reviewer_opening_deck">आपल्या फाईल व्यवस्थापकात डेक निवडा किंवा आयात करण्यासाठी त्याबद्दल: डाउनलोड पृष्ठास भेट द्या</string>
     <string name="answering_error_title">डेटाबेस त्रुटी</string>
     <string name="answering_error_message">संग्रहात लेखन अयशस्वी. डेटाबेस दूषित होऊ शकतो किंवा डिस्कवर पुरेशी रिक्त जागा असू शकत नाही. \N \n जर हे बर्‍याचदा घडले तर डेटाबेस तपासून पहा, संग्रह दुरुस्त करा किंवा बॅकअपमधून पुनर्संचयित करा. त्यासाठी “पर्याय” ला स्पर्श करा. \N\ किंवा हा अँकीड्रोइड बग देखील असू शकतो; कृपया त्रुटी नोंदवा जेणेकरुन आम्ही हे तपासू शकतो.</string>
     <string name="answering_error_report">अहवाल त्रुटी</string>
@@ -111,8 +96,10 @@
     <string name="dialog_confirm" tools:ignore="UnusedResources">Confirm</string>
     <string name="dialog_no">नाही</string>
     <string name="dialog_yes">होय</string>
+    <string name="dialog_keep">Keep</string>
+    <string name="dialog_remove">Remove</string>
     <string name="dialog_continue">सुरू</string>
-    <string name="dialog_processing">Processing...</string>
+    <string name="dialog_processing">Processing&#8230;</string>
     <string name="dialog_positive_create" comment="Create a new collection, probably erasing the previous one, may be necessary in case of error.">तयार करा</string>
     <string name="dialog_positive_delete">हटवा</string>
     <!-- Currently unsued, should be useful in the future -->
@@ -143,7 +130,7 @@
     <string name="tags_dialog_option_new_cards">नवीन</string>
     <string name="tags_dialog_option_due_cards" comment="Name of cards that are already been reviewed in the past, and that should be reviewed again">देय</string>
     <!-- Empty cards -->
-    <string name="emtpy_cards_finding">रिक्त कार्ड शोधत आहे ...</string>
+    <string name="emtpy_cards_finding">रिक्त कार्ड शोधत आहे &#8230;</string>
     <string name="empty_cards_count">हटविण्यासाठी कार्डे:%d</string>
     <string name="empty_cards_deleted">कार्ड हटविली:%d</string>
     <!-- Multimedia - Edit Field Activity -->
@@ -177,6 +164,7 @@
     <string name="failed_to_apply_background_image">पार्श्वभूमी प्रतिमा %s लागू करण्यात अयशस्वी</string>
     <string name="background_image_too_large">डेक पिकर पार्श्वभूमी खूप मोठी आहे</string>
     <string name="image_max_size_allowed">कमाल प्रतिमेचा आकार %d MB अनुमत आहे</string>
+    <string name="image_dimensions_too_large">Image dimensions are too large (%1$d × %2$d)</string>
     <!-- Global Intent handler -->
     <!-- Also used by Card Browser, not renaming to save translators effort -->
     <string name="intent_handler_failed_no_storage_permission">आवश्यक संचय परवानगी गहाळ आहे. कृपया संचयनास परवानगी द्या त्यानंतर आपल्या कृतीचा पुन्हा प्रयत्न करा.</string>
@@ -186,7 +174,7 @@
     <string name="boot_service_failed_to_schedule_notifications">स्मरणपत्रे शेड्यूल करण्यात अयशस्वी</string>
     <string name="boot_service_too_many_notifications">बरीच स्मरणपत्रे शेड्यूल केली. काही दिसणार नाहीत</string>
     <!-- Locale Selection Dialog -->
-    <string name="locale_selection_dialog_title">कीबोर्ड भाषा निवड</string>
+    <string name="locale_selection_dialog_title_new">Set Language</string>
     <string name="locale_selection_dialog_summary">मजकूर संपादित करताना जीबीआर्ड बदलणारी भाषा समर्थन करणारे काही बहुभाषिक कीबोर्ड \n\n कृपया आपला कीबोर्ड भाषा बदलत नसेल तर आपल्या कीबोर्ड निर्मात्याकडून “setImeHintLocales” वैशिष्ट्याची विनंती करा.</string>
     <!-- Help Dialog -->
     <string name="help_title_using_ankidroid">AnkiDroid वापरणे</string>
@@ -214,12 +202,13 @@
     <string name="help_item_ankiweb_terms_and_conditions">AnkiWeb Terms and Conditions</string>
     <string name="help_title_send_exception">समस्यानिवारण अहवाल पाठवा</string>
     <string name="help_dialog_exception_report_debounce">अहवाल आधीच सादर केला आहे</string>
+    <string name="help_dialog_exception_report_sent">Report was sent!</string>
     <!--Sync-->
     <plurals name="sync_automatic_sync_needs_more_time">
         <item quantity="one">An automatic sync may be triggered in %d second</item>
         <item quantity="other">स्वयंचलित समक्रमण %d सेकंदात ट्रिगर केले जाऊ शकते</item>
     </plurals>
-    <string name="metered_sync_warning">Your connection is metered. Data transfer may cost money</string>
+    <string name="metered_sync_data_warning">Your internet provider may charge money for data use</string>
     <string name="deck_picker_new">Number of new cards to see today in this deck.</string>
     <string name="deck_picker_rev">Number of cards due today in this deck.</string>
     <string name="deck_picker_lrn">Number of cards in learning in this deck.</string>
@@ -244,4 +233,23 @@
     </string>
     <string name="dismiss_backup_warning_upgrade">        Due to Android privacy changes, your data and automated backups will be inaccessible if the app is uninstalled
     </string>
+    <string name="deck_already_exists">Deck already exists</string>
+    <string name="create_deck_numeric_hint">If you have deck ordering issues (e.g. ‘10’ appears before ‘2’), replace ‘2’ with ‘02’</string>
+    <!-- Set Due Date -->
+    <string name="set_due_date_match_interval" comment="when setting a card\'s due date, this checkbox also changes the interval of the card">Set interval to same value</string>
+    <plurals name="set_due_date_single_day_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in</item>
+        <item quantity="other">Show cards in</item>
+    </plurals>
+    <plurals name="set_due_date_range_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in range</item>
+        <item quantity="other">Show cards in range</item>
+    </plurals>
+    <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <string name="range_delimiter" comment="Placed between two input boxes to denote a range">–</string>
+    <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">From</string>
+    <string name="set_due_date_range_end" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'maximum\' value of this range (inclusive)">To</string>
 </resources>

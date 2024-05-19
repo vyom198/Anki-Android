@@ -58,11 +58,11 @@
             search:ignore="true"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/background_image_title" >
-        <SwitchPreferenceCompat
-            android:checked="false"
+        <Preference
             android:defaultValue="0"
             android:key="@string/pref_deck_picker_background_key"
             android:shouldDisableView="true"
+            android:icon="@drawable/wallpaper_icon"
             android:title="@string/choose_an_image" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_cat_reviewer" >
@@ -107,7 +107,7 @@
             android:title="@string/show_progress" />
         <SwitchPreferenceCompat
             android:key="@string/show_eta_preference"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summary="@string/show_eta_summ"
             android:title="@string/show_eta" />
         <SwitchPreferenceCompat
@@ -115,6 +115,10 @@
             android:defaultValue="true"
             tools:title="Show play buttons on cards with audio"
             />
+        <SwitchPreferenceCompat
+            android:key="@string/show_deck_title_key"
+            android:defaultValue="false"
+            android:title="@string/show_deck_title"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/card_browser">
         <SwitchPreferenceCompat

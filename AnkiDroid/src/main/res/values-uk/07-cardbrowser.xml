@@ -46,24 +46,31 @@
 <resources>
     <!-- CardBrowser -->
     <plurals name="card_browser_subtitle">
-        <item quantity="one">%d картки/ок показано</item>
-        <item quantity="few">%d картки/ок показано</item>
-        <item quantity="many">%d картки/ок показано</item>
-        <item quantity="other">%d карт показано</item>
+        <item quantity="one">Показано %d картку</item>
+        <item quantity="few">Показано %d картки</item>
+        <item quantity="many">Показано %d карток</item>
+        <item quantity="other">Показано %d карток</item>
     </plurals>
     <plurals name="card_browser_subtitle_notes_mode">
-        <item quantity="one">%d Запис показано </item>
-        <item quantity="few">%d Записів показано </item>
-        <item quantity="many">%d карт показано</item>
-        <item quantity="other">%d карт показано</item>
+        <item quantity="one">Показано %d запис</item>
+        <item quantity="few">Показано %d записи</item>
+        <item quantity="many">Показано %d записів</item>
+        <item quantity="other">Показано %d записів</item>
     </plurals>
     <string name="card_browser_all_decks">Всі колоди</string>
-    <string name="card_browser_delete_card">Видалити записи</string>
-    <string name="card_browser_suspend_card">Призупинити картку</string>
+    <plurals name="card_browser_delete_cards">
+        <item quantity="one">Видалити картку</item>
+        <item quantity="few">Видалити картки</item>
+        <item quantity="many">Видалити картки</item>
+        <item quantity="other">Видалити картки</item>
+    </plurals>
+    <plurals name="card_browser_delete_notes">
+        <item quantity="one">Видалити запис</item>
+        <item quantity="few">Видалити записи</item>
+        <item quantity="many">Видалити записи</item>
+        <item quantity="other">Видалити записи</item>
+    </plurals>
     <string name="card_browser_change_deck">Змінити колоду</string>
-    <string name="card_browser_unsuspend_card">Відновити призупинені картки</string>
-    <string name="card_browser_mark_card">Позначити записи</string>
-    <string name="card_browser_unmark_card">Зняти позначку з записів</string>
     <string name="delete_card_title">Видалити запис?</string>
     <string name="card_browser_show_marked">Тільки з зірочокою</string>
     <string name="card_browser_show_suspended">Тільки призупинені</string>
@@ -100,6 +107,7 @@
     <string name="card_browser_search_all_decks">Шукати у всіх колодах</string>
     <string name="card_browser_unknown_deck_name">Невідома</string>
     <string name="card_browser_truncate" comment="allows users to show less of a field value">Скорочувати вміст</string>
+    <string name="set_due_date_hintText" comment="plural set_due_date_label_suffix is used for parameters, parameter 1 is the plural for 0, parameter 2 is the plural for 1">Сьогодні ‘0 %1$s’, завтра ‘1 %2$s’, і т.д&#8230;</string>
     <plurals name="card_browser_export_cards">
         <item quantity="one">Експортувати картку</item>
         <item quantity="few">Експортувати картки</item>
@@ -118,5 +126,4 @@
         <item quantity="many">%d карток видалено</item>
         <item quantity="other">%d картки видалено</item>
     </plurals>
-    <!-- Card Info subscreen -->
 </resources>

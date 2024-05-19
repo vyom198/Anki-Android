@@ -17,23 +17,28 @@
 
 package com.ichi2.libanki
 
+import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
-import com.ichi2.libanki.exception.WrongId
+import anki.notes.NoteFieldsCheckResponse
+import com.ichi2.libanki.Consts.DEFAULT_DECK_ID
+import com.ichi2.libanki.Consts.MODEL_STD
+import com.ichi2.libanki.backend.model.toBackendNote
+import com.ichi2.libanki.utils.NotInLibAnki
+import com.ichi2.libanki.utils.set
 import com.ichi2.utils.KotlinCleanup
-import net.ankiweb.rsdroid.RustCleanup
+import com.ichi2.utils.deepClone
+import com.ichi2.utils.emptyStringArray
 import org.json.JSONObject
-import timber.log.Timber
 import java.util.*
 import java.util.regex.Pattern
 
 @KotlinCleanup("lots to do")
 class Note : Cloneable {
-    val col: Collection
 
     /**
      * Should only be mutated by addNote()
      */
-    var id: Long
+    var id: Long = 0
 
     @get:VisibleForTesting
     var guId: String? = null
@@ -42,96 +47,98 @@ class Note : Cloneable {
 
     var mid: Long = 0
         private set
-    lateinit var tags: ArrayList<String>
-        private set
-    lateinit var fields: Array<String>
-        private set
-    private var mFlags = 0
-    private var mData: String? = null
-    private var mFMap: Map<String, Pair<Int, JSONObject>>? = null
-    private var mScm: Long = 0
+    lateinit var tags: MutableList<String>
+    lateinit var fields: MutableList<String>
+    private var fMap: Map<String, Pair<Int, JSONObject>>? = null
     var usn = 0
         private set
-    var mod: Long = 0
+    var mod: Int = 0
         private set
 
     constructor(col: Collection, id: Long) {
-        this.col = col
         this.id = id
-        load()
+        load(col)
     }
 
-    constructor(col: Collection, notetype: NotetypeJson) {
-        this.col = col
-        this.id = 0
-        guId = Utils.guid64()
-        this.notetype = notetype
-        mid = notetype.getLong("id")
-        tags = ArrayList()
-        fields = Array(notetype.getJSONArray("flds").length()) { "" }
-        mFlags = 0
-        mData = ""
-        mFMap = Notetypes.fieldMap(this.notetype)
-        mScm = col.scm
+    constructor(col: Collection, backendNote: anki.notes.Note) {
+        loadFromBackendNote(col, backendNote)
     }
 
-    fun load() {
-        Timber.d("load()")
-        col.db
-            .query(
-                "SELECT guid, mid, mod, usn, tags, flds, flags, data FROM notes WHERE id = ?",
-                this.id
-            ).use { cursor ->
-                if (!cursor.moveToFirst()) {
-                    throw WrongId(this.id, "note")
-                }
-                guId = cursor.getString(0)
-                mid = cursor.getLong(1)
-                mod = cursor.getLong(2)
-                usn = cursor.getInt(3)
-                tags = ArrayList(col.tags.split(cursor.getString(4)))
-                fields = Utils.splitFields(cursor.getString(5))
-                mFlags = cursor.getInt(6)
-                mData = cursor.getString(7)
-                notetype = col.notetypes.get(mid)!!
-                mFMap = Notetypes.fieldMap(notetype)
-                mScm = col.scm
-            }
-    }
-
-    fun reloadModel() {
-        notetype = col.notetypes.get(mid)!!
-    }
-
-    /*
-     * If fields or tags have changed, write changes to disk.
-     */
-    @RustCleanup("code should call col.updateNote() instead, in undoableOp {}")
-    fun flush() {
-        col.updateNote(this)
-    }
-
-    fun numberOfCards(): Int {
-        return col.db.queryLongScalar("SELECT count() FROM cards WHERE nid = ?", this.id).toInt()
-    }
-
-    fun cids(): List<Long> {
-        return col.db.queryLongList("SELECT id FROM cards WHERE nid = ? ORDER BY ord", this.id)
-    }
-
-    fun cards(): ArrayList<Card> {
-        val cards = ArrayList<Card>(cids().size)
-        for (cid in cids()) {
-            // each getCard access database. This is inefficient.
-            // Seems impossible to solve without creating a constructor of a list of card.
-            // Not a big trouble since most note have a small number of cards.
-            cards.add(col.getCard(cid))
+    companion object {
+        context (Collection)
+        fun fromNotetypeId(ntid: NoteTypeId): Note {
+            val backendNote = backend.newNote(ntid)
+            return Note(this@Collection, backendNote)
         }
-        return cards
+    }
+
+    fun load(col: Collection) {
+        val note = col.backend.getNote(this.id)
+        loadFromBackendNote(col, note)
+    }
+
+    private fun loadFromBackendNote(col: Collection, note: anki.notes.Note) {
+        this.id = note.id
+        this.guId = note.guid
+        this.mid = note.notetypeId
+        this.notetype = col.notetypes.get(mid)!! // not in libAnki
+        this.mod = note.mtimeSecs
+        this.usn = note.usn
+        // the lists in the protobuf are NOT mutable, even though they cast to MutableList
+        this.tags = note.tagsList.toMutableList()
+        this.fields = note.fieldsList.toMutableList()
+        this.fMap = Notetypes.fieldMap(notetype)
+    }
+
+    @NotInLibAnki
+    fun numberOfCards(col: Collection): Int {
+        return cardIds(col).size
+    }
+
+    fun cardIds(col: Collection): List<Long> {
+        return col.cardIdsOfNote(nid = this.id)
+    }
+
+    fun cards(col: Collection): List<Card> {
+        return cardIds(col).map { col.getCard(it) }
+    }
+
+    fun ephemeralCard(
+        col: Collection,
+        ord: Int = 0,
+        customNoteType: NotetypeJson? = null,
+        customTemplate: Template? = null,
+        fillEmpty: Boolean = false
+    ): Card {
+        val card = Card(col, id = null)
+        card.ord = ord
+        card.did = DEFAULT_DECK_ID
+
+        val model = customNoteType ?: notetype
+        val template = if (customTemplate != null) {
+            customTemplate.deepClone()
+        } else {
+            val index = if (model.type == MODEL_STD) ord else 0
+            model.tmpls.getJSONObject(index)
+        }
+        // may differ in cloze case
+        template["ord"] = card.ord
+
+        val output = TemplateManager.TemplateRenderContext.fromCardLayout(
+            note = this,
+            card = card,
+            notetype = model,
+            template = template,
+            fillEmpty = fillEmpty
+        ).render(col)
+        card.renderOutput = output
+        card.note = this
+        return card
     }
 
     /** The first card, assuming it exists. */
-    fun firstCard(): Card {
+    @CheckResult
+    fun firstCard(col: Collection): Card {
         return col.getCard(
             col.db.queryLongScalar(
                 "SELECT id FROM cards WHERE nid = ? ORDER BY ord LIMIT 1",
@@ -145,30 +152,30 @@ class Note : Cloneable {
      * ***********************************************************
      */
     fun keys(): Array<String> {
-        return mFMap!!.keys.toTypedArray()
+        return fMap!!.keys.toTypedArray()
     }
 
-    fun values(): Array<String> {
+    @KotlinCleanup("see if we can make this immutable")
+    fun values(): MutableList<String> {
         return fields
     }
 
-    @KotlinCleanup("make non-null")
-    fun items(): Array<Array<String?>> {
+    fun items(): Array<Array<String>> {
         // TODO: Revisit this method. The field order returned differs from Anki.
         // The items here are only used in the note editor, so it's a low priority.
         val result = Array(
-            mFMap!!.size
-        ) { arrayOfNulls<String>(2) }
-        for (fname in mFMap!!.keys) {
-            val i = mFMap!![fname]!!.first
+            fMap!!.size
+        ) { emptyStringArray(2) }
+        for (fname in fMap!!.keys) {
+            val i = fMap!![fname]!!.first
             result[i][0] = fname
             result[i][1] = fields[i]
         }
         return result
     }
 
-    private fun fieldOrd(key: String): Int {
-        val fieldPair = mFMap!![key]
+    private fun fieldIndex(key: String): Int {
+        val fieldPair = fMap!![key]
             ?: throw IllegalArgumentException(
                 String.format(
                     "No field named '%s' found",
@@ -179,34 +186,34 @@ class Note : Cloneable {
     }
 
     fun getItem(key: String): String {
-        return fields[fieldOrd(key)]
+        return fields[fieldIndex(key)]
     }
 
     fun setItem(key: String, value: String) {
-        fields[fieldOrd(key)] = value
+        fields[fieldIndex(key)] = value
     }
 
     operator fun contains(key: String): Boolean {
-        return mFMap!!.containsKey(key)
+        return fMap!!.containsKey(key)
     }
 
     /**
      * Tags
      * ***********************************************************
      */
-    fun hasTag(tag: String?): Boolean {
-        return col.tags.inList(tag!!, tags)
+    fun hasTag(col: Collection, tag: String): Boolean {
+        return col.tags.inList(tag, tags)
     }
 
-    fun stringTags(): String {
+    fun stringTags(col: Collection): String {
         return col.tags.join(col.tags.canonify(tags))
     }
 
-    fun setTagsFromStr(str: String?) {
-        tags = ArrayList(col.tags.split(str!!))
+    fun setTagsFromStr(col: Collection, str: String) {
+        tags = col.tags.split(str)
     }
 
-    fun delTag(tag: String?) {
+    fun removeTag(tag: String) {
         val rem: MutableList<String> = ArrayList(
             tags.size
         )
@@ -227,52 +234,20 @@ class Note : Cloneable {
         tags.add(tag)
     }
 
-    fun addTags(tags: AbstractSet<String>?) {
-        tags!!.addAll(tags)
+    fun addTags(tags: AbstractSet<String>) {
+        tags.addAll(tags)
     }
 
     /**
      * Unique/duplicate check
      * ***********************************************************
      */
-    enum class DupeOrEmpty {
-        CORRECT, EMPTY, DUPE
+    fun fieldsCheck(col: Collection): NoteFieldsCheckResponse.State {
+        return col.backend.noteFieldsCheck(this.toBackendNote()).state
     }
 
-    /**
-     *
-     * @return whether it has no content, dupe first field, or nothing remarkable.
-     */
-    fun dupeOrEmpty(): DupeOrEmpty {
-        if (fields[0].trim { it <= ' ' }.isEmpty()) {
-            return DupeOrEmpty.EMPTY
-        }
-        val csumAndStrippedFieldField = Utils.sfieldAndCsum(
-            fields,
-            0
-        )
-        val csum = csumAndStrippedFieldField.second
-        // find any matching csums and compare
-        val strippedFirstField = csumAndStrippedFieldField.first
-        val fields = col.db.queryStringList(
-            "SELECT flds FROM notes WHERE csum = ? AND id != ? AND mid = ?",
-            csum,
-            this.id,
-            mid
-        )
-        for (flds in fields) {
-            if (Utils.stripHTMLMedia(
-                    Utils.splitFields(flds)[0]
-                ) == strippedFirstField
-            ) {
-                return DupeOrEmpty.DUPE
-            }
-        }
-        return DupeOrEmpty.CORRECT
-    }
-
-    val sFld: String
-        get() = col.db.queryString("SELECT sfld FROM notes WHERE id = ?", this.id)
+    fun sFld(col: Collection): String =
+        col.db.queryString("SELECT sfld FROM notes WHERE id = ?", this.id)
 
     fun setField(index: Int, value: String) {
         fields[index] = value
@@ -326,3 +301,15 @@ class Note : Cloneable {
         }
     }
 }
+
+/** @see Note.hasTag */
+context (Collection)
+fun Note.hasTag(tag: String) = this.hasTag(this@Collection, tag)
+
+/** @see Note.setTagsFromStr */
+context (Collection)
+fun Note.setTagsFromStr(str: String) = this.setTagsFromStr(this@Collection, str)
+
+/** @see Note.load */
+context (Collection)
+fun Note.load() = this.load(this@Collection)

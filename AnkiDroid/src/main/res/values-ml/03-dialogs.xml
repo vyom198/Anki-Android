@@ -49,10 +49,8 @@
     <string name="contextmenu_deckpicker_delete_deck">ഡെക്ക് ഇല്ലാതാക്കുക</string>
     <string name="delete_deck_title">ഡെക്ക് ഇല്ലാതാക്കുക?</string>
     <string name="no_tts_available_message">ടെക്സ്റ്റ്-ടു-സ്പീച്ച് ഭാഷ ലഭ്യമല്ല</string>
-    <string name="initializing_tts">Initializing TTS&#8230;</string>
     <string name="tts_no_tts">സംസാരിക്കരുത്</string>
     <string name="unused_strings">\n\nUnused files:\n</string>
-    <string name="preview_title" comment="Title of the window allowing to preview card(s)">പ്രിവ്യൂ</string>
     <string name="reposition_card_dialog_title">പുതിയ കാർഡ് പുന  സ്ഥാപിക്കുക</string>
     <string name="reposition_card_dialog_message">പ്രാരംഭ സ്ഥാനം</string>
     <string name="reposition_card_not_new_error">പുതിയ കാർഡുകൾ മാത്രമേ പുന  സ്ഥാപിക്കാൻ കഴിയൂ</string>
@@ -61,28 +59,15 @@
         <item quantity="other">%d കാർഡുകൾ സ്ഥാനം മാറ്റി</item>
     </plurals>
     <string name="reset_card_dialog_title">കാർഡ് പുരോഗതി പുന Res സജ്ജമാക്കുക</string>
-    <string name="reset_card_dialog_message">ഈ കാർഡ് പുതിയ കാർഡ് ക്യൂവിന്റെ അവസാനം സ്ഥാപിക്കും</string>
     <plurals name="reset_cards_dialog_acknowledge">
         <item quantity="one">%dകാർഡ് പുന സജ്ജമാക്കുക</item>
         <item quantity="other">%dകാർഡുകൾ പുന സജ്ജമാക്കുക</item>
     </plurals>
     <!-- Reschedule Card Dialog -->
-    <plurals name="reschedule_cards_dialog_title_new">
-        <item quantity="one">Reschedule %d card</item>
-        <item quantity="other">Reschedule %d cards</item>
-    </plurals>
-    <plurals name="reschedule_card_dialog_interval">
-        <item quantity="one">നിലവിലെ ഇടവേള:%d ദിവസം</item>
-        <item quantity="other">നിലവിലെ ഇടവേള:%d ദിവസം</item>
-    </plurals>
-    <string name="reschedule_card_dialog_message">X ദിവസത്തിനുള്ളിൽ അവലോകനത്തിനായി വീണ്ടും ഷെഡ്യൂൾ ചെയ്യുക</string>
     <plurals name="reschedule_cards_dialog_acknowledge">
         <item quantity="one">%d കാർഡ് വീണ്ടും ഷെഡ്യൂൾ ചെയ്‌തു</item>
         <item quantity="other">%d കാർഡുകൾ വീണ്ടും ഷെഡ്യൂൾ ചെയ്‌തു</item>
     </plurals>
-    <string name="reschedule_card_dialog_new_card_warning">ഒരു പുതിയ കാർഡ് വീണ്ടും ഷെഡ്യൂൾ ചെയ്യുന്നു. പുന ക്രമീകരണം പുതിയ കാർഡുകളെ അവലോകന കാർഡുകളാക്കി മാറ്റുന്നു. പുതിയ ക്യൂവിനുള്ളിൽ ഒരു പുതിയ കാർഡിന്റെ സ്ഥാനം മാറ്റാൻ ‘റിപോസിഷൻ കാർഡ്’ ഓപ്ഷൻ ഉപയോഗിക്കുക</string>
-    <string name="reschedule_card_dialog_warning_ease_reset">ഭാവിയിൽ ഷെഡ്യൂളർ കാർഡിനെ എങ്ങനെ കൈകാര്യം ചെയ്യുന്നുവെന്നും പുന  ക്രമീകരിക്കുന്നു (എളുപ്പത്തിൽ %d%% ആയി സജ്ജമാക്കും)</string>
-    <string name="firefox_workaround_launched_reviewer_opening_deck">നിങ്ങളുടെ ഫയൽ മാനേജറിലെ ഡെക്ക് തിരഞ്ഞെടുക്കുക അല്ലെങ്കിൽ ഇറക്കുമതി ചെയ്യുന്നതിന് about: downloads പേജ് സന്ദർശിക്കുക</string>
     <string name="answering_error_title">ഡാറ്റാബേസ് പിശക്</string>
     <string name="answering_error_message">ശേഖരത്തിലേക്ക് എഴുതുന്നത് പരാജയപ്പെട്ടു. ഡാറ്റാബേസ് കേടായതാകാം അല്ലെങ്കിൽ ഡിസ്കിൽ വേണ്ടത്ര ശൂന്യമായ ഇടം ഉണ്ടാകണമെന്നില്ല. \n\n ഇത് പലപ്പോഴും സംഭവിക്കുകയാണെങ്കിൽ, ഡാറ്റാബേസ് പരിശോധിക്കാനോ ശേഖരം നന്നാക്കാനോ ബാക്കപ്പിൽ നിന്ന് പുന സ്ഥാപിക്കാനോ ശ്രമിക്കുക. അതിനായി “ഓപ്ഷനുകൾ” സ്‌പർശിക്കുക. \n\ അല്ലെങ്കിൽ ഇത് ഒരു അങ്കിഡ്രോയിഡ് ബഗ് ആകാം; പിശക് റിപ്പോർട്ടുചെയ്യുക, അതുവഴി ഞങ്ങൾക്ക് ഇത് പരിശോധിക്കാൻ കഴിയും.</string>
     <string name="answering_error_report">റിപ്പോർട്ട് പിശക്</string>
@@ -111,8 +96,10 @@
     <string name="dialog_confirm" tools:ignore="UnusedResources">Confirm</string>
     <string name="dialog_no">No (വേണ്ട)</string>
     <string name="dialog_yes">അതെ</string>
+    <string name="dialog_keep">Keep</string>
+    <string name="dialog_remove">Remove</string>
     <string name="dialog_continue">തുടരുക</string>
-    <string name="dialog_processing">Processing...</string>
+    <string name="dialog_processing">Processing&#8230;</string>
     <string name="dialog_positive_create" comment="Create a new collection, probably erasing the previous one, may be necessary in case of error.">സൃഷ്ടിച്ചു</string>
     <string name="dialog_positive_delete">ഇല്ലാതാക്കുക</string>
     <!-- Currently unsued, should be useful in the future -->
@@ -177,6 +164,7 @@
     <string name="failed_to_apply_background_image">പശ്ചാത്തല ചിത്രം %s പ്രയോഗിക്കുന്നതിൽ പരാജയപ്പെട്ടു</string>
     <string name="background_image_too_large">ഡെക്ക് പിക്കർ പശ്ചാത്തലം വളരെ വലുതാണ്</string>
     <string name="image_max_size_allowed">പരമാവധി ഇമേജ് വലുപ്പം %d MB അനുവദനീയമാണ്</string>
+    <string name="image_dimensions_too_large">Image dimensions are too large (%1$d × %2$d)</string>
     <!-- Global Intent handler -->
     <!-- Also used by Card Browser, not renaming to save translators effort -->
     <string name="intent_handler_failed_no_storage_permission">ആവശ്യമായ സംഭരണ ​​അനുമതി നഷ്‌ടമായി. സംഭരണ ​​അനുമതി നൽകി നിങ്ങളുടെ പ്രവർത്തനം വീണ്ടും ശ്രമിക്കുക.</string>
@@ -186,7 +174,7 @@
     <string name="boot_service_failed_to_schedule_notifications">ഓർമ്മപ്പെടുത്തലുകൾ ഷെഡ്യൂൾ ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു</string>
     <string name="boot_service_too_many_notifications">വളരെയധികം ഓർമ്മപ്പെടുത്തലുകൾ ഷെഡ്യൂൾ ചെയ്‌തു. ചിലത് ദൃശ്യമാകില്ല</string>
     <!-- Locale Selection Dialog -->
-    <string name="locale_selection_dialog_title">കീബോർഡ് ഭാഷാ തിരഞ്ഞെടുപ്പ്</string>
+    <string name="locale_selection_dialog_title_new">Set Language</string>
     <string name="locale_selection_dialog_summary">വാചകം എഡിറ്റുചെയ്യുമ്പോൾ ഭാഷ മാറ്റുന്നതിനെ GBoard പോലുള്ള ചില ബഹുഭാഷാ കീബോർഡുകൾ \n\n നിങ്ങളുടെ കീബോർഡ് ഭാഷ മാറ്റിയില്ലെങ്കിൽ കീബോർഡ് നിർമ്മാതാവിൽ നിന്ന് “setImeHintLocales” സവിശേഷത അഭ്യർത്ഥിക്കുക.</string>
     <!-- Help Dialog -->
     <string name="help_title_using_ankidroid">AnkiDroid ഉപയോഗിക്കുന്നു</string>
@@ -214,12 +202,13 @@
     <string name="help_item_ankiweb_terms_and_conditions">AnkiWeb Terms and Conditions</string>
     <string name="help_title_send_exception">പ്രശ്‌നപരിഹാര റിപ്പോർട്ട് അയയ്‌ക്കുക</string>
     <string name="help_dialog_exception_report_debounce">റിപ്പോർട്ട് ഇതിനകം സമർപ്പിച്ചു</string>
+    <string name="help_dialog_exception_report_sent">Report was sent!</string>
     <!--Sync-->
     <plurals name="sync_automatic_sync_needs_more_time">
         <item quantity="one">%d സെക്കൻഡിൽ ഒരു യാന്ത്രിക സമന്വയം പ്രവർത്തനക്ഷമമാക്കാം</item>
         <item quantity="other">%d സെക്കൻഡിനുള്ളിൽ ഒരു യാന്ത്രിക സമന്വയം പ്രവർത്തനക്ഷമമാക്കാം</item>
     </plurals>
-    <string name="metered_sync_warning">Your connection is metered. Data transfer may cost money</string>
+    <string name="metered_sync_data_warning">Your internet provider may charge money for data use</string>
     <string name="deck_picker_new">ഈ ഡെക്കിൽ ഇന്ന് കാണാനുള്ള പുതിയ കാർഡുകളുടെ എണ്ണം.</string>
     <string name="deck_picker_rev">ഈ ഡെക്കിൽ ഇന്ന് കാണാനുള്ള പുതിയ കാർഡുകളുടെ എണ്ണം.</string>
     <string name="deck_picker_lrn">ഈ ഡെക്കിൽ ഇന്ന് കാണാനുള്ള പുതിയ കാർഡുകളുടെ എണ്ണം.</string>
@@ -244,4 +233,23 @@
     </string>
     <string name="dismiss_backup_warning_upgrade">        Due to Android privacy changes, your data and automated backups will be inaccessible if the app is uninstalled
     </string>
+    <string name="deck_already_exists">Deck already exists</string>
+    <string name="create_deck_numeric_hint">If you have deck ordering issues (e.g. ‘10’ appears before ‘2’), replace ‘2’ with ‘02’</string>
+    <!-- Set Due Date -->
+    <string name="set_due_date_match_interval" comment="when setting a card\'s due date, this checkbox also changes the interval of the card">Set interval to same value</string>
+    <plurals name="set_due_date_single_day_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in</item>
+        <item quantity="other">Show cards in</item>
+    </plurals>
+    <plurals name="set_due_date_range_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in range</item>
+        <item quantity="other">Show cards in range</item>
+    </plurals>
+    <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <string name="range_delimiter" comment="Placed between two input boxes to denote a range">–</string>
+    <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">From</string>
+    <string name="set_due_date_range_end" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'maximum\' value of this range (inclusive)">To</string>
 </resources>

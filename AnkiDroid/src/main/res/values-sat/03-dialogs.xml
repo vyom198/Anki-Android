@@ -49,10 +49,8 @@
     <string name="contextmenu_deckpicker_delete_deck">ᱰᱮᱠ ᱢᱮᱴᱟᱣᱚᱜ ᱠᱟᱱᱟ</string>
     <string name="delete_deck_title">ᱰᱮᱠ ᱴᱚᱭᱴᱚᱞ ᱢᱮᱴᱟᱣᱟ  ᱥᱮ?</string>
     <string name="no_tts_available_message">text-to-speech ᱯᱟᱹᱨᱥᱤ ᱵᱟᱱᱩᱜᱼᱟ ᱾</string>
-    <string name="initializing_tts">TTS ᱮᱛᱚᱷᱚᱵᱽᱚᱜ ᱠᱟᱱᱟ&#8230;</string>
     <string name="tts_no_tts">ᱟᱞᱚᱢ ᱨᱚᱲᱟ</string>
     <string name="unused_strings">\n\nUnused ᱯᱟᱹᱤᱞ:\n</string>
-    <string name="preview_title" comment="Title of the window allowing to preview card(s)">ᱞᱟᱦᱟᱛᱮᱭᱟᱜ ᱧᱮᱞ</string>
     <string name="reposition_card_dialog_title">ᱱᱟᱶᱟ ᱠᱟᱰ ᱥᱛᱷᱟᱱᱚᱱᱛᱚᱨ ᱯᱮ</string>
     <string name="reposition_card_dialog_message">ᱮᱛᱦᱚᱵ ᱡᱟᱭᱜᱟᱺ</string>
     <string name="reposition_card_not_new_error">ᱠᱷᱟᱹᱞᱤ ᱱᱟᱶᱟ ᱠᱟᱰ ᱜᱮ ᱥᱛᱷᱟᱱᱚᱱᱛᱚᱨ ᱫᱟᱲᱮᱭᱟᱜᱟᱢ</string>
@@ -61,28 +59,15 @@
         <item quantity="other">%d ᱠᱟᱰ ᱥᱛᱷᱟᱱᱚᱱᱛᱚᱨ ᱮᱱᱟ</item>
     </plurals>
     <string name="reset_card_dialog_title">ᱠᱟᱰ ᱨᱤᱥᱮᱴ ᱯᱨᱚᱜᱨᱮᱥᱚᱜ ᱠᱟᱱᱟ</string>
-    <string name="reset_card_dialog_message">ᱱᱚᱶᱟ ᱠᱟᱰ ᱫᱚ ᱱᱟᱶᱟ ᱠᱟᱰ ᱠᱭᱩ ᱢᱩᱪᱟᱹᱫ ᱨᱮ ᱫᱚᱦᱚᱜᱼᱟ</string>
     <plurals name="reset_cards_dialog_acknowledge">
         <item quantity="one">%d ᱠᱟᱰ ᱨᱤᱥᱮᱴ</item>
         <item quantity="other">%d ᱠᱟᱰ ᱨᱤᱥᱮᱴ</item>
     </plurals>
     <!-- Reschedule Card Dialog -->
-    <plurals name="reschedule_cards_dialog_title_new">
-        <item quantity="one">Reschedule %d card</item>
-        <item quantity="other">Reschedule %d cards</item>
-    </plurals>
-    <plurals name="reschedule_card_dialog_interval">
-        <item quantity="one">ᱱᱤᱛᱚᱜᱟᱜ ᱚᱵᱫᱷᱤᱺ %d ᱫᱤᱱ</item>
-        <item quantity="other">ᱱᱤᱛᱚᱜᱟᱜ ᱚᱵᱫᱷᱤᱺ %d ᱫᱤᱱ</item>
-    </plurals>
-    <string name="reschedule_card_dialog_message">x ᱫᱤᱱ ᱧᱮᱞᱡᱚᱝ ᱞᱟᱹᱜᱤᱫ Reschedule ᱢᱮ</string>
     <plurals name="reschedule_cards_dialog_acknowledge">
         <item quantity="one">%d ᱠᱟᱰ ᱨᱤᱥᱮᱰᱭᱩᱞ ᱮᱱᱟ</item>
         <item quantity="other">%d ᱠᱟᱰ ᱨᱤᱥᱮᱰᱭᱩᱞ ᱮᱱᱟ</item>
     </plurals>
-    <string name="reschedule_card_dialog_new_card_warning">ᱱᱟᱶᱟ ᱠᱟᱰ ᱨᱤᱥᱮᱰᱭᱩᱞ ᱠᱟᱱᱟ ᱾ ᱨᱤᱥᱮᱰᱭᱩᱞ ᱞᱮᱠᱷᱟᱱ ᱱᱟᱶᱟ ᱠᱟᱰ ᱠᱚ ᱨᱤᱵᱷᱭᱩ ᱠᱟᱰ ‌ᱛᱮ‌ ᱵᱚᱫᱚᱞᱚᱜᱼᱟ ᱾ ᱱᱟᱶᱟ ᱫᱷᱟᱲᱤ ᱨᱮ ᱱᱟᱶᱟ ᱡᱠᱟᱰ ᱨᱮᱭᱟᱜ ᱡᱟᱭᱜᱟ ᱵᱚᱫᱚᱞ‌ ᱞᱟᱹᱜᱤᱫ ᱨᱤᱯᱚᱡᱤᱥᱚᱱ ᱠᱟᱰ ᱵᱮᱵᱷᱟᱨ ᱢᱮ‌ᱸ</string>
-    <string name="reschedule_card_dialog_warning_ease_reset">ᱨᱤᱥᱮᱰᱭᱩᱞ ᱫᱚ ᱵᱷᱚᱵᱤᱥᱭᱚᱛ ᱨᱮ ᱚᱠᱟᱞᱠᱟᱛᱮ ᱠᱟᱰ ᱠᱚ ᱥᱮᱰᱭᱩᱞ ᱟ ᱚᱱᱟ ᱦᱚᱸ ᱨᱤᱥᱚᱴ ᱟᱭ (ᱮᱡᱽ ᱫᱚ %d%% ᱛᱮ ᱥᱮᱴᱚᱜᱼᱟ)</string>
-    <string name="firefox_workaround_launched_reviewer_opening_deck">ᱨᱮᱫ ᱢᱮᱱᱮᱡᱟᱨ ᱛᱮ ᱰᱮᱠ ᱠᱷᱚᱱ ᱠᱟᱰ ᱵᱟᱪᱷᱟᱣ ᱢᱮ ᱟᱨ ᱵᱟᱝᱠᱷᱟᱱ about:downloads ᱥᱟᱠᱟᱢ ᱠᱷᱟᱱ import ᱢᱮ</string>
     <string name="answering_error_title">ᱥᱟᱹᱠᱷᱭᱟᱛ ᱵᱟᱹᱭᱥᱟᱣ ᱵᱷᱩᱞ ᱦᱩᱭᱮᱱᱟ</string>
     <string name="answering_error_message">ᱴᱩᱢᱟᱹᱞ ᱛᱮ ᱚᱞ ᱵᱷᱩᱞ ᱾ database ᱫᱚ ᱠᱦᱟᱨᱟᱯ ᱜᱮᱭᱟ ᱟᱨ ᱵᱟᱝᱠᱷᱟᱱ ᱰᱤᱥᱠ ᱨᱮ ᱥᱯᱮᱥ ᱵᱟᱱᱩᱜᱟ ᱾ \n\nᱡᱚᱫᱤ ᱵᱟᱨᱚᱢᱵᱟᱨ ᱱᱚᱠᱟ ᱦᱩᱭᱩᱜ ᱠᱟᱱᱟ, ᱮᱱᱰᱮᱠᱷᱟᱱ ᱟᱨ ᱢᱤᱫ ᱡᱮᱠᱷᱟ ᱰᱟᱴᱟᱵᱮᱥ ᱪᱮᱠ ᱯᱮ ᱟᱨ ᱵᱟᱝᱠᱷᱟᱱ backup ᱠᱷᱚᱱ ᱰᱟᱴᱟ restore ᱛᱟᱵᱚᱱ ᱯᱮ ᱾ ᱚᱱᱟ ᱞᱟᱹᱜᱤᱫ \&quot;options\&quot; ᱨᱮ ᱚᱛᱟᱭ ᱯᱮ ᱾\n\ᱟᱨ ᱵᱟᱝᱠᱷᱟᱱ ᱱᱚᱟ ᱫᱚ bug ᱦᱩᱭ ᱫᱟᱲᱮᱭᱟᱜᱟ; ᱫᱚᱭᱟᱠᱟᱛᱮ report ᱯᱮ ᱾ </string>
     <string name="answering_error_report">ᱦᱩᱰᱟᱜ ᱥᱚᱱᱫᱮᱥ</string>
@@ -111,8 +96,10 @@
     <string name="dialog_confirm" tools:ignore="UnusedResources">ᱴᱷᱟᱹᱣᱠᱟᱹ</string>
     <string name="dialog_no">ᱵᱟᱝ</string>
     <string name="dialog_yes">ᱦᱮᱸ</string>
+    <string name="dialog_keep">Keep</string>
+    <string name="dialog_remove">Remove</string>
     <string name="dialog_continue">ᱞᱮᱛᱟᱲ</string>
-    <string name="dialog_processing">ᱠᱟᱹᱢᱤ ᱪᱟᱹᱞᱩ ᱠᱟᱱᱟ ...</string>
+    <string name="dialog_processing">ᱠᱟᱹᱢᱤ ᱪᱟᱹᱞᱩ ᱠᱟᱱᱟ &#8230;</string>
     <string name="dialog_positive_create" comment="Create a new collection, probably erasing the previous one, may be necessary in case of error.">ᱛᱮᱭᱟᱨ</string>
     <string name="dialog_positive_delete">ᱜᱮᱫ ᱜᱤᱰᱤ</string>
     <!-- Currently unsued, should be useful in the future -->
@@ -177,6 +164,7 @@
     <string name="failed_to_apply_background_image">ᱚᱱᱚᱰ ᱪᱤᱛᱟᱨ ᱵᱟᱦᱟᱞ ᱰᱤᱜᱟᱹᱣ %s</string>
     <string name="background_image_too_large">ᱰᱠᱮ ᱦᱟᱛᱟᱣ ᱵᱮᱠᱜᱟᱨᱩᱸᱰ ᱢᱟᱨᱟᱝ ᱜᱮᱭᱟ</string>
     <string name="image_max_size_allowed">ᱰᱷᱮᱨ ᱢᱚᱦᱰᱟ %d MB ᱜᱟᱱᱚᱜ ᱟ</string>
+    <string name="image_dimensions_too_large">Image dimensions are too large (%1$d × %2$d)</string>
     <!-- Global Intent handler -->
     <!-- Also used by Card Browser, not renaming to save translators effort -->
     <string name="intent_handler_failed_no_storage_permission">ᱫᱚᱦᱚ ᱪᱷᱟᱰ ᱵᱟᱱᱩᱜᱟ ᱾ ᱫᱚᱭᱟᱠᱟᱛᱮ ᱫᱚᱦᱚ ᱪᱷᱟᱰ ᱮᱢᱚᱜ ᱢᱮ ᱟᱨ ᱯᱷᱮᱨ ᱪᱮᱥᱴᱟᱭ ᱢᱮ</string>
@@ -186,7 +174,7 @@
     <string name="boot_service_failed_to_schedule_notifications">ᱠᱟᱹᱢᱤ ᱦᱚᱨᱟ ᱩᱭᱦᱟᱹᱨ ᱰᱤᱜᱟᱹᱣ</string>
     <string name="boot_service_too_many_notifications">ᱟᱹᱰᱤᱜᱟᱱ ᱠᱟᱹᱢᱤ ᱦᱚᱨᱟ ᱩᱭᱦᱟᱹᱨ ᱾ ᱛᱤᱱᱟᱹᱝᱜᱟᱱ ᱡᱤᱱᱥ ᱵᱟᱭ ᱫᱮᱠᱷᱟᱣᱟ</string>
     <!-- Locale Selection Dialog -->
-    <string name="locale_selection_dialog_title">ᱠᱤᱵᱚᱰ ᱦᱤᱸᱴ ᱵᱟᱪᱷᱟᱣ</string>
+    <string name="locale_selection_dialog_title_new">Set Language</string>
     <string name="locale_selection_dialog_summary">ᱠᱤᱪᱷᱤ ᱢᱟᱹᱞᱴᱤᱞᱤᱱᱜᱩᱟᱞ ᱠᱤᱭᱵᱚᱰ, ᱡᱮᱢᱚᱱ GBoard  ᱫᱚ ᱚᱞ ᱠᱚ ᱥᱟᱯᱲᱟᱣ ᱡᱷᱚᱜ ᱯᱟᱹᱨᱥᱤ ᱵᱚᱫᱚᱞ ᱠᱚ ᱜᱟᱱᱚᱜᱼᱟ \n\n ᱡᱩᱫᱤ ᱟᱢᱟᱜᱽ ᱠᱤᱭᱵᱚᱰ ᱯᱟᱹᱨᱥᱤ ᱵᱚᱫᱚᱞ ᱠᱚ ᱵᱟᱭ ᱜᱟᱱᱚᱜ ᱠᱟᱱ ᱠᱷᱟᱱ ᱫᱚᱭᱟ ᱠᱟᱛᱮ ᱠᱮᱭᱵᱚᱰ ᱢᱮᱱᱭᱩᱯᱷᱮᱠᱪᱚᱨᱟᱹᱨ ᱨᱮᱭᱟᱜ “setImeHintLocales” ᱱᱮᱦᱚᱨᱮᱢ ᱾</string>
     <!-- Help Dialog -->
     <string name="help_title_using_ankidroid">AnkiDroid ᱵᱮᱵᱷᱟᱨᱮᱫᱟᱹᱧ</string>
@@ -214,12 +202,13 @@
     <string name="help_item_ankiweb_terms_and_conditions">AnkiWeb ᱟᱹᱱᱟᱹᱨᱤ ᱟᱨ ᱥᱚᱨᱛᱚ</string>
     <string name="help_title_send_exception">ᱦᱤᱲᱤᱡ ᱥᱟᱦᱟ ᱨᱤᱯᱚᱴ ᱠᱩᱞ ᱢᱮ</string>
     <string name="help_dialog_exception_report_debounce">ᱨᱤᱯᱚᱴ ᱢᱟᱨᱟᱝ ᱨᱮ ᱮᱢᱮᱠᱟᱱᱟ</string>
+    <string name="help_dialog_exception_report_sent">Report was sent!</string>
     <!--Sync-->
     <plurals name="sync_automatic_sync_needs_more_time">
         <item quantity="one">%d ᱴᱤᱡ ᱨᱮ ᱟᱡ ᱛᱮᱜᱮ ᱟᱹᱛᱩᱨ ᱟᱬᱜᱚ ᱜᱮᱭᱟ</item>
         <item quantity="other">%d ᱴᱤᱡ ᱨᱮ ᱟᱡ ᱛᱮᱜᱮ ᱟᱹᱛᱩᱨ ᱟᱬᱜᱚ ᱜᱮᱭᱟ</item>
     </plurals>
-    <string name="metered_sync_warning">Your connection is metered. Data transfer may cost money</string>
+    <string name="metered_sync_data_warning">Your internet provider may charge money for data use</string>
     <string name="deck_picker_new">ᱱᱚᱣᱟ ᱰᱮᱠᱨᱮ ᱛᱮᱦᱮᱧ ᱧᱮᱞ ᱞᱟᱹᱜᱤᱫ ᱱᱟᱣᱟ ᱠᱟᱰ ᱨᱮᱭᱟᱜ ᱮᱞ</string>
     <string name="deck_picker_rev">ᱱᱚᱣᱟ ᱰᱮᱠ ᱨᱮ ᱛᱮᱦᱮᱧ ᱞᱟᱹᱜᱤᱫ ᱢᱮᱱᱟᱜ ᱱᱟᱣᱟ ᱮᱞ</string>
     <string name="deck_picker_lrn">ᱱᱚᱣᱟ ᱰᱮᱠ ᱨᱮᱭᱟᱜ ᱥᱮᱪᱮᱫ ᱠᱟᱰ  ᱮᱞ </string>
@@ -244,4 +233,23 @@
     </string>
     <string name="dismiss_backup_warning_upgrade">        Due to Android privacy changes, your data and automated backups will be inaccessible if the app is uninstalled
     </string>
+    <string name="deck_already_exists">Deck already exists</string>
+    <string name="create_deck_numeric_hint">If you have deck ordering issues (e.g. ‘10’ appears before ‘2’), replace ‘2’ with ‘02’</string>
+    <!-- Set Due Date -->
+    <string name="set_due_date_match_interval" comment="when setting a card\'s due date, this checkbox also changes the interval of the card">Set interval to same value</string>
+    <plurals name="set_due_date_single_day_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in</item>
+        <item quantity="other">Show cards in</item>
+    </plurals>
+    <plurals name="set_due_date_range_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in range</item>
+        <item quantity="other">Show cards in range</item>
+    </plurals>
+    <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <string name="range_delimiter" comment="Placed between two input boxes to denote a range">–</string>
+    <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">From</string>
+    <string name="set_due_date_range_end" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'maximum\' value of this range (inclusive)">To</string>
 </resources>

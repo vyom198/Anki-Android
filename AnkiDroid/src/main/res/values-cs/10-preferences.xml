@@ -46,9 +46,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- generic strings -->
     <string name="disabled">Vypnuto</string>
-    <string name="pref_summary_seconds">%s s</string>
-    <string name="pref_summary_minutes">%s min</string>
-    <string comment="Percentage value of a preference. %s represents the number to be replaced. Use \%% to represent a single percent sign (%)" name="pref_summary_percentage">%s \%%</string>
+    <plurals name="pref_summ_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="few">%d min</item>
+        <item quantity="many">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <string name="pref_milliseconds">%s ms</string>
+    <!-- TODO: move to 20-search-preference so we can contribute upstream (searchpreference_no_results)-->
     <string name="pref_search_no_results">Žádné výsledky</string>
     <!-- preferences.xml categories-->
     <string name="pref_cat_general" comment="name of the general preference category" maxLength="41">Obecné</string>
@@ -60,7 +65,6 @@
     <string name="pref_cat_whiteboard" maxLength="41">Tabule</string>
     <string name="pref_cat_appearance" maxLength="41">Vzhled</string>
     <string name="pref_cat_themes" maxLength="41">Motivy vzhledu</string>
-    <string name="pref_cat_fonts" maxLength="41">Písmo</string>
     <string name="pref_cat_gestures" maxLength="41">Gesta</string>
     <string name="pref_cat_controls" maxLength="41">Ovládání</string>
     <string name="pref_cat_advanced" maxLength="41">Pokročilé</string>
@@ -113,6 +117,7 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">Klepnutí uprostřed ve středu</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">Klepnutí vlevo dole</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">Klepnutí vpravo dole</string>
+    <string name="gestures_shake" maxLength="41">Zatřesení zařízením</string>
     <string name="card_browser_enable_external_context_menu">Menu „%s“</string>
     <string name="card_browser_enable_external_context_menu_summary">Povolí globální kontextovou nabídku „%s“</string>
     <string name="double_scrolling_gap" maxLength="41">Dvojitý posun</string>
@@ -148,10 +153,7 @@
     <string name="notification_minimum_cards_due_vibrate" maxLength="41">Vibrace</string>
     <string name="notification_minimum_cards_due_blink" maxLength="41">Blikající světlo</string>
     <string name="timeout_answer_text" maxLength="41">Automatické zobrazení odpovědi</string>
-    <string name="timeout_answer" maxLength="41">Odpověď po časovém limitu</string>
-    <string name="timeout_answer_summ">Zobrazit odpověď automaticky bez zásahu uživatele. Zpoždění zahrnuje čas pro automaticky přehrávané zvukové soubory</string>
-    <string name="timeout_answer_seconds" maxLength="41">Čas pro zobrazení odpovědi</string>
-    <string name="timeout_question_seconds" maxLength="41">Čas pro zobrazení další otázky</string>
+    <string name="timeout_answer_summ2">Automaticky zobrazit odpověď bez zásahu uživatele. Konfiguruje se v nastavení balíčku.</string>
     <string name="select_locale_title">Vyberte jazyk</string>
     <string name="software_render" maxLength="41">Zakázat hardwarové vykreslování karty</string>
     <string name="software_render_summ">Hardwarové vykreslování je rychlejší, ale může způsobovat problémy, konkrétně na Android 8/8.1. Pokud nevidíte části uživatelského rozhraní pro opakování karet, zkuste toto nastavení</string>
@@ -164,8 +166,8 @@
     <string name="vertical_centering_summ">Obsah karet vycentrovat svisle na střed</string>
     <string name="pref_double_tap_time_interval" maxLength="41">Čas dvojklepnutí (milisekundy)</string>
     <string name="pref_double_tap_time_interval_summary">Druhé klepnutí na tlačítka odpovědí bude ignorováno, pokud tento čas neuplynul. Zabraňuje to náhodným dvojím klepnutím</string>
-    <string name="pref_show_answer_long_press" maxLength="41">Čas dlouhého stisknutí pro zobrazení odpovědi (ms)</string>
-    <string name="pref_show_answer_long_press_summary">Minimální čas dlouhého stisknutí před tím, než tlačítko Zobrazit odpověď registruje dotyk. Může snížit pravděpodobnost nechtěného stisknutí tlačítka. Výchozí hodnota je 0ms</string>
+    <string name="pref_show_answer_long_press_time" maxLength="41">Čas dlouhého stisknutí pro zobrazení odpovědi</string>
+    <string name="pref_show_answer_long_press_time_summary">Minimální doba stisku předtím, než tlačítko zobrazit odpověď zaregistruje dotyk.</string>
     <string name="show_estimates" maxLength="41">Zobrazit čas tlačítek</string>
     <string name="show_estimates_summ">Zobrazit čas příštího opakování na tlačítkách odpovědí</string>
     <string name="show_large_answer_buttons" maxLength="41">Zobrazit velká tlačítka odpovědí</string>
@@ -179,13 +181,12 @@
     <string name="use_current" maxLength="41">Balíček pro nové karty</string>
     <string name="learn_cutoff" maxLength="41">Limit učení se napřed</string>
     <string name="time_limit" maxLength="41">Časové omezení</string>
-    <string name="new_timezone" maxLength="41">Nové zpracování časového pásma</string>
     <string name="day_offset_with_description" maxLength="41">Začátek příštího dne</string>
     <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
-        <item quantity="one">%d hour past midnight</item>
-        <item quantity="few">%d hours past midnight</item>
-        <item quantity="many">%d hours past midnight</item>
-        <item quantity="other">%d hours past midnight</item>
+        <item quantity="one">%d hodina po půlnoci</item>
+        <item quantity="few">%d hodiny po půlnoci</item>
+        <item quantity="many">%d hodiny po půlnoci</item>
+        <item quantity="other">%d hodin po půlnoci</item>
     </plurals>
     <string name="pref_keep_screen_on" maxLength="41">Nevypínat obrazovku</string>
     <string name="pref_keep_screen_on_summ">Nepovolit zhasnutí displeje</string>
@@ -201,10 +202,9 @@
     <string name="reset">Obnovit</string>
     <string name="thirdparty_apps_title" maxLength="41">API aplikace třetích stran</string>
     <string name="thirdparty_apps_summary">Zobrazit seznam aplikací, které používají AnkiDroid API, jako jsou slovníky, nástroje</string>
-    <string name="html_javascript_debugging" maxLength="41">HTML / Javascript Debugging</string>
-    <string name="html_javascript_debugging_summ">Umožnit vzdálené připojení k WebView a uložit HTML karet do adresáře AnkiDroid</string>
     <!-- Appearance settings -->
     <string name="pref_cat_reviewer" maxLength="41">Opakování karet</string>
+    <string name="show_deck_title" maxLength="41">Zobrazit název balíčku</string>
     <string name="accessibility" maxLength="41">Usnadnění přístupu</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">Vkládat obrázky ze schránky jako PNG</string>
@@ -244,16 +244,15 @@
     <string name="deck_conf_cram_reschedule" maxLength="41" comment="Title of the box labelled by deck_conf_cram_reschedule_summ">Přeplánovat</string>
     <string name="deck_conf_cram_reschedule_summ">Přeplánovat karty podle mých odpovědí v tomto balíčku</string>
     <string name="deck_conf_cram_filter_2_check">Povolit druhý filtr</string>
-    <string name="deck_conf_cram_steps" maxLength="41">Vlastní kroky (v minutách)</string>
     <string name="deck_conf_cram_steps_summ" maxLength="41">Definovat vlastní kroky</string>
+    <string name="deck_conf_cram_preview_delays" maxLength="41">Prodlevy náhledu</string>
+    <string name="deck_conf_cram_preview_delays_summ">Prodlevy jsou v sekundách. 0 vrátí kartu do původního balíčku.</string>
     <!-- analytics options -->
     <string name="analytics_dialog_title">Pomozte udělat AnkiDroid lepší!</string>
     <string name="analytics_title" maxLength="41">Sdílet používání funkcí</string>
     <string name="analytics_summ">Můžete přispět do AnkiDroid tím, že pomůžete vývojovému týmu dozvědět se, které funkce lidé používají</string>
     <string name="note_editor_replace_newlines" maxLength="41">Nahradit nové řádky HTML</string>
     <string name="note_editor_replace_newlines_summ">V editoru poznámek převede při úpravě karty každý výskyt &lt;br&gt; na nový řádek</string>
-    <string name="no_code_formatting" maxLength="41">Jednoduché formátování napsané odpovědi</string>
-    <string name="no_code_formatting_summ">Opraví „􏿾“, které se vyskytuje ve výsledcích napsaných odpovědí</string>
     <string name="type_in_answer_focus" maxLength="41">Vybrat „napište odpověď“</string>
     <string name="type_in_answer_focus_summ">Automaticky vybrat pole „napište odpověď“ při opakování</string>
     <!-- About -->
@@ -270,6 +269,19 @@
     <string name="binding_add_key">Přidat klávesu</string>
     <string name="binding_replace_key">Nahradit klávesu</string>
     <string name="key_picker_default_press_key">Stiskněte tlačítko</string>
+    <string name="binding_add_axis">Přidat joystick / ovladač pohybu</string>
+    <string name="axis_picker_move_joystick">Pohnout joystickem / ovladačem pohybu</string>
+    <string name="user_actions" maxLength="41">Akce uživatele</string>
+    <string name="user_actions_summary" maxLength="41">Spustit JavaScript z obrazovky opakování</string>
+    <string name="user_action_1" maxLength="41">Akce uživatele 1</string>
+    <string name="user_action_2" maxLength="41">Akce uživatele 2</string>
+    <string name="user_action_3" maxLength="41">Akce uživatele 3</string>
+    <string name="user_action_4" maxLength="41">Akce uživatele 4</string>
+    <string name="user_action_5" maxLength="41">Akce uživatele 5</string>
+    <string name="user_action_6" maxLength="41">Akce uživatele 6</string>
+    <string name="user_action_7" maxLength="41">Akce uživatele 7</string>
+    <string name="user_action_8" maxLength="41">Akce uživatele 8</string>
+    <string name="user_action_9" maxLength="41">Akce uživatele 9</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">Vybrat stranu karty</string>
     <string name="card_side_question">Otázka</string>
@@ -283,6 +295,8 @@
     <string name="bindings_already_bound">Již přiřazeno k %s</string>
     <!-- Advanced -->
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">Experimentální</string>
+    <string name="readtext_deprecation_warn">AnkiDroid zavedl lepší TTS mechanismus, který je kompatibilní s ostatními klienty Anki a obsahuje více hlasů a vylepšení přehrávání!\n\nPřejděte prosím co nejdříve na nové TTS, protože toto nastavení bude brzy odstraněno</string>
+    <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">Přejděte prosím na nový formát převodu textu na řeč</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">Možnosti pro vývojáře</string>
     <string name="dev_options_enabled_pref" maxLength="41">Povolit možnosti pro vývojáře</string>

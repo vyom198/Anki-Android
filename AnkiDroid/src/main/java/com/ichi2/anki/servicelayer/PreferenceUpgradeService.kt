@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
+import com.ichi2.anki.analytics.UsageAnalytics
 import com.ichi2.anki.cardviewer.Gesture
 import com.ichi2.anki.cardviewer.ViewerCommand
 import com.ichi2.anki.noteeditor.CustomToolbarButton
@@ -32,6 +33,7 @@ import com.ichi2.anki.reviewer.CardSide
 import com.ichi2.anki.reviewer.FullScreenMode
 import com.ichi2.anki.reviewer.MappableBinding
 import com.ichi2.anki.reviewer.MappableBinding.Companion.toPreferenceString
+import com.ichi2.anki.reviewer.screenBuilder
 import com.ichi2.libanki.Consts
 import com.ichi2.utils.HashUtil.hashSetInit
 import timber.log.Timber
@@ -92,6 +94,11 @@ object PreferenceUpgradeService {
                 yield(RemoveScrollingButtons())
                 yield(RemoveAnswerRecommended())
                 yield(RemoveBackupMax())
+                yield(RemoveInCardsMode())
+                yield(RemoveReviewerETA())
+                yield(SetShowDeckTitle())
+                yield(ResetAnalyticsOptIn())
+                yield(RemoveNoCodeFormatting())
             }
 
             /** Returns a list of preference upgrade classes which have not been applied */
@@ -268,6 +275,7 @@ object PreferenceUpgradeService {
                 Pair(34, ViewerCommand.ABORT_AND_SYNC),
                 Pair(35, ViewerCommand.RECORD_VOICE),
                 Pair(36, ViewerCommand.REPLAY_VOICE),
+                Pair(46, ViewerCommand.SAVE_VOICE),
                 Pair(37, ViewerCommand.TOGGLE_WHITEBOARD),
                 Pair(44, ViewerCommand.CLEAR_WHITEBOARD),
                 Pair(45, ViewerCommand.CHANGE_WHITEBOARD_PEN_COLOR),
@@ -334,7 +342,7 @@ object PreferenceUpgradeService {
                 Timber.i("Moving preference from '%s' to '%s'", oldGesturePreferenceKey, command.preferenceKey)
 
                 // add to the binding_COMMANDNAME preference
-                val mappableBinding = MappableBinding(binding, MappableBinding.Screen.Reviewer(CardSide.BOTH))
+                val mappableBinding = MappableBinding(binding, command.screenBuilder(CardSide.BOTH))
                 command.addBindingAtEnd(preferences, mappableBinding)
             }
         }
@@ -443,6 +451,54 @@ object PreferenceUpgradeService {
                     putInt("monthly_backups_to_keep", legacyValue)
                 }
             }
+        }
+
+        /** We should have used [anki.config.ConfigKey.Bool.BROWSER_TABLE_SHOW_NOTES_MODE] */
+        internal class RemoveInCardsMode : PreferenceUpgrade(14) {
+            override fun upgrade(preferences: SharedPreferences) {
+                preferences.edit {
+                    remove("inCardsMode")
+                }
+            }
+        }
+
+        internal class RemoveReviewerETA : PreferenceUpgrade(15) {
+            override fun upgrade(preferences: SharedPreferences) {
+                // reverted: #15405
+                // preferences.edit { remove("showETA") }
+            }
+        }
+
+        /** default to true for existing users  */
+        internal class SetShowDeckTitle : PreferenceUpgrade(16) {
+            override fun upgrade(preferences: SharedPreferences) {
+                if (!preferences.contains("showDeckTitle")) {
+                    preferences.edit { putBoolean("showDeckTitle", true) }
+                }
+            }
+        }
+
+        /**
+         * Issue 14386: Opening preferences opted users in to analytics in 2.16 due to an oversight
+         *
+         * Despite the fact that analytics were broken at the time due to Google's migration from
+         * Universal Analytics to Google Analytics 4, we want analytics to STRICTLY be opt-in
+         *
+         * As we likely have inadvertent opt-ins, we stated that we would opt everyone out:
+         * https://ankidroid.org/docs/changelog.html#_version_2_16_5_20230906
+         *
+         * We now use "analytics_opt_in"
+         *
+         * @see [UsageAnalytics.ANALYTICS_OPTIN_KEY]
+         */
+        internal class ResetAnalyticsOptIn : PreferenceUpgrade(17) {
+            override fun upgrade(preferences: SharedPreferences) =
+                preferences.edit { remove("analyticsOptIn") }
+        }
+
+        internal class RemoveNoCodeFormatting : PreferenceUpgrade(18) {
+            override fun upgrade(preferences: SharedPreferences) =
+                preferences.edit { remove("noCodeFormatting") }
         }
     }
 }

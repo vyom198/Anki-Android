@@ -25,8 +25,8 @@ import com.ichi2.anki.CardTemplateBrowserAppearanceEditor.Companion.INTENT_ANSWE
 import com.ichi2.anki.CardTemplateBrowserAppearanceEditor.Companion.INTENT_QUESTION_FORMAT
 import com.ichi2.anki.multimediacard.activity.MultimediaEditFieldActivity
 import com.ichi2.anki.notetype.ManageNotetypes
-import com.ichi2.anki.pages.PagesActivity
 import com.ichi2.anki.preferences.Preferences
+import com.ichi2.anki.previewer.CardViewerActivity
 import com.ichi2.anki.services.ReminderService.Companion.getReviewDeckIntent
 import com.ichi2.anki.ui.windows.managespace.ManageSpaceActivity
 import com.ichi2.anki.ui.windows.permissions.PermissionsActivity
@@ -63,18 +63,18 @@ object ActivityList {
             get(Info::class.java),
             // NoteEditor has unhandled intents
             get(NoteEditor::class.java),
-            get(Previewer::class.java),
-            get(CardTemplatePreviewer::class.java),
             get(MultimediaEditFieldActivity::class.java),
             get(CardTemplateEditor::class.java) { intentForCardTemplateEditor() },
             get(CardTemplateBrowserAppearanceEditor::class.java) { intentForCardTemplateBrowserAppearanceEditor() },
             get(SharedDecksActivity::class.java),
-            get(PagesActivity::class.java),
             get(LoginActivity::class.java),
             get(IntroductionActivity::class.java),
             get(ManageNotetypes::class.java),
             get(ManageSpaceActivity::class.java),
-            get(PermissionsActivity::class.java)
+            get(PermissionsActivity::class.java),
+            get(SingleFragmentActivity::class.java),
+            get(ImageOcclusionActivity::class.java),
+            get(CardViewerActivity::class.java)
         )
     }
 

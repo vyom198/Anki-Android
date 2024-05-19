@@ -59,15 +59,14 @@
     <!-- DeckPicker.kt -->
     <string name="expand">Perluaskan</string>
     <string name="collapse">Sembunyikan</string>
-    <string name="study_more">Ulang kaji lagi</string>
     <plurals name="reviewer_window_title">
-        <item quantity="other">tinggal %d minit</item>
+        <item quantity="other">%d minutes left</item>
     </plurals>
     <plurals name="reviewer_window_title_hours_new">
-        <item quantity="other">%1$d jam %2$d lagi</item>
+        <item quantity="other">%1$d hours %2$d left</item>
     </plurals>
     <plurals name="reviewer_window_title_days_new">
-        <item quantity="other">%1$d hari %2$d lagi</item>
+        <item quantity="other">%1$d days %2$d left</item>
     </plurals>
     <string name="no_cards_placeholder_title">Koleksi kosong</string>
     <string name="no_cards_placeholder_description">Mula tambah kad\nmenggunakan ikon +.</string>
@@ -82,12 +81,14 @@
     <string name="ease_button_easy">Senang</string>
     <string name="menu_import">Import</string>
     <string name="undo">Buat asal</string>
+    <string name="redo">Redo</string>
     <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in Reviewer. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)">Buat asal garisan</string>
     <string name="move_all_to_deck">Pindah semua ke dek</string>
     <string name="unbury">Tampil</string>
     <string name="rename_deck">Nama semula dek</string>
     <string name="create_shortcut">Cipta pintasan</string>
     <string name="browse_cards">Cari kad</string>
+    <string name="edit_deck_description" comment="edit the deck description">Edit description</string>
     <string name="menu_add" comment="A generic add button. Please inform us if you need more specific strings">Tambah</string>
     <string name="menu_add_note">Tambah nota</string>
     <string name="menu_my_account" comment="Label of the window in which the user should enter their account. This text can\'t be found in AnkiDroid directly.">Segerakkan akaun</string>
@@ -101,14 +102,6 @@
     <string name="menu_delete_note">Padam nota</string>
     <string name="menu_flag">Tanda</string>
     <string name="menu_flag_card">Tanda kad</string>
-    <string name="menu_flag_card_zero">Tiada tanda</string>
-    <string name="menu_flag_card_one">Tanda merah</string>
-    <string name="menu_flag_card_two">Tanda jingga</string>
-    <string name="menu_flag_card_three">Tanda hijau</string>
-    <string name="menu_flag_card_four">Tanda biru</string>
-    <string name="menu_flag_card_five">Tanda merah jambu</string>
-    <string name="menu_flag_card_six">Tanda firus</string>
-    <string name="menu_flag_card_seven">Tanda ungu</string>
     <string name="menu_edit_tags">Sunting tag</string>
     <string name="delete_note_message">Pasti padam nota dan semua kadnya?\n%s</string>
     <string name="menu_search">Cari di %1$s</string>
@@ -130,14 +123,11 @@
     <string name="empty_filtered_deck">Mengosongkan dek ditapis&#8230;</string>
     <string name="custom_study_deck_name">Sesi ulang kaji tersuai</string>
     <string name="custom_study_deck_exists">Nama semula dek ulang kaji tersuai sedia ada dahulu</string>
-    <string name="empty_deck">Dek kosong</string>
     <string name="search_deck" comment="Deck search for selecting it">Carian Dek</string>
+    <string name="empty_deck">Dek kosong</string>
     <string name="search_for_download_deck" comment="Deck search value for downloading deck">Carian Dek</string>
     <string name="invalid_deck_name">Nama dek tidak sah</string>
-    <string name="studyoptions_empty">Dek kosong. Tekan butang + untuk tambah kandungan baru.</string>
-    <string name="studyoptions_limit_reached">Had ulang kaji harian tercapai</string>
-    <string name="studyoptions_empty_schedule">Tiada kad untuk ulang kaji</string>
-    <string name="studyoptions_congrats_finished">Tahniah! Kini anda telah selesai.</string>
+    <string name="studyoptions_congrats_finished">Congratulations! You have finished for now.</string>
     <string name="studyoptions_no_cards_due">Tiada kad tertunggak lagi</string>
     <string name="sd_card_not_mounted">Peranti storan tidak dipasang</string>
     <string name="button_sync" comment="Text of the sync button">Segerak</string>
@@ -146,8 +136,7 @@
     <string name="continue_sync" tools:ignore="UnusedResources">Teruskan penyegerakan</string>
     <string name="sync_cancelled" tools:ignore="UnusedResources">Penyegerakan terbatal</string>
     <string name="sync_cancel_message" tools:ignore="UnusedResources">Membatal&#8230;\nMungkin mengambil masa.</string>
-    <string name="export">Eksport</string>
-    <string name="export_collection">Eksport koleksi</string>
+    <string name="syncing_media">Syncing media</string>
     <string name="export_deck">Eksport dek</string>
     <string name="nothing">Tiada</string>
     <!-- Card template editor -->
@@ -166,7 +155,6 @@
     <plurals name="card_template_editor_confirm_delete">
         <item quantity="other">Padam jenis kad “%2$s”, dan %1$d kad-kadnya?</item>
     </plurals>
-    <string name="invalid_template">Kad tidak dapat dihasilkan</string>
     <string name="card_template_editor_would_delete_note">Membuang jenis kad ini akan akibatkan satu atau lebih nota turut dipadam. Sila cipta dan simpan jenis kad yang baru dahulu.</string>
     <string name="card_template_editor_save_error">Gagal simpan suntingan templat kad: %s</string>
     <string name="template_for_current_card_deleted">Jenis kad bagi kad ini telah dipadam.</string>
@@ -238,6 +226,7 @@
     <string name="migration__resume_after_failed_dialog__button_positive">Teruskan penghijrahan</string>
     <string name="directory_inaccessible_after_uninstall" comment="Dialog title if AnkiDroid can\'t access the collection once the app is installed">Koleksi tidak dapat dicapai</string>
     <string name="directory_inaccessible_after_uninstall_summary" comment="the parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">Kami gagal mencapai koleksi anda setelah AnkiDroid dinyahpasang akibat perubahan Polisi Play Store\n\nData anda selamat dan boleh dipulihkan. Ia terletak di \n%s\n\nPilih antara pilihan di bawah untuk pulihkan:</string>
+    <string name="directory_revoked_after_inactivity" comment="the first parameter is WRITE_EXTERNAL_STORAGE the second parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">Android has removed AnkiDroid\'s %1$s permission due to app inactivity.\n\nYour data is safe and can be restored. It is located at\n%2$s\n\nSelect an option below to restore:</string>
     <string name="restore_data_from_ankiweb">Pulih dari AnkiWeb (disyorkan)</string>
     <string name="install_non_play_store_ankidroid_recommended">Pulih capaian folder (disyorkan)</string>
     <string name="install_non_play_store_ankidroid">Pulih capaian folder (lanjutan)</string>
@@ -249,4 +238,6 @@
     <string name="storage_access_title">Storage access</string>
     <string name="storage_access_summary">Saves your collection in a safe place that will not be deleted if the app is uninstalled</string>
     <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">All files access</string>
+    <string name="image_occlusion">Image Occlusion</string>
+    <string name="remove_account" comment="open a website to start the deletion of an AnkiWeb account">Remove account</string>
 </resources>

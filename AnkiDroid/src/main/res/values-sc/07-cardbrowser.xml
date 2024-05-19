@@ -54,12 +54,15 @@
         <item quantity="other">%d notas ammustradas</item>
     </plurals>
     <string name="card_browser_all_decks">Totu sos matzos</string>
-    <string name="card_browser_delete_card">Iscantzella sas notas</string>
-    <string name="card_browser_suspend_card">Suspende cartas</string>
+    <plurals name="card_browser_delete_cards">
+        <item quantity="one">Delete card</item>
+        <item quantity="other">Delete cards</item>
+    </plurals>
+    <plurals name="card_browser_delete_notes">
+        <item quantity="one">Delete note</item>
+        <item quantity="other">Delete notes</item>
+    </plurals>
     <string name="card_browser_change_deck">Càmbia matzu</string>
-    <string name="card_browser_unsuspend_card">Boga sa sospensione a sas cartas</string>
-    <string name="card_browser_mark_card">Marca sas notas</string>
-    <string name="card_browser_unmark_card">Boga sa marcadura a sas notas</string>
     <string name="delete_card_title">Iscantzellare sa nota?</string>
     <string name="card_browser_show_marked">Filtra sas marcadas</string>
     <string name="card_browser_show_suspended">Filtra sas suspèndidas</string>
@@ -96,6 +99,7 @@
     <string name="card_browser_search_all_decks">Chirca in totu sos matzos</string>
     <string name="card_browser_unknown_deck_name">Disconnotu</string>
     <string name="card_browser_truncate" comment="allows users to show less of a field value">Mutza su cuntenutu</string>
+    <string name="set_due_date_hintText" comment="plural set_due_date_label_suffix is used for parameters, parameter 1 is the plural for 0, parameter 2 is the plural for 1">Today is ‘0 %1$s’, tomorrow is ‘1 %2$s’, etc&#8230;</string>
     <plurals name="card_browser_export_cards">
         <item quantity="one">Esporta carta</item>
         <item quantity="other">Esporta cartas</item>
@@ -108,5 +112,4 @@
         <item quantity="one">%d carta iscantzellada</item>
         <item quantity="other">%d cartas iscantzelladas</item>
     </plurals>
-    <!-- Card Info subscreen -->
 </resources>

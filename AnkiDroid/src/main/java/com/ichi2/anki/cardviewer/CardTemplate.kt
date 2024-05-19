@@ -15,19 +15,34 @@
  */
 package com.ichi2.anki.cardviewer
 
+import android.content.Context
 import androidx.annotation.CheckResult
-import java.lang.IllegalStateException
+import com.ichi2.anki.cardviewer.CardTemplate.Companion.TEMPLATE_FILE
+import com.ichi2.anki.utils.ext.convertToString
+import java.io.IOException
 
+/**
+ * Full HTML to be displayed in a WebView
+ */
+@JvmInline
+value class RenderedCard(val html: String)
+
+/**
+ * The static, global AnkiDroid template for rendering a card: [TEMPLATE_FILE]
+ *
+ * Handles loading the file from disk and replacements of sections of dynamic content
+ */
 class CardTemplate(template: String) {
-    private var mPreStyle: String? = null
-    private var mPreScript: String? = null
-    private var mPreClass: String? = null
-    private var mPreContent: String? = null
-    private var mPostContent: String? = null
+    private var preStyle: String? = null
+    private var preScript: String? = null
+    private var preClass: String? = null
+    private var preContent: String? = null
+    private var postContent: String? = null
 
     @CheckResult
-    fun render(content: String, style: String, script: String, cardClass: String): String {
-        return mPreStyle + style + mPreScript + script + mPreClass + cardClass + mPreContent + content + mPostContent
+    fun render(content: String, style: String, script: String, cardClass: String): RenderedCard {
+        val html = preStyle + style + preScript + script + preClass + cardClass + preContent + content + postContent
+        return RenderedCard(html)
     }
 
     init {
@@ -42,13 +57,26 @@ class CardTemplate(template: String) {
         val classIndex = template.indexOf(classDelim)
         val contentIndex = template.indexOf(contentDelim)
         try {
-            mPreStyle = template.substring(0, styleIndex)
-            mPreScript = template.substring(styleIndex + styleDelim.length, scriptIndex)
-            mPreClass = template.substring(scriptIndex + scriptDelim.length, classIndex)
-            mPreContent = template.substring(classIndex + classDelim.length, contentIndex)
-            mPostContent = template.substring(contentIndex + contentDelim.length)
+            preStyle = template.substring(0, styleIndex)
+            preScript = template.substring(styleIndex + styleDelim.length, scriptIndex)
+            preClass = template.substring(scriptIndex + scriptDelim.length, classIndex)
+            preContent = template.substring(classIndex + classDelim.length, contentIndex)
+            postContent = template.substring(contentIndex + contentDelim.length)
         } catch (ex: StringIndexOutOfBoundsException) {
             throw IllegalStateException("The card template had replacement string order, or content changed", ex)
         }
+    }
+
+    companion object {
+        private const val TEMPLATE_FILE = "card_template.html"
+
+        /**
+         * Load the template for the card
+         *
+         * @throws IOException failure to read [TEMPLATE_FILE]
+         */
+        fun load(context: Context) = CardTemplate(
+            template = context.assets.open(TEMPLATE_FILE).convertToString()
+        )
     }
 }

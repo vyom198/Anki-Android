@@ -62,12 +62,23 @@
         <item quantity="other">%d ملحوظة معروضة</item>
     </plurals>
     <string name="card_browser_all_decks">كل الرزم</string>
-    <string name="card_browser_delete_card">حذف الملحوظات</string>
-    <string name="card_browser_suspend_card">تعليق البطاقات</string>
+    <plurals name="card_browser_delete_cards">
+        <item quantity="zero">حذف البطاقة</item>
+        <item quantity="one">حذف البطاقة</item>
+        <item quantity="two">حذف البطاقتين</item>
+        <item quantity="few">حذف البطاقات</item>
+        <item quantity="many">حذف البطاقات</item>
+        <item quantity="other">حذف البطاقات</item>
+    </plurals>
+    <plurals name="card_browser_delete_notes">
+        <item quantity="zero">حذف الملحوظة</item>
+        <item quantity="one">حذف الملحوظة</item>
+        <item quantity="two">حذف الملحوظتين</item>
+        <item quantity="few">حذف الملحوظات</item>
+        <item quantity="many">حذف الملحوظات</item>
+        <item quantity="other">حذف الملحوظات</item>
+    </plurals>
     <string name="card_browser_change_deck">تغيير الرزمة</string>
-    <string name="card_browser_unsuspend_card">تفعيل البطاقات</string>
-    <string name="card_browser_mark_card">تعليم الملحوظات</string>
-    <string name="card_browser_unmark_card">إلغاء تعليم الملحوظات</string>
     <string name="delete_card_title">هل تريد حذف الملحوظة؟</string>
     <string name="card_browser_show_marked">فلترة البطاقات المعلمة</string>
     <string name="card_browser_show_suspended">فلترة البطاقات المعلقة</string>
@@ -104,6 +115,7 @@
     <string name="card_browser_search_all_decks">البحث في كل الرزم</string>
     <string name="card_browser_unknown_deck_name">غير معروف</string>
     <string name="card_browser_truncate" comment="allows users to show less of a field value">اقتطاع المحتوى</string>
+    <string name="set_due_date_hintText" comment="plural set_due_date_label_suffix is used for parameters, parameter 1 is the plural for 0, parameter 2 is the plural for 1">Today is ‘0 %1$s’, tomorrow is ‘1 %2$s’, etc&#8230;</string>
     <plurals name="card_browser_export_cards">
         <item quantity="zero">تصدير البطاقة</item>
         <item quantity="one">تصدير البطاقة</item>
@@ -128,5 +140,4 @@
         <item quantity="many">حُذِفت %d بطاقة</item>
         <item quantity="other">حُذِفت %d بطاقة</item>
     </plurals>
-    <!-- Card Info subscreen -->
 </resources>

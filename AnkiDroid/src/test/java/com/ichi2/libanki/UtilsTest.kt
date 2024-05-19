@@ -17,19 +17,17 @@
 package com.ichi2.libanki
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class UtilsTest {
 
     @Test
     fun testSplit() {
-        Assert.assertArrayEquals(arrayOf("foo", "bar"), Utils.splitFields("foobar"))
-        Assert.assertArrayEquals(arrayOf("", "foo", "", "", ""), Utils.splitFields("foo"))
+        assertEquals(listOf("foo", "bar"), Utils.splitFields("foobar"))
+        assertEquals(listOf("", "foo", "", "", ""), Utils.splitFields("foo"))
     }
 
     @Test
@@ -68,5 +66,27 @@ class UtilsTest {
                 Utils.stripHTML(s)
             )
         }
+    }
+
+    @Test
+    fun test_stripSpecialFields_will_remove_type() {
+        val input = "test\n\n[[type:Back]]"
+        val output = Utils.stripSpecialFields(input)
+        assertEquals(
+            "type field should be removed",
+            "test\n\n",
+            output
+        )
+    }
+
+    @Test
+    fun test_stripSpecialFields_will_remove_avRef() {
+        val input = "test\n\n[anki:play:q:0]"
+        val output = Utils.stripSpecialFields(input)
+        assertEquals(
+            "avRef field should be removed",
+            "test\n\n",
+            output
+        )
     }
 }

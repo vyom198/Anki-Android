@@ -8,8 +8,8 @@ import android.database.sqlite.SQLiteException
 import androidx.annotation.WorkerThread
 import com.ichi2.anki.model.WhiteboardPenColor
 import com.ichi2.anki.model.WhiteboardPenColor.Companion.default
+import com.ichi2.anki.reviewer.CardSide
 import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.Sound.SoundSide
 import com.ichi2.utils.KotlinCleanup
 import com.ichi2.widget.SmallWidgetStatus
 import timber.log.Timber
@@ -180,7 +180,7 @@ object MetaDB {
     }
 
     /** Reset the widget status.  */
-    fun resetWidget(context: Context): Boolean {
+    private fun resetWidget(context: Context): Boolean {
         openDBIfClosed(context)
         try {
             Timber.i("MetaDB:: Resetting widget status")
@@ -203,7 +203,7 @@ object MetaDB {
      * [.LANGUAGES_QA_ANSWER], or [.LANGUAGES_QA_UNDEFINED]
      * @param language the language to associate, as a two-characters, lowercase string
      */
-    fun storeLanguage(context: Context, did: DeckId, ord: Int, qa: SoundSide, language: String) {
+    fun storeLanguage(context: Context, did: DeckId, ord: Int, qa: CardSide, language: String) {
         openDBIfClosed(context)
         try {
             if ("" == getLanguage(context, did, ord, qa)) {
@@ -241,7 +241,7 @@ object MetaDB {
      * [.LANGUAGES_QA_ANSWER], or [.LANGUAGES_QA_UNDEFINED] return the language associate with
      * the type, as a two-characters, lowercase string, or the empty string if no association is defined
      */
-    fun getLanguage(context: Context, did: DeckId, ord: Int, qa: SoundSide): String {
+    fun getLanguage(context: Context, did: DeckId, ord: Int, qa: CardSide): String {
         openDBIfClosed(context)
         var language = ""
         val query = "SELECT language FROM languages WHERE did = ? AND ord = ? AND qa = ? LIMIT 1"
@@ -249,9 +249,9 @@ object MetaDB {
             mMetaDb!!.rawQuery(
                 query,
                 arrayOf(
-                    java.lang.Long.toString(did),
-                    Integer.toString(ord),
-                    Integer.toString(qa.int)
+                    did.toString(),
+                    ord.toString(),
+                    qa.int.toString()
                 )
             ).use { cur ->
                 Timber.v("getLanguage: %s", query)
@@ -275,7 +275,7 @@ object MetaDB {
         try {
             mMetaDb!!.rawQuery(
                 "SELECT state FROM whiteboardState  WHERE did = ?",
-                arrayOf(java.lang.Long.toString(did))
+                arrayOf(did.toString())
             ).use { cur -> return DatabaseUtil.getScalarBoolean(cur) }
         } catch (e: Exception) {
             Timber.e(e, "Error retrieving whiteboard state from MetaDB ")
@@ -296,7 +296,7 @@ object MetaDB {
             val metaDb = mMetaDb!!
             metaDb.rawQuery(
                 "SELECT _id FROM whiteboardState WHERE did = ?",
-                arrayOf(java.lang.Long.toString(did))
+                arrayOf(did.toString())
             ).use { cur ->
                 if (cur.moveToNext()) {
                     metaDb.execSQL(
@@ -327,7 +327,7 @@ object MetaDB {
         try {
             mMetaDb!!.rawQuery(
                 "SELECT stylus FROM whiteboardState WHERE did = ?",
-                arrayOf(java.lang.Long.toString(did))
+                arrayOf(did.toString())
             ).use { cur -> return DatabaseUtil.getScalarBoolean(cur) }
         } catch (e: Exception) {
             Timber.e(e, "Error retrieving whiteboard stylus mode state from MetaDB ")
@@ -348,7 +348,7 @@ object MetaDB {
             val metaDb = mMetaDb!!
             metaDb.rawQuery(
                 "SELECT _id FROM whiteboardState WHERE did = ?",
-                arrayOf(java.lang.Long.toString(did))
+                arrayOf(did.toString())
             ).use { cur ->
                 if (cur.moveToNext()) {
                     metaDb.execSQL(
@@ -379,7 +379,7 @@ object MetaDB {
         try {
             mMetaDb!!.rawQuery(
                 "SELECT visible FROM whiteboardState WHERE did = ?",
-                arrayOf(java.lang.Long.toString(did))
+                arrayOf(did.toString())
             ).use { cur -> return DatabaseUtil.getScalarBoolean(cur) }
         } catch (e: Exception) {
             Timber.e(e, "Error retrieving whiteboard state from MetaDB ")
@@ -400,7 +400,7 @@ object MetaDB {
             val metaDb = mMetaDb!!
             metaDb.rawQuery(
                 "SELECT _id FROM whiteboardState WHERE did  = ?",
-                arrayOf(java.lang.Long.toString(did))
+                arrayOf(did.toString())
             ).use { cur ->
                 if (cur.moveToNext()) {
                     metaDb.execSQL(
@@ -429,7 +429,7 @@ object MetaDB {
         try {
             mMetaDb!!.rawQuery(
                 "SELECT lightpencolor, darkpencolor FROM whiteboardState WHERE did = ?",
-                arrayOf(java.lang.Long.toString(did))
+                arrayOf(did.toString())
             ).use { cur ->
                 cur.moveToFirst()
                 val light = DatabaseUtil.getInteger(cur, 0)
@@ -456,7 +456,7 @@ object MetaDB {
             val metaDb = mMetaDb!!
             metaDb.rawQuery(
                 "SELECT _id FROM whiteboardState WHERE did  = ?",
-                arrayOf(java.lang.Long.toString(did))
+                arrayOf(did.toString())
             ).use { cur ->
                 if (cur.moveToNext()) {
                     metaDb.execSQL(

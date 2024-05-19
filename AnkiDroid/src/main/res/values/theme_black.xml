@@ -39,6 +39,7 @@
         <item name="reviewCountColor">@color/material_green_400</item>
         <item name="zeroCountColor">#202020</item>
         <!-- Reviewer colors -->
+        <item name="showAnswerColor">@color/theme_black_primary</item>
         <item name="topBarColor">@color/theme_black_primary</item>
         <item name="maxTimerColor">@color/material_red_300</item>
         <item name="answerButtonTextColor">@color/theme_black_primary_text</item>
@@ -46,6 +47,7 @@
         <item name="hardButtonTextColor">@color/white</item>
         <item name="goodButtonTextColor">@color/material_green_400</item>
         <item name="easyButtonTextColor">@color/material_blue_700</item>
+        <item name="alternativeBackgroundColor">#101010</item>
         <!-- Reviewer button drawables -->
         <item name="againButtonRef">@drawable/footer_button_all_black</item>
         <item name="hardButtonRef">@drawable/footer_button_all_black</item>
@@ -61,13 +63,6 @@
         <item name="suspendedColor">#A8A634</item>
         <item name="selectedColor">#a86634</item>
         <item name="markedColor">#391080</item>
-        <item name="flagRed">@color/flag_red_dark</item>
-        <item name="flagOrange">@color/flag_orange_dark</item>
-        <item name="flagGreen">@color/flag_green_dark</item>
-        <item name="flagBlue">@color/flag_blue_dark</item>
-        <item name="flagPink">@color/flag_pink_dark</item>
-        <item name="flagTurquoise">@color/flag_turquoise_dark</item>
-        <item name="flagPurple">@color/flag_purple_dark</item>
         <!-- Note editor colors -->
         <item name="duplicateColor">#855</item>
         <!-- Note editor colors -->
@@ -86,6 +81,7 @@
         <item name="navDrawerImage">@drawable/nav_drawer_logo_black_theme</item>
         <!-- Dialog styles -->
         <item name="android:listPreferredItemHeight">56dip</item>
+        <!--        TODO: Remove it once we migrate to Alert Dialog-->
         <item name="md_background_color">@color/theme_black_primary_light</item>
         <item name="md_color_button_text">@color/white</item>
         <!--Custom Tabs colors-->
@@ -104,8 +100,14 @@
         <!-- Introduction -->
         <item name="introductionLogoTransparent">#55111111</item>
 
-        <!-- Browser Options Dialog-->
-        <item name="colorSurface">@color/theme_black_primary</item>
+
+        <!-- ProgressDialog-->
+        <item name="dialogBackground">@color/theme_black_primary_light</item>
+        <item name="progressDialogButtonTextColor">@color/material_light_blue_400</item>
+
+        <!-- AlertDialogTheme-->
+        <item name="alertDialogTheme">@style/AlertDialogStyle</item>
+
     </style>
 
     <style name="SnackbarTextStyleBlack" parent="@style/Widget.MaterialComponents.Snackbar.TextView">

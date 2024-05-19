@@ -61,6 +61,18 @@
     </style>
 
     <!-- Styles for each of the 4 answer buttons -->
+    <style name="AgainButton">
+        <item name="answerButtonBackground">?attr/againButtonBackground</item>
+    </style>
+    <style name="HardButton">
+        <item name="answerButtonBackground">?attr/hardButtonBackground</item>
+    </style>
+    <style name="GoodButton">
+        <item name="answerButtonBackground">?attr/goodButtonBackground</item>
+    </style>
+    <style name="EasyButton">
+        <item name="answerButtonBackground">?attr/easyButtonBackground</item>
+    </style>
     <!-- Ease text -->
     <style name="AgainButtonEaseStyle" parent="FooterButtonEaseText">
         <item name="android:textColor">?attr/againButtonTextColor</item>
@@ -111,22 +123,20 @@
         <item name="tabTextAppearance">@style/TextAppearance.Material3.LabelLarge</item>
         <item name="tabIndicator">@drawable/tab_layout_indicator_floating_pill</item>
         <item name="tabIndicatorHeight">14dp</item>
+        <item name="tabTextColor">@color/white</item>
+        <item name="tabIndicatorColor">@color/white</item>
     </style>
     <style name="ThemeOverlay.App.TabLayout" parent="">
         <item name="colorSurface">?attr/tabLayoutBackgroundColor</item> <!-- Background -->
-        <item name="colorPrimary">@color/white</item> <!-- Selected text color -->
         <item name="colorOnSurfaceVariant">#cfff</item> <!-- Not selected text color -->
     </style>
 
     <style name="BottomNavigationViewStyle" parent="@style/Widget.Material3.BottomNavigationView">
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
-        <item name="elevation">0dp</item> <!-- Prevent slight changes of surface color -->
     </style>
     <style name="ThemeOverlay.App.BottomNavigationView" parent="">
-        <item name="colorPrimary">#afff</item> <!-- Ripple & other things -->
         <item name="colorSecondaryContainer">#fff</item> <!-- Selected item indicator -->
         <item name="colorOnSecondaryContainer">?attr/tabLayoutBackgroundColor</item> <!-- Active icon -->
-        <item name="colorSurface">?attr/tabLayoutBackgroundColor</item> <!-- Container background -->
         <item name="colorOnSurface">#fff</item> <!-- Active icon -->
         <item name="colorOnSurfaceVariant">#fff</item> <!-- Inactive icon & label -->
         <item name="textAppearanceTitleSmall">@style/TextAppearance.Material3.TitleSmall</item>
@@ -158,10 +168,10 @@
     </style>
 
     <!-- Snackbars -->
-    <style name="SnackbarStyle" parent="Widget.MaterialComponents.Snackbar">
+    <style name="SnackbarStyle" parent="Widget.Material3.Snackbar">
         <item name="android:backgroundTint">?attr/snackbarBackgroundTintColor</item>
     </style>
-    <style name="SnackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+    <style name="SnackbarButtonStyle" parent="Widget.Material3.Button.TextButton.Snackbar">
         <item name="android:textColor">?attr/snackbarButtonTextColor</item>
     </style>
 
@@ -186,4 +196,33 @@
     <style name="PreferenceThemeOverlay.AnkiDroid">
         <item name="singleLineTitle">false</item>
     </style>
+
+    <style name="AppCompatProgressDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorAccent">?attr/progressDialogButtonTextColor</item>
+        <item name="android:textColorPrimary">?android:attr/textColor</item>
+        <item name="android:background">?attr/dialogBackground</item>
+        <item name="android:buttonBarButtonStyle">@style/CustomButtonBarButtonStyle</item>
+        <item name="dialogCornerRadius">@dimen/dialog_corner_radius</item>
+    </style>
+
+    <style name="AlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorPrimary">?attr/progressDialogButtonTextColor</item>
+        <item name="buttonTint">?attr/colorOnPrimary</item>
+        <item name="dialogCornerRadius">@dimen/dialog_corner_radius</item>
+        <item name="android:dialogCornerRadius" tools:targetApi="p">@dimen/dialog_corner_radius</item>
+        <item name="checkboxStyle">@style/AlertDialogCheckBox.Style</item>
+    </style>
+
+    <style name="CustomButtonBarButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">?attr/progressDialogButtonTextColor</item>
+    </style>
+
+    <style name="AlertDialogCheckBox.Style" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="buttonTint">@color/material_blue_500</item>
+    </style>
+
+    <style name="CardView.PreviewerStyle" parent="Widget.Material3.CardView.Elevated">
+        <item name="android:elevation">0.8dp</item>
+    </style>
+
 </resources>

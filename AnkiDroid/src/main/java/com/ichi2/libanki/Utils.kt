@@ -41,7 +41,8 @@ object Utils {
     private val scriptPattern = Pattern.compile("(?si)<script.*?>.*?</script>")
     private val tagPattern = Pattern.compile("(?s)<.*?>")
     private val imgPattern = Pattern.compile("(?i)<img[^>]+src=[\"']?([^\"'>]+)[\"']?[^>]*>")
-    private val soundPattern = Pattern.compile("(?i)\\[sound:([^]]+)]")
+    private val typePattern = Pattern.compile("(?s)\\[\\[type:.+?]]")
+    private val avRefPattern = Pattern.compile("(?s)\\[anki:play:.:\\d+?]")
     private val htmlEntitiesPattern = Pattern.compile("&#?\\w+;")
     private const val ALL_CHARACTERS =
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -88,14 +89,6 @@ object Utils {
     }
 
     /**
-     * Strip sound but keep media filenames
-     */
-    fun stripSoundMedia(s: String, replacement: String = " $1 "): String {
-        val soundMatcher = soundPattern.matcher(s)
-        return soundMatcher.replaceAll(replacement)
-    }
-
-    /**
      * Takes a string and replaces all the HTML symbols in it with their unescaped representation.
      * This should only affect substrings of the form `&something;` and not tags.
      * Internet rumour says that Html.fromHtml() doesn't cover all cases, but it doesn't get less
@@ -120,6 +113,26 @@ object Utils {
         return sb.toString()
     }
 
+    /**
+     * Strip special fields like `[[type:...]]` and `[anki:play...]` from a string.
+     * @param input The text to be cleaned.
+     * @return The text without special fields.
+     */
+    fun stripSpecialFields(input: String): String {
+        val s = typePattern.matcher(input).replaceAll("")
+        return avRefPattern.matcher(s).replaceAll("")
+    }
+
+    /**
+     * Strip HTML and special fields from a string.
+     * @param input The text to be cleaned.
+     * @return The text without HTML and special fields.
+     */
+    fun stripHTMLAndSpecialFields(input: String): String {
+        val s = stripHTML(input)
+        return stripSpecialFields(s)
+    }
+
     /*
      * IDs
      * ***********************************************************************************************
@@ -128,7 +141,7 @@ object Utils {
     fun ids2str(ids: IntArray?): String = StringBuilder().apply {
         append("(")
         if (ids != null) {
-            val s = Arrays.toString(ids)
+            val s = ids.contentToString()
             append(s.substring(1, s.length - 1))
         }
         append(")")
@@ -138,7 +151,7 @@ object Utils {
     fun ids2str(ids: LongArray?): String = StringBuilder().apply {
         append("(")
         if (ids != null) {
-            val s = Arrays.toString(ids)
+            val s = ids.contentToString()
             append(s.substring(1, s.length - 1))
         }
         append(")")
@@ -199,9 +212,9 @@ object Utils {
     }
 
     // TODO ensure manual conversion is correct
-    fun splitFields(fields: String): Array<String> {
+    fun splitFields(fields: String): MutableList<String> {
         // -1 ensures that we don't drop empty fields at the ends
-        return fields.split(FIELD_SEPARATOR).toTypedArray()
+        return fields.split(FIELD_SEPARATOR).toMutableList()
     }
 
     /*
@@ -250,7 +263,7 @@ object Utils {
      * @param sortIdx An index of the field
      * @return The field at sortIdx, without html media, and the csum of the first field.
      */
-    fun sfieldAndCsum(fields: Array<String>, sortIdx: Int): Pair<String, Long> {
+    fun sfieldAndCsum(fields: List<String>, sortIdx: Int): Pair<String, Long> {
         val firstStripped = stripHTMLMedia(fields[0])
         val sortStripped = if (sortIdx == 0) firstStripped else stripHTMLMedia(fields[sortIdx])
         return Pair(sortStripped, fieldChecksumWithoutHtmlMedia(firstStripped))

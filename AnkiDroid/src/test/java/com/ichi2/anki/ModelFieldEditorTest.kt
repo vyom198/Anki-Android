@@ -21,7 +21,6 @@ import android.widget.EditText
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.getActionButton
-import com.ichi2.libanki.NotetypeJson
 import com.ichi2.libanki.exception.ConfirmModSchemaException
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
@@ -101,7 +100,7 @@ class ModelFieldEditorTest(private val forbiddenCharacter: String) : Robolectric
                     // start ModelFieldEditor activity
                     val intent = Intent()
                     intent.putExtra("title", modelName)
-                    intent.putExtra("noteTypeID", findModelIdByName(modelName))
+                    intent.putExtra("noteTypeID", col.notetypes.id_for_name(modelName)!!)
                     val modelFieldEditor = startActivityNormallyOpenCollectionWithIntent(
                         this,
                         ModelFieldEditor::class.java,
@@ -117,17 +116,6 @@ class ModelFieldEditorTest(private val forbiddenCharacter: String) : Robolectric
                     throw RuntimeException(exception)
                 }
             }
-    }
-
-    /**
-     * Finds the model with specified name in {@link Models#getModels()} and returns its key
-     *
-     * @param modelName Name of the model
-     * @return Key in {@link Models#getModels()} HashMap for the model
-     */
-    @Suppress("SameParameterValue")
-    private fun findModelIdByName(modelName: String): Long {
-        return col.notetypes.getModels().filter { idModels: Map.Entry<Long?, NotetypeJson> -> idModels.value.getString("name") == modelName }.keys.first()
     }
 
     companion object {

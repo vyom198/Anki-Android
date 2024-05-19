@@ -49,10 +49,8 @@
     <string name="contextmenu_deckpicker_delete_deck">Iscantzella su matzu</string>
     <string name="delete_deck_title">Iscantzellare su matzu?</string>
     <string name="no_tts_available_message">Non b\'est a disponimentu peruna limba de sìntesi vocale</string>
-    <string name="initializing_tts">Initzializende sa sìntesi vocale TTS&#8230;</string>
     <string name="tts_no_tts">Non chistiones</string>
     <string name="unused_strings">\n\nDocumentos no impreados:\n</string>
-    <string name="preview_title" comment="Title of the window allowing to preview card(s)">Antiprima</string>
     <string name="reposition_card_dialog_title">Torra a positzionare sa carta noa</string>
     <string name="reposition_card_dialog_message">Positzione de incumintzu:</string>
     <string name="reposition_card_not_new_error">Petzi sas cartas noas si podent torrare a positzionare</string>
@@ -61,28 +59,15 @@
         <item quantity="other">%d cartas torradas a positzionare</item>
     </plurals>
     <string name="reset_card_dialog_title">Reseta su progressu de sa carta</string>
-    <string name="reset_card_dialog_message">Custa carta s\'at a pònnere a sa fine de sa lista de cartas noa</string>
     <plurals name="reset_cards_dialog_acknowledge">
         <item quantity="one">%d carta resetada</item>
         <item quantity="other">%d cartas resetadas</item>
     </plurals>
     <!-- Reschedule Card Dialog -->
-    <plurals name="reschedule_cards_dialog_title_new">
-        <item quantity="one">Torra a pranificare %d carta</item>
-        <item quantity="other">Torra a pranificare %d cartas</item>
-    </plurals>
-    <plurals name="reschedule_card_dialog_interval">
-        <item quantity="one">Intervallu atuale: %d die</item>
-        <item quantity="other">Intervallu atuale: %d dies</item>
-    </plurals>
-    <string name="reschedule_card_dialog_message">Torra a pranificare pro sa revisione in x dies</string>
     <plurals name="reschedule_cards_dialog_acknowledge">
         <item quantity="one">%d carta torrada a pranificare</item>
         <item quantity="other">%d cartas torradas a pranificare</item>
     </plurals>
-    <string name="reschedule_card_dialog_new_card_warning">Una carta noes est in fase de ripranificatzione. Su de torrare a pranificare una carta trasformat fintzas sas cartas noas in cartas de revisione. also turns new cards into review cards. Imprea s\'optzione ‘torra a positzionare sa carta’ pro mudare sa positzione de una carta noa in sa lista noa</string>
-    <string name="reschedule_card_dialog_warning_ease_reset">Sa ripranificatzione resetat fintzas sa manera de tratare sas cartas chi su pranificadore at a impreare in su benidore (sa fatzilidade s\'at a impostare %d%%)</string>
-    <string name="firefox_workaround_launched_reviewer_opening_deck">Ischerta su matzu in su navigadore de documentos tuo o bìsita sa pàgina about:downloads pro l\'importare</string>
     <string name="answering_error_title">Faddina de sa base de datos</string>
     <string name="answering_error_message">Iscritura in sa colletzione fallida. Sa base de datos diat pòdere èssere corrùmpida o bi diat pòdere no èssere logu bastante in su discu.\n
                                              \n
@@ -116,8 +101,10 @@
     <string name="dialog_confirm" tools:ignore="UnusedResources">Cunfirma</string>
     <string name="dialog_no">Nono</string>
     <string name="dialog_yes">Eja</string>
+    <string name="dialog_keep">Keep</string>
+    <string name="dialog_remove">Remove</string>
     <string name="dialog_continue">Sighi</string>
-    <string name="dialog_processing">Protzessende...</string>
+    <string name="dialog_processing">Protzessende&#8230;</string>
     <string name="dialog_positive_create" comment="Create a new collection, probably erasing the previous one, may be necessary in case of error.">Crea</string>
     <string name="dialog_positive_delete">Iscantzella</string>
     <!-- Currently unsued, should be useful in the future -->
@@ -189,6 +176,7 @@
     <string name="failed_to_apply_background_image">Aplicatzione de s\'immàgine de isfundu %s fallida</string>
     <string name="background_image_too_large">S\'isfundu de s\'isseberadore de matzos est tropu largu</string>
     <string name="image_max_size_allowed">Mannària màssima de s\'immàgine %d MB permìtidos</string>
+    <string name="image_dimensions_too_large">Image dimensions are too large (%1$d × %2$d)</string>
     <!-- Global Intent handler -->
     <!-- Also used by Card Browser, not renaming to save translators effort -->
     <string name="intent_handler_failed_no_storage_permission">Mancat su permissu netzessàriu pro s\'archiviatzione. Dae su permissu pro s\'archiviatzione e torra a proare a fàghere s\'atzione tua.</string>
@@ -198,7 +186,7 @@
     <string name="boot_service_failed_to_schedule_notifications">Pranificatzione de sos avisos fallida</string>
     <string name="boot_service_too_many_notifications">Tropu avisos pranificados. Unos cantos no ant a apàrrere</string>
     <!-- Locale Selection Dialog -->
-    <string name="locale_selection_dialog_title">Issèberu de sa limba de su tecladu</string>
+    <string name="locale_selection_dialog_title_new">Set Language</string>
     <string name="locale_selection_dialog_summary">Unos cantos teclados a prus limbas, a esèmpiu GBoard, suportant su càmbiu de limba durante sa modìfica de su testu\'\n
                             \n
                             Pro praghere pedi sa funtzionalidade “setImeHintLocales” a su produtore de su tecladu tuo si cussu tecladu non mudat de limba.</string>
@@ -228,12 +216,13 @@
     <string name="help_item_ankiweb_terms_and_conditions">Tèrmines e cunditziones de AnkiWeb</string>
     <string name="help_title_send_exception">Imbia unu raportu in subra de sa risolutzione de problemas</string>
     <string name="help_dialog_exception_report_debounce">Sinnalatzione giai imbiada</string>
+    <string name="help_dialog_exception_report_sent">Report was sent!</string>
     <!--Sync-->
     <plurals name="sync_automatic_sync_needs_more_time">
         <item quantity="one">In %d segundu diat pòdere incumintzare una sincronizatzione automàtica</item>
         <item quantity="other">In %d segundos diat pòdere incumintzare una sincronizatzione automàtica</item>
     </plurals>
-    <string name="metered_sync_warning">Sa connessione tua est a consumu. Su tramudòngiu de datos diat pòdere costare dinare</string>
+    <string name="metered_sync_data_warning">Your internet provider may charge money for data use</string>
     <string name="deck_picker_new">Nùmeru de cartas noas de pompiare oe in custu matzu.</string>
     <string name="deck_picker_rev">Nùmeru de cartas chi iscadint oe in custu matzu.</string>
     <string name="deck_picker_lrn">Nùmeru de cartas de imparare in custu matzu.</string>
@@ -258,4 +247,23 @@
     </string>
     <string name="dismiss_backup_warning_upgrade">        Pro neghe de sas modìficas a sa riservadesa de Android, non s\'at a pòdere atzèdere a sos datos tuos e a sas còpias de seguresa automàticas tuas si as a disinstallare s\'aplicatzione
     </string>
+    <string name="deck_already_exists">Deck already exists</string>
+    <string name="create_deck_numeric_hint">If you have deck ordering issues (e.g. ‘10’ appears before ‘2’), replace ‘2’ with ‘02’</string>
+    <!-- Set Due Date -->
+    <string name="set_due_date_match_interval" comment="when setting a card\'s due date, this checkbox also changes the interval of the card">Set interval to same value</string>
+    <plurals name="set_due_date_single_day_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in</item>
+        <item quantity="other">Show cards in</item>
+    </plurals>
+    <plurals name="set_due_date_range_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in range</item>
+        <item quantity="other">Show cards in range</item>
+    </plurals>
+    <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <string name="range_delimiter" comment="Placed between two input boxes to denote a range">–</string>
+    <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">From</string>
+    <string name="set_due_date_range_end" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'maximum\' value of this range (inclusive)">To</string>
 </resources>

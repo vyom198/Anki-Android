@@ -37,7 +37,7 @@ package com.ichi2.anki.jsaddons
 import android.content.Context
 import android.text.format.Formatter
 import com.ichi2.anki.R
-import com.ichi2.anki.UIUtils
+import com.ichi2.anki.showThemedToast
 import com.ichi2.compat.CompatHelper.Companion.compat
 import com.ichi2.utils.FileUtil
 import org.apache.commons.compress.archivers.ArchiveException
@@ -125,12 +125,12 @@ class TgzPackageExtract(private val context: Context) {
      */
     @Throws(Exception::class)
     fun extractTarGzipToAddonFolder(tarballFile: File, addonsPackageDir: AddonsPackageDir) {
-        require(isGzip(tarballFile)) { context.getString(R.string.not_valid_js_addon, tarballFile.absolutePath) }
+        require(isGzip(tarballFile)) { context.getString(R.string.not_valid_js_addon_package, tarballFile.absolutePath) }
 
         try {
             compat.createDirectories(addonsPackageDir)
         } catch (e: IOException) {
-            UIUtils.showThemedToast(context, context.getString(R.string.could_not_create_dir, addonsPackageDir.absolutePath), false)
+            showThemedToast(context, context.getString(R.string.could_not_create_dir, addonsPackageDir.absolutePath), false)
             Timber.w(e)
             return
         }
@@ -228,9 +228,9 @@ class TgzPackageExtract(private val context: Context) {
 
         try {
             FileInputStream(inputFile).use { inputStream ->
-                ArchiveStreamFactory().createArchiveInputStream("tar", inputStream).use { tarInputStream ->
-                    val tarInputStream1 = tarInputStream as TarArchiveInputStream
-                    var entry: TarArchiveEntry? = tarInputStream1.nextEntry as TarArchiveEntry
+                ArchiveStreamFactory().createArchiveInputStream<TarArchiveInputStream>("tar", inputStream).use { tarInputStream ->
+
+                    var entry = tarInputStream.nextEntry
 
                     while (entry != null) {
                         val outputFile = File(outputDir, entry.name)
@@ -243,7 +243,7 @@ class TgzPackageExtract(private val context: Context) {
                             unTarFile(tarInputStream, entry, outputDir, outputFile)
                         }
 
-                        entry = tarInputStream.nextEntry as? TarArchiveEntry
+                        entry = tarInputStream.nextEntry
                     }
                 }
             }
@@ -347,15 +347,15 @@ class TgzPackageExtract(private val context: Context) {
         var unTarSize: Long = 0
 
         FileInputStream(tarFile).use { inputStream ->
-            ArchiveStreamFactory().createArchiveInputStream("tar", inputStream).use { tarInputStream ->
-                val tarInputStream1 = tarInputStream as TarArchiveInputStream
-                var entry: TarArchiveEntry? = tarInputStream1.nextEntry as TarArchiveEntry
+            ArchiveStreamFactory().createArchiveInputStream<TarArchiveInputStream>("tar", inputStream).use { tarInputStream ->
+
+                var entry = tarInputStream.nextEntry
                 var numOfEntries = 0
 
                 while (entry != null) {
                     numOfEntries++
                     unTarSize += entry.size
-                    entry = tarInputStream.nextEntry as? TarArchiveEntry
+                    entry = tarInputStream.nextEntry
                 }
 
                 if (numOfEntries > TOO_MANY_FILES) {

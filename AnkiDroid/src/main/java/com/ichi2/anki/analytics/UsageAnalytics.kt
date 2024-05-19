@@ -39,7 +39,7 @@ import timber.log.Timber
 
 @KotlinCleanup("see if we can make variables lazy, or properties without the `s` prefix")
 object UsageAnalytics {
-    const val ANALYTICS_OPTIN_KEY = "analyticsOptIn"
+    const val ANALYTICS_OPTIN_KEY = "analytics_opt_in"
 
     @KotlinCleanup("lateinit")
     private var sAnalytics: GoogleAnalytics? = null
@@ -458,18 +458,14 @@ object UsageAnalytics {
         "learnCutoff", // Learn ahead limit
         "timeLimit", // Timebox time limit
         "timeoutAnswer", // Automatic display answer
-        "automaticAnswerAction", // Timeout answer
-        "timeoutAnswerSeconds", // Time to show answer
-        "timeoutQuestionSeconds", // Time to show next question
         "keepScreenOn", // Disable screen timeout
-        "newTimezoneHandling", // New timezone handling
         "doubleTapTimeInterval", // Double tap time interval (milliseconds)
         // Sync
         "syncFetchMedia", // Fetch media on sync
         "automaticSyncMode", // Automatic synchronization
         "showSyncStatusBadge", // Display synchronization status
         "allowMetered", // Allow sync on metered connections
-        "force_full_sync", // Force full sync
+        "one_way_sync", // One-way sync
         // Backup
         "minutes_between_automatic_backups",
         "daily_backups_to_keep",
@@ -489,6 +485,7 @@ object UsageAnalytics {
         "showETA", // Show ETA
         "showAudioPlayButtons", // Show play buttons on cards with audio (reversed in collection: HIDE_AUDIO_PLAY_BUTTONS)
         "card_browser_show_media_filenames", // Display filenames in card browser
+        "showDeckTitle", // Show deck title
         // Controls
         "gestures", // Enable gestures
         "gestureCornerTouch", // 9-point touch
@@ -500,6 +497,7 @@ object UsageAnalytics {
         "binding_FLIP_OR_ANSWER_EASE3",
         "binding_FLIP_OR_ANSWER_EASE4",
         "binding_UNDO",
+        "binding_REDO",
         "binding_EDIT",
         "binding_MARK",
         "binding_BURY_CARD",
@@ -524,6 +522,7 @@ object UsageAnalytics {
         "binding_ABORT_AND_SYNC",
         "binding_RECORD_VOICE",
         "binding_REPLAY_VOICE",
+        "binding_SAVE_VOICE",
         "binding_TOGGLE_WHITEBOARD",
         "binding_CLEAR_WHITEBOARD",
         "binding_CHANGE_WHITEBOARD_PEN_COLOR",
@@ -531,6 +530,15 @@ object UsageAnalytics {
         "binding_SHOW_ALL_HINTS",
         "binding_ADD_NOTE",
         "binding_RESCHEDULE_NOTE",
+        "binding_USER_ACTION_1",
+        "binding_USER_ACTION_2",
+        "binding_USER_ACTION_3",
+        "binding_USER_ACTION_4",
+        "binding_USER_ACTION_5",
+        "binding_USER_ACTION_6",
+        "binding_USER_ACTION_7",
+        "binding_USER_ACTION_8",
+        "binding_USER_ACTION_9",
         // Accessibility
         "cardZoom",
         "imageZoom",
@@ -546,13 +554,13 @@ object UsageAnalytics {
         "useInputTag", // Type answer into the card
         "disableExtendedTextUi", // Disable Single-Field Edit Mode
         "noteEditorNewlineReplace", // Replace newlines with HTML
-        "noCodeFormatting", // Simple typed answer formatting
         "autoFocusTypeInAnswer", // Focus ‘type in answer’
         "mediaImportAllowAllFiles", // Allow all files in media imports
         "providerEnabled", // Enable AnkiDroid API
         // App bar buttons
         "reset_custom_buttons",
         "customButtonUndo",
+        "customButtonRedo",
         "customButtonScheduleCard",
         "customButtonFlag",
         "customButtonEditCard",
@@ -572,6 +580,15 @@ object UsageAnalytics {
         "customButtonSaveWhiteboard",
         "customButtonWhiteboardPenColor",
         "customButtonShowHideWhiteboard",
-        "customButtonClearWhiteboard"
+        "customButtonClearWhiteboard",
+        "customButtonUserAction1",
+        "customButtonUserAction2",
+        "customButtonUserAction3",
+        "customButtonUserAction4",
+        "customButtonUserAction5",
+        "customButtonUserAction6",
+        "customButtonUserAction7",
+        "customButtonUserAction8",
+        "customButtonUserAction9"
     )
 }

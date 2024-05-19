@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~  Copyright (c) 2020 David Allison <davidallisongithub@gmail.com>
+  ~  Copyright (c) 2023 Brayan Oliveira <brayandso.dev@gmail.com>
   ~
   ~  This program is free software; you can redistribute it and/or modify it under
   ~  the terms of the GNU General Public License as published by the Free Software
@@ -14,12 +14,61 @@
   ~  You should have received a copy of the GNU General Public License along with
   ~  this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
-
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ankidroid="http://schemas.android.com/apk/res-auto" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <item
+        android:id="@+id/action_back_side_only"
+        android:icon="@drawable/ic_card_question"
+        android:title="@string/card_side_both"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_flag"
+        android:title="@string/menu_flag_card"
+        android:icon="@drawable/ic_flag_transparent"
+        app:showAsAction="always" >
+        <menu>
+            <item
+                android:id="@+id/action_flag_zero"
+                tools:title="No Flag"/>
+            <item
+                android:id="@+id/action_flag_one"
+                tools:title="Red"
+                android:icon="@drawable/ic_flag_red"/>
+            <item
+                android:id="@+id/action_flag_two"
+                tools:title="Orange"
+                android:icon="@drawable/ic_flag_orange"/>
+            <item
+                android:id="@+id/action_flag_three"
+                tools:title="Green"
+                android:icon="@drawable/ic_flag_green"/>
+            <item
+                android:id="@+id/action_flag_four"
+                tools:title="Blue"
+                android:icon="@drawable/ic_flag_blue"/>
+            <item
+                android:id="@+id/action_flag_five"
+                tools:title="Pink"
+                android:icon="@drawable/ic_flag_pink"/>
+            <item
+                android:id="@+id/action_flag_six"
+                tools:title="Turquoise"
+                android:icon="@drawable/ic_flag_turquoise"/>
+            <item
+                android:id="@+id/action_flag_seven"
+                tools:title="Purple"
+                android:icon="@drawable/ic_flag_purple"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/action_mark"
+        android:icon="@drawable/ic_star_border_white"
+        android:title="@string/menu_mark_note"
+        app:showAsAction="always"/>
     <item
         android:id="@+id/action_edit"
         android:icon="@drawable/ic_mode_edit_white"
         android:title="@string/cardeditor_title_edit_card"
-        ankidroid:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 </menu>

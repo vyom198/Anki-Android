@@ -18,9 +18,9 @@ package com.ichi2.anki.tests
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import com.ichi2.anki.AnkiDroidApp
 import com.ichi2.anki.Channel
 import com.ichi2.anki.testutil.GrantStoragePermission
@@ -36,31 +36,29 @@ import timber.log.Timber
 import kotlin.test.junit.JUnitAsserter.assertNotNull
 
 @RunWith(AndroidJUnit4::class)
-@RequiresApi(Build.VERSION_CODES.O) // getNotificationChannels, NotificationChannel.getId
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.O) // getNotificationChannels, NotificationChannel.getId
 
 @KotlinCleanup("Enable JUnit 5 in androidTest and use JUnit5Asserter to match the standard tests")
 class NotificationChannelTest : InstrumentedTest() {
     @get:Rule
     var runtimePermissionRule = GrantStoragePermission.instance
-    private var mCurrentAPI = -1
-    private var mTargetAPI = -1
+    private var currentAPI = -1
+    private var targetAPI = -1
 
-    @KotlinCleanup("lateinit")
-    private var mManager: NotificationManager? = null
+    private lateinit var manager: NotificationManager
 
     @Before
     @UiThreadTest
     fun setUp() {
         val targetContext = testContext
         (targetContext.applicationContext as AnkiDroidApp).onCreate()
-        mCurrentAPI = sdkVersion
-        mTargetAPI = targetContext.applicationInfo.targetSdkVersion
-        mManager =
-            targetContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        currentAPI = sdkVersion
+        targetAPI = targetContext.applicationInfo.targetSdkVersion
+        manager = targetContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     private fun channelsInAPI(): Boolean {
-        return mCurrentAPI >= 26
+        return currentAPI >= 26
     }
 
     @Test
@@ -68,13 +66,13 @@ class NotificationChannelTest : InstrumentedTest() {
         if (!channelsInAPI()) return
 
         // onCreate was called in setUp(), so we should have channels now
-        val channels = mManager!!.notificationChannels
+        val channels = manager.notificationChannels
         for (i in channels.indices) {
             Timber.d("Found channel with id %s", channels[i].id)
         }
-        var expectedChannels = Channel.values().size
+        var expectedChannels = Channel.entries.size
         // If we have channels but have *targeted* pre-26, there is a "miscellaneous" channel auto-defined
-        if (mTargetAPI < 26) {
+        if (targetAPI < 26) {
             expectedChannels += 1
         }
 
@@ -89,10 +87,10 @@ class NotificationChannelTest : InstrumentedTest() {
             expectedChannels,
             greaterThanOrEqualTo(channels.size)
         )
-        for (channel in Channel.values()) {
+        for (channel in Channel.entries) {
             assertNotNull(
                 "There should be a reminder channel",
-                mManager!!.getNotificationChannel(channel.id)
+                manager.getNotificationChannel(channel.id)
             )
         }
     }

@@ -17,60 +17,72 @@
  ****************************************************************************************/
 package com.ichi2.anki
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Resources
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.system.Os
-import android.util.Log
-import android.view.View
 import android.webkit.CookieManager
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.MutableLiveData
+import androidx.work.Configuration
 import com.ichi2.anki.CrashReportService.sendExceptionReport
-import com.ichi2.anki.UIUtils.showThemedToast
 import com.ichi2.anki.analytics.UsageAnalytics
+import com.ichi2.anki.browser.SharedPreferencesLastDeckIdRepository
 import com.ichi2.anki.contextmenu.AnkiCardContextMenu
 import com.ichi2.anki.contextmenu.CardBrowserContextMenu
 import com.ichi2.anki.exception.StorageAccessException
+import com.ichi2.anki.logging.FragmentLifecycleLogger
+import com.ichi2.anki.logging.LogType
+import com.ichi2.anki.logging.ProductionCrashReportingTree
+import com.ichi2.anki.logging.RobolectricDebugTree
+import com.ichi2.anki.preferences.SharedPreferencesProvider
 import com.ichi2.anki.preferences.sharedPrefs
+import com.ichi2.anki.servicelayer.DebugInfoService
 import com.ichi2.anki.services.BootService
 import com.ichi2.anki.services.NotificationService
 import com.ichi2.anki.ui.dialogs.ActivityAgnosticDialogs
+import com.ichi2.annotations.NeedsTest
 import com.ichi2.compat.CompatHelper
-import com.ichi2.utils.*
+import com.ichi2.utils.AdaptionUtil
+import com.ichi2.utils.ExceptionUtil
+import com.ichi2.utils.KotlinCleanup
+import com.ichi2.utils.LanguageUtil
+import com.ichi2.utils.Permissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.util.Locale
-import java.util.regex.Pattern
 
 /**
  * Application class.
  */
 @KotlinCleanup("lots to do")
 @KotlinCleanup("IDE Lint")
-open class AnkiDroidApp : Application() {
+open class AnkiDroidApp : Application(), Configuration.Provider {
     /** An exception if the WebView subsystem fails to load  */
-    private var mWebViewError: Throwable? = null
-    private val mNotifications = MutableLiveData<Void?>()
+    private var webViewError: Throwable? = null
+    private val notifications = MutableLiveData<Void?>()
 
     lateinit var activityAgnosticDialogs: ActivityAgnosticDialogs
+    val sharedPrefsLastDeckIdRepository = SharedPreferencesLastDeckIdRepository()
 
     /** Used to avoid showing extra progress dialogs when one already shown. */
     var progressDialogShown = false
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().build()
 
     @KotlinCleanup("analytics can be moved to attachBaseContext()")
     /**
@@ -105,15 +117,11 @@ open class AnkiDroidApp : Application() {
         val preferences = this.sharedPrefs()
 
         CrashReportService.initialize(this)
-        if (BuildConfig.DEBUG) {
-            // Enable verbose error logging and do method tracing to put the Class name as log tag
-            if (isRobolectric) {
-                Timber.plant(RobolectricDebugTree())
-            } else {
-                Timber.plant(DebugTree())
-            }
-        } else {
-            Timber.plant(ProductionCrashReportingTree())
+        val logType = LogType.value
+        when (logType) {
+            LogType.DEBUG -> Timber.plant(DebugTree())
+            LogType.ROBOLECTRIC -> Timber.plant(RobolectricDebugTree())
+            LogType.PRODUCTION -> Timber.plant(ProductionCrashReportingTree())
         }
         if (BuildConfig.ENABLE_LEAK_CANARY) {
             LeakCanaryConfiguration.setInitialConfigFor(this)
@@ -122,11 +130,16 @@ open class AnkiDroidApp : Application() {
         }
         Timber.tag(TAG)
         Timber.d("Startup - Application Start")
+        Timber.i("Timber config: $logType")
 
         // analytics after ACRA, they both install UncaughtExceptionHandlers but Analytics chains while ACRA does not
         UsageAnalytics.initialize(this)
         if (BuildConfig.DEBUG) {
             UsageAnalytics.setDryRun(true)
+        }
+
+        applicationScope.launch {
+            Timber.i(DebugInfoService.getDebugInfo(this@AnkiDroidApp))
         }
 
         // Stop after analytics and logging are initialised.
@@ -155,12 +168,7 @@ open class AnkiDroidApp : Application() {
         )
         CompatHelper.compat.setupNotificationChannel(applicationContext)
 
-        if (Build.FINGERPRINT != "robolectric") {
-            // Prevent sqlite throwing error 6410 due to the lack of /tmp on Android
-            Os.setenv("TMPDIR", cacheDir.path, false)
-            // Load backend library
-            System.loadLibrary("rsdroid")
-        }
+        makeBackendUsable(this)
 
         // Configure WebView to allow file scheme pages to access cookies.
         if (!acceptFileSchemeCookies()) {
@@ -189,7 +197,10 @@ open class AnkiDroidApp : Application() {
         BootService().onReceive(this, Intent(this, BootService::class.java))
 
         // Register for notifications
-        mNotifications.observeForever { NotificationService.triggerNotificationFor(this) }
+        notifications.observeForever { NotificationService.triggerNotificationFor(this) }
+
+        // listen for day rollover: time + timezone changes
+        DayRolloverHandler.listenForRolloverEvents(this)
 
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -229,6 +240,8 @@ open class AnkiDroidApp : Application() {
 
         activityAgnosticDialogs = ActivityAgnosticDialogs.register(this)
         TtsVoices.launchBuildLocalesJob()
+        // enable {{tts-voices:}} field filter
+        TtsVoicesFieldFilter.ensureApplied()
     }
 
     /**
@@ -247,7 +260,7 @@ open class AnkiDroidApp : Application() {
     }
 
     fun scheduleNotification() {
-        mNotifications.postValue(null)
+        notifications.postValue(null)
     }
 
     @Suppress("deprecation") // 7109: setAcceptFileSchemeCookies
@@ -259,75 +272,10 @@ open class AnkiDroidApp : Application() {
             // 5794: Errors occur if the WebView fails to load
             // android.webkit.WebViewFactory.MissingWebViewPackageException.MissingWebViewPackageException
             // Error may be excessive, but I expect a UnsatisfiedLinkError to be possible here.
-            mWebViewError = e
+            webViewError = e
             sendExceptionReport(e, "setAcceptFileSchemeCookies")
             Timber.e(e, "setAcceptFileSchemeCookies")
             false
-        }
-    }
-
-    /**
-     * A tree which logs necessary data for crash reporting.
-     *
-     * Requirements:
-     * 1) ignore verbose and debug log levels
-     * 2) use the fixed AnkiDroidApp.TAG log tag (ACRA filters logcat for it when reporting errors)
-     * 3) dynamically discover the class name and prepend it to the message for warn and error
-     */
-    @SuppressLint("LogNotTimber")
-    class ProductionCrashReportingTree : Timber.Tree() {
-        /**
-         * Extract the tag which should be used for the message from the `element`. By default
-         * this will use the class name without any anonymous class suffixes (e.g., `Foo$1`
-         * becomes `Foo`).
-         *
-         *
-         * Note: This will not be called if an API with a manual tag was called with a non-null tag
-         */
-        fun createStackElementTag(element: StackTraceElement): String {
-            val m = ANONYMOUS_CLASS.matcher(element.className)
-            val tag = if (m.find()) m.replaceAll("") else element.className
-            return tag.substring(tag.lastIndexOf('.') + 1)
-        } // --- this is not present in the Timber.DebugTree copy/paste ---
-
-        // We are in production and should not crash the app for a logging failure
-        // throw new IllegalStateException(
-        //        "Synthetic stacktrace didn't have enough elements: are you using proguard?");
-        // --- end of alteration from upstream Timber.DebugTree.getTag ---
-        // DO NOT switch this to Thread.getCurrentThread().getStackTrace(). The test will pass
-        // because Robolectric runs them on the JVM but on Android the elements are different.
-        val tag: String
-            get() {
-                // DO NOT switch this to Thread.getCurrentThread().getStackTrace(). The test will pass
-                // because Robolectric runs them on the JVM but on Android the elements are different.
-                val stackTrace = Throwable().stackTrace
-                return if (stackTrace.size <= CALL_STACK_INDEX) {
-
-                    // --- this is not present in the Timber.DebugTree copy/paste ---
-                    // We are in production and should not crash the app for a logging failure
-                    "$TAG unknown class"
-                    // throw new IllegalStateException(
-                    //        "Synthetic stacktrace didn't have enough elements: are you using proguard?");
-                    // --- end of alteration from upstream Timber.DebugTree.getTag ---
-                } else {
-                    createStackElementTag(stackTrace[CALL_STACK_INDEX])
-                }
-            }
-
-        // ----  END copied from Timber.DebugTree because DebugTree.getTag() is package private ----
-        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-            when (priority) {
-                Log.VERBOSE, Log.DEBUG -> {}
-                Log.INFO -> Log.i(TAG, message, t)
-                Log.WARN -> Log.w(TAG, "${this.tag}/ $message", t)
-                Log.ERROR, Log.ASSERT -> Log.e(TAG, "${this.tag}/ $message", t)
-            }
-        }
-
-        companion object {
-            // ----  BEGIN copied from Timber.DebugTree because DebugTree.getTag() is package private ----
-            private const val CALL_STACK_INDEX = 6
-            private val ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$")
         }
     }
 
@@ -348,6 +296,13 @@ open class AnkiDroidApp : Application() {
          */
         val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
+        /**
+         * A [SharedPreferencesProvider] which does not require [onCreate] when run from tests
+         *
+         * @see sharedPreferencesTestingOverride
+         */
+        val sharedPreferencesProvider get() = SharedPreferencesProvider { sharedPrefs() }
+
         /** Running under instrumentation. a "/androidTest" directory will be created which contains a test collection  */
         var INSTRUMENTATION_TESTING = false
         const val XML_CUSTOM_NAMESPACE = "http://arbitrary.app.namespace/com.ichi2.anki"
@@ -361,6 +316,23 @@ open class AnkiDroidApp : Application() {
          */
         lateinit var instance: AnkiDroidApp
             private set
+
+        /**
+         * An override for Shared Preferences to use for unit tests
+         *
+         * This does not depend on an instance of AnkiDroidApp and therefore has no Android
+         * implementations
+         */
+        @VisibleForTesting
+        var sharedPreferencesTestingOverride: SharedPreferences? = null
+
+        /**
+         * A test-friendly accessor to Shared Preferences.
+         *
+         * In tests, this can avoid an instance of `AnkiDroidApp`, which is slow
+         * This was added to avoid code churn
+         */
+        fun sharedPrefs() = sharedPreferencesTestingOverride ?: instance.sharedPrefs()
 
         /**
          * The latest package version number that included important changes to the database integrity check routine. All
@@ -395,6 +367,18 @@ open class AnkiDroidApp : Application() {
                 isAccessible = true
                 set(field, value)
             }
+        }
+
+        /** Load the libraries to allow access to Anki-Android-Backend */
+        @NeedsTest("Not calling this in the ContentProvider should have failed a test")
+        fun makeBackendUsable(context: Context) {
+            // Robolectric uses RustBackendLoader.ensureSetup()
+            if (Build.FINGERPRINT == "robolectric") return
+
+            // Prevent sqlite throwing error 6410 due to the lack of /tmp on Android
+            Os.setenv("TMPDIR", context.cacheDir.path, false)
+            // Load backend library
+            System.loadLibrary("rsdroid")
         }
 
         val appResources: Resources
@@ -438,92 +422,17 @@ open class AnkiDroidApp : Application() {
                 }
 
         fun webViewFailedToLoad(): Boolean {
-            return instance.mWebViewError != null
+            return instance.webViewError != null
         }
 
         val webViewErrorMessage: String?
             get() {
-                val error = instance.mWebViewError
+                val error = instance.webViewError
                 if (error == null) {
                     Timber.w("getWebViewExceptionMessage called without webViewFailedToLoad check")
                     return null
                 }
                 return ExceptionUtil.getExceptionMessage(error)
             }
-    }
-
-    class RobolectricDebugTree : DebugTree() {
-        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-            // This is noisy in test environments
-            if (tag == "Backend\$checkMainThreadOp") {
-                return
-            }
-            super.log(priority, tag, message, t)
-        }
-    }
-
-    private class FragmentLifecycleLogger(
-        private val activity: Activity
-    ) : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentAttached(
-            fm: FragmentManager,
-            f: Fragment,
-            context: Context
-        ) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onAttach")
-        }
-
-        override fun onFragmentCreated(
-            fm: FragmentManager,
-            f: Fragment,
-            savedInstanceState: Bundle?
-        ) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onCreate")
-        }
-
-        override fun onFragmentViewCreated(
-            fm: FragmentManager,
-            f: Fragment,
-            v: View,
-            savedInstanceState: Bundle?
-        ) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onViewCreated")
-        }
-
-        override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onStart")
-        }
-
-        override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onResume")
-        }
-
-        override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onPause")
-        }
-
-        override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onStop")
-        }
-
-        override fun onFragmentSaveInstanceState(
-            fm: FragmentManager,
-            f: Fragment,
-            outState: Bundle
-        ) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onSaveInstanceState")
-        }
-
-        override fun onFragmentViewDestroyed(fm: FragmentManager, f: Fragment) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onViewDestroyed")
-        }
-
-        override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onDestroy")
-        }
-
-        override fun onFragmentDetached(fm: FragmentManager, f: Fragment) {
-            Timber.i("${activity::class.simpleName}::${f::class.simpleName}::onDetach")
-        }
     }
 }

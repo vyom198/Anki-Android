@@ -46,9 +46,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- generic strings -->
     <string name="disabled">Выкл.</string>
-    <string name="pref_summary_seconds">%s с</string>
-    <string name="pref_summary_minutes">%s мин.</string>
-    <string comment="Percentage value of a preference. %s represents the number to be replaced. Use \%% to represent a single percent sign (%)" name="pref_summary_percentage">%s\%%</string>
+    <plurals name="pref_summ_minutes">
+        <item quantity="one">%d мин</item>
+        <item quantity="few">%d мин</item>
+        <item quantity="many">%d мин</item>
+        <item quantity="other">%d мин</item>
+    </plurals>
+    <string name="pref_milliseconds">%s мс</string>
+    <!-- TODO: move to 20-search-preference so we can contribute upstream (searchpreference_no_results)-->
     <string name="pref_search_no_results">Не найдено</string>
     <!-- preferences.xml categories-->
     <string name="pref_cat_general" comment="name of the general preference category" maxLength="41">Общие</string>
@@ -60,7 +65,6 @@
     <string name="pref_cat_whiteboard" maxLength="41">Доска</string>
     <string name="pref_cat_appearance" maxLength="41">Внешний вид</string>
     <string name="pref_cat_themes" maxLength="41">Темы</string>
-    <string name="pref_cat_fonts" maxLength="41">Шрифты</string>
     <string name="pref_cat_gestures" maxLength="41">Жесты</string>
     <string name="pref_cat_controls" maxLength="41">Управление</string>
     <string name="pref_cat_advanced" maxLength="41">Расширенные</string>
@@ -113,6 +117,7 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">Касание в центре экрана</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">Касание внизу в левом углу</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">Касание внизу в правом углу</string>
+    <string name="gestures_shake" maxLength="41">Потрясти устройство </string>
     <string name="card_browser_enable_external_context_menu">Пункт «%s» в меню</string>
     <string name="card_browser_enable_external_context_menu_summary">Добавляет пункт «%s» в контекстное меню системы</string>
     <string name="double_scrolling_gap" maxLength="41">Двойная прокрутка</string>
@@ -133,8 +138,8 @@
     <string name="sync_status_badge_summ">Добавляет точку на значок синхронизации, когда можно выгрузить изменения</string>
     <string name="metered_sync_title" maxLength="41">Разрешить синхронизацию в тарифицируемых сетях</string>
     <string name="metered_sync_summary">Если отключено, предупреждает, если вы синхронизируетесь через тарифицированную сеть</string>
-    <string name="backup_limits_frequency">Frequency</string>
-    <string name="backup_limits_lifetime">Lifetime</string>
+    <string name="backup_limits_frequency">Частота</string>
+    <string name="backup_limits_lifetime">Время хранения</string>
     <string name="app_theme" maxLength="41">Тема</string>
     <string name="day_theme" maxLength="41">Дневная тема</string>
     <string name="night_theme" maxLength="41">Ночная тема</string>
@@ -148,10 +153,7 @@
     <string name="notification_minimum_cards_due_vibrate" maxLength="41">Вибросигнал</string>
     <string name="notification_minimum_cards_due_blink" maxLength="41">Мерцание светодиода</string>
     <string name="timeout_answer_text" maxLength="41">Автоматически показывать ответ</string>
-    <string name="timeout_answer" maxLength="41">Задержка ответа</string>
-    <string name="timeout_answer_summ">Показывает ответ автоматически. Задержка включает в себя время для воспроизведения звука.</string>
-    <string name="timeout_answer_seconds" maxLength="41">Показать ответ через</string>
-    <string name="timeout_question_seconds" maxLength="41">Показать следующий вопрос через</string>
+    <string name="timeout_answer_summ2">Показывать ответ автоматически без пользовательского ввода. Настройте параметры колоды.</string>
     <string name="select_locale_title">Выберите язык</string>
     <string name="software_render" maxLength="41">Отключить аппаратную отрисовку</string>
     <string name="software_render_summ">Аппаратная отрисовка быстрее, но может вызывать проблемы (особенно на Android 8/8.1). Попробуйте отключить её если при повторении пропадают элементы интерфейса.</string>
@@ -164,8 +166,8 @@
     <string name="vertical_centering_summ">Выравнивает содержимое карточек по вертикали</string>
     <string name="pref_double_tap_time_interval" maxLength="41">Интервал двойного нажатия (в мс)</string>
     <string name="pref_double_tap_time_interval_summary">Второе нажатие на ответ будет проигнорировано, если это время не истекло. Предотвращает случайное двойное нажатие</string>
-    <string name="pref_show_answer_long_press" maxLength="41">Длительность нажатия для ответа</string>
-    <string name="pref_show_answer_long_press_summary">Minimum long-press time before the show answer button will register a touch. May reduce the chance of accidental extra button presses. Default is 0ms</string>
+    <string name="pref_show_answer_long_press_time" maxLength="41">Show answer long-press time</string>
+    <string name="pref_show_answer_long_press_time_summary">Minimum pressing time before the show answer button registers a touch.</string>
     <string name="show_estimates" maxLength="41">Показывать время на кнопках</string>
     <string name="show_estimates_summ">Показывает время следующего повторения над кнопками ответа</string>
     <string name="show_large_answer_buttons" maxLength="41">Большие кнопки ответа</string>
@@ -175,17 +177,16 @@
     <string name="show_progress" maxLength="41">Показать оставшиеся</string>
     <string name="show_progress_summ">Показывает число оставшихся карточек</string>
     <string name="show_eta" maxLength="41">Показывать оценку времени</string>
-    <string name="show_eta_summ">Показывает оставшееся время</string>
+    <string name="show_eta_summ">Показать оставшееся время</string>
     <string name="use_current" maxLength="41">Колода для новых карточек</string>
     <string name="learn_cutoff" maxLength="41">Лимит опережения</string>
     <string name="time_limit" maxLength="41">Лимит учебного блока</string>
-    <string name="new_timezone" maxLength="41">Новая обработка часовых поясов</string>
     <string name="day_offset_with_description" maxLength="41">Начало нового дня</string>
     <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
-        <item quantity="one">%d hour past midnight</item>
-        <item quantity="few">%d hours past midnight</item>
-        <item quantity="many">%d hours past midnight</item>
-        <item quantity="other">%d hours past midnight</item>
+        <item quantity="one">%d час после полуночи</item>
+        <item quantity="few">%d часов после полуночи</item>
+        <item quantity="many">%d часов после полуночи</item>
+        <item quantity="other">%d часов после полуночи</item>
     </plurals>
     <string name="pref_keep_screen_on" maxLength="41">Не выключать экран</string>
     <string name="pref_keep_screen_on_summ">Отключает спящий режим экрана</string>
@@ -201,10 +202,9 @@
     <string name="reset">Сброс</string>
     <string name="thirdparty_apps_title" maxLength="41">Сторонние приложения</string>
     <string name="thirdparty_apps_summary">Покажет список приложений, которые используют API AnkiDroid, например, словари</string>
-    <string name="html_javascript_debugging" maxLength="41">Отладка HTML и JavaScript</string>
-    <string name="html_javascript_debugging_summ">Включает удалённые соединения WebView и сохраняет HTML карточек в директорию AnkiDroid</string>
     <!-- Appearance settings -->
     <string name="pref_cat_reviewer" maxLength="41">Повторение</string>
+    <string name="show_deck_title" maxLength="41">Показать название колоды</string>
     <string name="accessibility" maxLength="41">Специальные возможности</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">Вставлять изображения буфера как PNG</string>
@@ -243,16 +243,15 @@
     <string name="deck_conf_cram_reschedule" maxLength="41" comment="Title of the box labelled by deck_conf_cram_reschedule_summ">Перепланировать</string>
     <string name="deck_conf_cram_reschedule_summ">Перепланировать карточки в зависимости от ответов</string>
     <string name="deck_conf_cram_filter_2_check">Включить второй фильтр</string>
-    <string name="deck_conf_cram_steps" maxLength="41">Заданные шаги (мин.)</string>
     <string name="deck_conf_cram_steps_summ" maxLength="41">Задать свои шаги</string>
+    <string name="deck_conf_cram_preview_delays" maxLength="41">Задержка предварительного просмотра</string>
+    <string name="deck_conf_cram_preview_delays_summ">Задержки в секундах. 0 возвращает карту в исходную колоду.</string>
     <!-- analytics options -->
     <string name="analytics_dialog_title">Помогите сделать AnkiDroid лучше!</string>
     <string name="analytics_title" maxLength="41">Делиться статистикой использования</string>
     <string name="analytics_summ">Отправляет информацию о функциях, которые предпочитают пользователи</string>
     <string name="note_editor_replace_newlines" maxLength="41">Заменять перенос строк на HTML</string>
     <string name="note_editor_replace_newlines_summ">Заменяет &lt;br&gt; в редакторе записей на перенос строки</string>
-    <string name="no_code_formatting" maxLength="41">Простое форматирование ответа</string>
-    <string name="no_code_formatting_summ">Исправляет «􏿾» при вводе ответа</string>
     <string name="type_in_answer_focus" maxLength="41">Переключать на «Ввести ответ»</string>
     <string name="type_in_answer_focus_summ">Во время учёбы автоматически переходит к полю «Ввести ответ»</string>
     <!-- About -->
@@ -269,6 +268,19 @@
     <string name="binding_add_key">Добавить кнопку</string>
     <string name="binding_replace_key">Заменить клавишу</string>
     <string name="key_picker_default_press_key">Нажмите кнопку</string>
+    <string name="binding_add_axis">Добавить джойстик/контроллер движения</string>
+    <string name="axis_picker_move_joystick">Переместить джойстик/контроллер движения</string>
+    <string name="user_actions" maxLength="41">Пользовательские действия</string>
+    <string name="user_actions_summary" maxLength="41">Запустить JavaScript на экране проверки</string>
+    <string name="user_action_1" maxLength="41">Пользовательское действие 1</string>
+    <string name="user_action_2" maxLength="41">Пользовательское действие 2</string>
+    <string name="user_action_3" maxLength="41">Пользовательское действие 3</string>
+    <string name="user_action_4" maxLength="41">Пользовательское действие 4</string>
+    <string name="user_action_5" maxLength="41">Пользовательское действие 5</string>
+    <string name="user_action_6" maxLength="41">Пользовательское действие 6</string>
+    <string name="user_action_7" maxLength="41">Пользовательское действие 7</string>
+    <string name="user_action_8" maxLength="41">Пользовательское действие 8</string>
+    <string name="user_action_9" maxLength="41">Пользовательское действие 9</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">Выберите сторону карточки</string>
     <string name="card_side_question">Вопрос</string>
@@ -282,6 +294,8 @@
     <string name="bindings_already_bound">Уже назначено на «%s»</string>
     <!-- Advanced -->
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">Экспериментальная</string>
+    <string name="readtext_deprecation_warn">У AnkiDroid появился более совершенный механизм TTS, который совместим с другими клиентами Anki и содержит больше голосов и улучшения в воспроизведении языков.\n\nПожалуйста, обновитесь как можно скорее, так как эта настройка скоро будет удалена.</string>
+    <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">Пожалуйста, обновитесь до нового формата преобразования текста в речь</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">Настройки разработчика</string>
     <string name="dev_options_enabled_pref" maxLength="41">Включить параметры для разработчиков</string>

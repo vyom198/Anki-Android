@@ -19,10 +19,9 @@ package com.ichi2.anki.workarounds
 import android.app.Activity
 import android.os.Bundle
 import android.os.Process
-import com.ichi2.anki.AnkiActivity
 import com.ichi2.anki.AnkiDroidApp
 import com.ichi2.anki.R
-import com.ichi2.anki.UIUtils
+import com.ichi2.anki.showThemedToast
 import com.ichi2.themes.Themes
 import timber.log.Timber
 
@@ -51,7 +50,7 @@ object AppLoadedFromBackupWorkaround {
         // * A restore took place
         // * The app is reopened (until it exits: finish() does not do this - and removes it from the app list)
         Timber.w("Activity started with no application instance")
-        UIUtils.showThemedToast(
+        showThemedToast(
             this,
             getString(R.string.ankidroid_cannot_open_after_backup_try_again),
             false
@@ -62,7 +61,7 @@ object AppLoadedFromBackupWorkaround {
         Themes.setTheme(this)
         // Avoids a SuperNotCalledException
         activitySuperOnCreate(savedInstanceState)
-        AnkiActivity.finishActivityWithFade(this)
+        finish()
 
         // If we don't kill the process, the backup is not "done" and reopening the app show the same message.
         Thread {

@@ -46,9 +46,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- generic strings -->
     <string name="disabled">Devredışı</string>
-    <string name="pref_summary_seconds">%s s</string>
-    <string name="pref_summary_minutes">%s dk</string>
-    <string comment="Percentage value of a preference. %s represents the number to be replaced. Use \%% to represent a single percent sign (%)" name="pref_summary_percentage">%s\%%</string>
+    <plurals name="pref_summ_minutes">
+        <item quantity="one">%d dk</item>
+        <item quantity="other">%d dk</item>
+    </plurals>
+    <string name="pref_milliseconds">%s ms</string>
+    <!-- TODO: move to 20-search-preference so we can contribute upstream (searchpreference_no_results)-->
     <string name="pref_search_no_results">Sonuç yok</string>
     <!-- preferences.xml categories-->
     <string name="pref_cat_general" comment="name of the general preference category" maxLength="41">Genel</string>
@@ -60,7 +63,6 @@
     <string name="pref_cat_whiteboard" maxLength="41">Yazı tahtası</string>
     <string name="pref_cat_appearance" maxLength="41">Görünüş</string>
     <string name="pref_cat_themes" maxLength="41">Temalar</string>
-    <string name="pref_cat_fonts" maxLength="41">Fontlar</string>
     <string name="pref_cat_gestures" maxLength="41">Jestler</string>
     <string name="pref_cat_controls" maxLength="41">Kontroller</string>
     <string name="pref_cat_advanced" maxLength="41">Gelişmiş</string>
@@ -113,6 +115,7 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">Orta merkeze dokun</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">Sol alta dokun</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">Sağ alta dokun</string>
+    <string name="gestures_shake" maxLength="41">Cihazı salla</string>
     <string name="card_browser_enable_external_context_menu">\"%s\" Menüsü</string>
     <string name="card_browser_enable_external_context_menu_summary">\"%s\" durum menüsünü uygulama çapında etkinleştirir</string>
     <string name="double_scrolling_gap" maxLength="41">Hızlı kaydırma</string>
@@ -148,10 +151,7 @@
     <string name="notification_minimum_cards_due_vibrate" maxLength="41">Titreş</string>
     <string name="notification_minimum_cards_due_blink" maxLength="41">Işığı yanıp söndür</string>
     <string name="timeout_answer_text" maxLength="41">Cevabı otomatik göster</string>
-    <string name="timeout_answer" maxLength="41">Zaman aşımı yanıtı</string>
-    <string name="timeout_answer_summ">Cevabı kullanıcı girişi yapılmadan otomatik olarak göster. Ses dosyasını otomatik oynatmak için gecikme zamanı içerir.</string>
-    <string name="timeout_answer_seconds" maxLength="41">Cevabı gösterme zamanı</string>
-    <string name="timeout_question_seconds" maxLength="41">Sonraki soruyu gösterme zamanı</string>
+    <string name="timeout_answer_summ2">Cevabı kullanıcı adı olmadan otomatik olarak göster. Deste seçeneklerinden yapılandırın.</string>
     <string name="select_locale_title">Dil Seç</string>
     <string name="software_render" maxLength="41">Kart donanım renderını devredışı bırak</string>
     <string name="software_render_summ">Donanım renderı daha hızlıdır ama sorunları olabilir, özellikle de Android 8/8.1\'de. Kart çalışma kullanıcı arayüzünün bazı kısımlarını göremiyorsanız, bunu ayarı deneyin.</string>
@@ -164,8 +164,8 @@
     <string name="vertical_centering_summ">Kartların içeriğini dikey olarak ortala</string>
     <string name="pref_double_tap_time_interval" maxLength="41">Çift dokunma zaman aralığı (milisaniye)</string>
     <string name="pref_double_tap_time_interval_summary">Cevaplama düğmelerine ikinci bir tıklama, bu süre geçmediyse, göz ardı edilecektir. Bu, yanlışlıkla çift tıklamayı önler</string>
-    <string name="pref_show_answer_long_press" maxLength="41">Cevabı göster basılı tutma süresi (ms)</string>
-    <string name="pref_show_answer_long_press_summary">Cevabı göster düğmesi dokunmayı kabûl etmeden önce minimum basılı tutma süresi. Yanlışlıkla düğmeye basma ihtimâlini azaltabilir. Varsayılan 0 ms.</string>
+    <string name="pref_show_answer_long_press_time" maxLength="41">Cevabı göster basılı tutma süresi</string>
+    <string name="pref_show_answer_long_press_time_summary">Cevabı göster düğmesi dokunmayı algılayana kadar minimum basma süresi</string>
     <string name="show_estimates" maxLength="41">Düğmede zaman göster</string>
     <string name="show_estimates_summ">Cevap düğmelerinin üzerinde sonraki çıkma zamanını göster</string>
     <string name="show_large_answer_buttons" maxLength="41">Büyük cevap düğmelerini göster</string>
@@ -174,16 +174,15 @@
     <string name="show_top_bar_summ">Üst çubukta kart sayılarını ve işaretlemeleri göster</string>
     <string name="show_progress" maxLength="41">Kalanı göster</string>
     <string name="show_progress_summ">Kalan kart sayısını göster</string>
-    <string name="show_eta" maxLength="41">ETA göster</string>
-    <string name="show_eta_summ">Kalan zamanı göster</string>
+    <string name="show_eta" maxLength="41">Kalan zamanı göster</string>
+    <string name="show_eta_summ">Beklenen kalan zamanı göster</string>
     <string name="use_current" maxLength="41">Yeni kartlar için deste</string>
     <string name="learn_cutoff" maxLength="41">Önceden öğrenme sınırı</string>
     <string name="time_limit" maxLength="41">Zaman sınırı</string>
-    <string name="new_timezone" maxLength="41">Yeni zaman dilimi idaresi</string>
     <string name="day_offset_with_description" maxLength="41">Sonraki günün başlangıcı (0 geceyarısı, 23 akşam 11)</string>
     <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
-        <item quantity="one">%d hour past midnight</item>
-        <item quantity="other">%d hours past midnight</item>
+        <item quantity="one">Geceyarısından %d saat sonra</item>
+        <item quantity="other">Geceyarısından %d saat sonra</item>
     </plurals>
     <string name="pref_keep_screen_on" maxLength="41">Ekranı açık tut</string>
     <string name="pref_keep_screen_on_summ">Ekran zaman aşımını devredışı bırak</string>
@@ -199,10 +198,9 @@
     <string name="reset">Sıfırla</string>
     <string name="thirdparty_apps_title" maxLength="41">Üçüncü parti API uygulamaları</string>
     <string name="thirdparty_apps_summary">AnkiDroid API\'ından faydalanan sözlük, araç gibi uygulamaların bir listesine bakın.</string>
-    <string name="html_javascript_debugging" maxLength="41">HTML / Javascript Debugging</string>
-    <string name="html_javascript_debugging_summ">WebView bağlantılarını etkinleştir, ve kart HTML\'ini AnkiDroid dizinine kaydet</string>
     <!-- Appearance settings -->
     <string name="pref_cat_reviewer" maxLength="41">Çalışıcı</string>
+    <string name="show_deck_title" maxLength="41">Deste başlığını göster</string>
     <string name="accessibility" maxLength="41">Erişilebilirlik</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">Panodaki resimleri PNG olarak yapıştırın</string>
@@ -242,16 +240,15 @@
     <string name="deck_conf_cram_reschedule" maxLength="41" comment="Title of the box labelled by deck_conf_cram_reschedule_summ">Yeniden planlama</string>
     <string name="deck_conf_cram_reschedule_summ">Bu destedeki cevaplarıma göre kartları yeniden planlama</string>
     <string name="deck_conf_cram_filter_2_check">İkinci filtreyi etkinleştir</string>
-    <string name="deck_conf_cram_steps" maxLength="41">Özel adımlar (dakika cinsinden)</string>
     <string name="deck_conf_cram_steps_summ" maxLength="41">Kendi adımlarınızı tanımlayın</string>
+    <string name="deck_conf_cram_preview_delays" maxLength="41">Gecikmeleri önizle</string>
+    <string name="deck_conf_cram_preview_delays_summ">Gecikmeler saniye cinsindendir. 0, kartı orijinal destesine döndürür.</string>
     <!-- analytics options -->
     <string name="analytics_dialog_title">AnkiDroid\'in iyileştirilmesine yardım et!</string>
     <string name="analytics_title" maxLength="41">Özellik kullanımını paylaş</string>
     <string name="analytics_summ">Geliştirme ekibinin insanların hangi özellikleri kullandığını görmesine yardım ederek AnkiDroid\'e katkıda bulunabilirsiniz.</string>
     <string name="note_editor_replace_newlines" maxLength="41">Satırbaşlarını HTML\'le değiştir</string>
     <string name="note_editor_replace_newlines_summ">Not Düzenleyicide kart değiştirirken, bütün &lt;br&gt;leri satırbaşına çevir</string>
-    <string name="no_code_formatting" maxLength="41">Basit yazılı cevap formatı</string>
-    <string name="no_code_formatting_summ">Yazılı cevap sonuçlarında \"􏿾\" çıkmasını düzeltir</string>
     <string name="type_in_answer_focus" maxLength="41">\"Cevabı yaz\"a odaklan</string>
     <string name="type_in_answer_focus_summ">Çalışıcıda otomatik olarak \"Cevabı yaz\" alanına odaklan</string>
     <!-- About -->
@@ -268,6 +265,19 @@
     <string name="binding_add_key">Anahtar ekle</string>
     <string name="binding_replace_key">Tuşu değiştir</string>
     <string name="key_picker_default_press_key">Bir tuşa basın</string>
+    <string name="binding_add_axis">Joystick/hareket kumandası ekle</string>
+    <string name="axis_picker_move_joystick">Bir joystick/hareket kumandasını hareket ettir</string>
+    <string name="user_actions" maxLength="41">Kullanıcı eylemleri</string>
+    <string name="user_actions_summary" maxLength="41">JavaScript\'i gözden geçirme ekranından tetikle</string>
+    <string name="user_action_1" maxLength="41">Kullanıcı eylemi 1</string>
+    <string name="user_action_2" maxLength="41">Kullanıcı eylemi 2</string>
+    <string name="user_action_3" maxLength="41">Kullanıcı eylemi 3</string>
+    <string name="user_action_4" maxLength="41">Kullanıcı eylemi 4</string>
+    <string name="user_action_5" maxLength="41">Kullanıcı eylemi 5</string>
+    <string name="user_action_6" maxLength="41">Kullanıcı eylemi 6</string>
+    <string name="user_action_7" maxLength="41">Kullanıcı eylemi 7</string>
+    <string name="user_action_8" maxLength="41">Kullanıcı eylemi 8</string>
+    <string name="user_action_9" maxLength="41">Kullanıcı eylemi 9</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">Kartın tarafını seç</string>
     <string name="card_side_question">Soru</string>
@@ -281,6 +291,8 @@
     <string name="bindings_already_bound">%s bileşenine bağlı zaten</string>
     <!-- Advanced -->
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">Deneysel</string>
+    <string name="readtext_deprecation_warn">AnkiDroid diğer Anki istemcileriyle uyumlu, daha fazla ses ve dil seslendirmesine geliştirmeler içeren daha iyi bir metin okuma mekanizması getirdi!\n\nLütfen mümkün olan en yakın zamanda yeni sisteme geçin, çünkü bu ayar yakında kaldırılacak.</string>
+    <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">Lütfen yeni metin okuma formatına geçin</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">Geliştirici seçenekleri</string>
     <string name="dev_options_enabled_pref" maxLength="41">Geliştirici seçeneklerini aç</string>

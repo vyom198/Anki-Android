@@ -59,18 +59,17 @@
     <!-- DeckPicker.kt -->
     <string name="expand">Palawakin</string>
     <string name="collapse">Itiklop</string>
-    <string name="study_more">Pag-aralan ang iba pa</string>
     <plurals name="reviewer_window_title">
-        <item quantity="one">%d natitirang minuto</item>
-        <item quantity="other">%d mga natitirang minuto</item>
+        <item quantity="one">%d minute left</item>
+        <item quantity="other">%d minutes left</item>
     </plurals>
     <plurals name="reviewer_window_title_hours_new">
-        <item quantity="one">%1$d oras %2$d pa ang natititra</item>
-        <item quantity="other">%1$d oras %2$d pa ang natititra</item>
+        <item quantity="one">%1$d hour %2$d left</item>
+        <item quantity="other">%1$d hours %2$d left</item>
     </plurals>
     <plurals name="reviewer_window_title_days_new">
-        <item quantity="one">%1$d araw %2$d pa ang natititra</item>
-        <item quantity="other">%1$d araw %2$d pa ang natititra</item>
+        <item quantity="one">%1$d day %2$d left</item>
+        <item quantity="other">%1$d days %2$d left</item>
     </plurals>
     <string name="no_cards_placeholder_title">Walang laman ang tipon</string>
     <string name="no_cards_placeholder_description">Magsimulang magdadag ng mga cards\n gamit ang + na aykon.</string>
@@ -85,12 +84,14 @@
     <string name="ease_button_easy">Madali</string>
     <string name="menu_import">Mag-angkat</string>
     <string name="undo">Ibalik sa dati</string>
+    <string name="redo">Redo</string>
     <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in Reviewer. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)">Magtanggal ng guhit</string>
     <string name="move_all_to_deck">Iusong lahat sa deck</string>
     <string name="unbury">Hukayin</string>
     <string name="rename_deck">Palitan ang pangalan ng deck</string>
     <string name="create_shortcut">Lumikha ng gitis</string>
     <string name="browse_cards">Magbasa-basa ng mga card</string>
+    <string name="edit_deck_description" comment="edit the deck description">Edit description</string>
     <string name="menu_add" comment="A generic add button. Please inform us if you need more specific strings">Magdagdag</string>
     <string name="menu_add_note">Magdagdag ng tala</string>
     <string name="menu_my_account" comment="Label of the window in which the user should enter their account. This text can\'t be found in AnkiDroid directly.">I-sync ang account</string>
@@ -104,14 +105,6 @@
     <string name="menu_delete_note">Burahin ang tala</string>
     <string name="menu_flag">Watawat</string>
     <string name="menu_flag_card">Lagyan ng watawat ang card</string>
-    <string name="menu_flag_card_zero">Walang watawat</string>
-    <string name="menu_flag_card_one">Pulang watawat</string>
-    <string name="menu_flag_card_two">Kahel na watawat</string>
-    <string name="menu_flag_card_three">Berdeng watawat</string>
-    <string name="menu_flag_card_four">Asul na watawat</string>
-    <string name="menu_flag_card_five">Rosas na watawat</string>
-    <string name="menu_flag_card_six">Turkesa na watawat</string>
-    <string name="menu_flag_card_seven">Lila na watawat</string>
     <string name="menu_edit_tags">Baguhin ang mga tag</string>
     <string name="delete_note_message">Talaga bang gusto mong burahin ang talang ito at pati na rin ang lahat ngmga kard?\n%s</string>
     <string name="menu_search">Hanapin sa %1$s</string>
@@ -133,14 +126,11 @@
     <string name="empty_filtered_deck">Inaalisan ng laman ang filtered deck&#8230;</string>
     <string name="custom_study_deck_name">I-custom ang study session</string>
     <string name="custom_study_deck_exists">Baguhin muna ang pangalan ng umiiral na pasadyang deck sa pag-aaral</string>
-    <string name="empty_deck">Ang deck na ito ay walang laman</string>
     <string name="search_deck" comment="Deck search for selecting it">Maghanap ng Deck</string>
+    <string name="empty_deck">Ang deck na ito ay walang laman</string>
     <string name="search_for_download_deck" comment="Deck search value for downloading deck">Maghanap ng Deck</string>
     <string name="invalid_deck_name">Hindi wasto ang pangalan ng deck</string>
-    <string name="studyoptions_empty">Ang deck na ito ay walang laman. Pindotin ang + na button para magdagdag ng laman.</string>
-    <string name="studyoptions_limit_reached">Naabot na ang limit sa pang-araw-araw na pag-aaral</string>
-    <string name="studyoptions_empty_schedule">Walang card na nakatakdang pag-aralan</string>
-    <string name="studyoptions_congrats_finished">Binabati kita! Natapos mo na sa ngayon.</string>
+    <string name="studyoptions_congrats_finished">Congratulations! You have finished for now.</string>
     <string name="studyoptions_no_cards_due">Wala pang card na nakatakda</string>
     <string name="sd_card_not_mounted">Ang device storage ay hindi naka-mount</string>
     <string name="button_sync" comment="Text of the sync button">I-sync</string>
@@ -148,9 +138,8 @@
     <string name="cancel_sync_confirm" tools:ignore="UnusedResources">Gusto mo bang kanselahin ang sync?</string>
     <string name="continue_sync" tools:ignore="UnusedResources">Ipagtuloy ang pagsync</string>
     <string name="sync_cancelled" tools:ignore="UnusedResources">Nakansela ang sync</string>
-    <string name="sync_cancel_message" tools:ignore="UnusedResources">Kinakansela...\nIto ay maaaring matagalan.</string>
-    <string name="export">I-export</string>
-    <string name="export_collection">Iluwas ang mga tipon</string>
+    <string name="sync_cancel_message" tools:ignore="UnusedResources">Kinakansela&#8230;\nIto ay maaaring matagalan.</string>
+    <string name="syncing_media">Syncing media</string>
     <string name="export_deck">I-export ang deck</string>
     <string name="nothing">Wala</string>
     <!-- Card template editor -->
@@ -171,7 +160,6 @@
         <item quantity="one">Tanggalin ang \"%2$s\" uri ng kard, at ang %1$d kard nito?</item>
         <item quantity="other">Burahin ang \"%2$s\" uri ng kard, at ang %1$d kard nito?</item>
     </plurals>
-    <string name="invalid_template">Ang isang kard ay hindi mabubuo</string>
     <string name="card_template_editor_would_delete_note">Ang pag-alis ng uri ng card na ito ay magdudulot ng pagkakatanggal ng isa o higit pang mga tala. Mangyaring gumawa muna ng isang bagong uri ng card.</string>
     <string name="card_template_editor_save_error">Hindi ma-i-save ang mga binago sa padron ng card: %s</string>
     <string name="template_for_current_card_deleted">Nabura ang uri ng card sa kasalukuyang card.</string>
@@ -244,6 +232,7 @@
     <string name="migration__resume_after_failed_dialog__button_positive">Resume migration</string>
     <string name="directory_inaccessible_after_uninstall" comment="Dialog title if AnkiDroid can\'t access the collection once the app is installed">Hindi ma-access ang tipon</string>
     <string name="directory_inaccessible_after_uninstall_summary" comment="the parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">Hindi namin ma-access ang iyong tipon matapos ma-uninstall ang AnkiDroid dahil sa bagong polisiya ng Play Store\n\nLigtas ang iyong data at maari itong i-restore. Makikita it sa\n%s\n\nPumili ng opsyon sa ibaba upang ma-restore:</string>
+    <string name="directory_revoked_after_inactivity" comment="the first parameter is WRITE_EXTERNAL_STORAGE the second parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">Android has removed AnkiDroid\'s %1$s permission due to app inactivity.\n\nYour data is safe and can be restored. It is located at\n%2$s\n\nSelect an option below to restore:</string>
     <string name="restore_data_from_ankiweb">Mag-restore mula sa AnkiWeb (nirerekomenda)</string>
     <string name="install_non_play_store_ankidroid_recommended">I-restore ang access sa folder (nirerekomenda)</string>
     <string name="install_non_play_store_ankidroid">I-restore ang access sa folder (dalubhasa)</string>
@@ -255,4 +244,6 @@
     <string name="storage_access_title">Storage access</string>
     <string name="storage_access_summary">Saves your collection in a safe place that will not be deleted if the app is uninstalled</string>
     <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">All files access</string>
+    <string name="image_occlusion">Image Occlusion</string>
+    <string name="remove_account" comment="open a website to start the deletion of an AnkiWeb account">Remove account</string>
 </resources>

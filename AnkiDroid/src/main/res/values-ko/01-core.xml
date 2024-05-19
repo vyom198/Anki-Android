@@ -59,15 +59,14 @@
     <!-- DeckPicker.kt -->
     <string name="expand">확장</string>
     <string name="collapse">감추기</string>
-    <string name="study_more">더 학습하기</string>
     <plurals name="reviewer_window_title">
-        <item quantity="other">%d분 남음</item>
+        <item quantity="other">%d minutes left</item>
     </plurals>
     <plurals name="reviewer_window_title_hours_new">
         <item quantity="other">%1$d hours %2$d left</item>
     </plurals>
     <plurals name="reviewer_window_title_days_new">
-        <item quantity="other">%1$d일 %2$d시간 남음</item>
+        <item quantity="other">%1$d days %2$d left</item>
     </plurals>
     <string name="no_cards_placeholder_title">이 컬렉션은 비어 있습니다</string>
     <string name="no_cards_placeholder_description">＋아이콘을 눌러 \n카드를 추가해 주십시오</string>
@@ -82,12 +81,14 @@
     <string name="ease_button_easy">쉬움</string>
     <string name="menu_import">가져오기</string>
     <string name="undo">실행 취소</string>
+    <string name="redo">다시 실행</string>
     <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in Reviewer. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)">실행 취소</string>
     <string name="move_all_to_deck">카드묶음으로 모두 이동</string>
     <string name="unbury">지금 보기</string>
     <string name="rename_deck">카드 묶음 이름 바꾸기</string>
     <string name="create_shortcut">바로가기 만들기</string>
     <string name="browse_cards">카드 찾아보기</string>
+    <string name="edit_deck_description" comment="edit the deck description">Edit description</string>
     <string name="menu_add" comment="A generic add button. Please inform us if you need more specific strings">추가</string>
     <string name="menu_add_note">노트 추가</string>
     <string name="menu_my_account" comment="Label of the window in which the user should enter their account. This text can\'t be found in AnkiDroid directly.">계정 동기화</string>
@@ -101,14 +102,6 @@
     <string name="menu_delete_note">노트 삭제하기</string>
     <string name="menu_flag">표시</string>
     <string name="menu_flag_card">카드에 플래그 추가</string>
-    <string name="menu_flag_card_zero">플래그 없음</string>
-    <string name="menu_flag_card_one">빨간색 표시</string>
-    <string name="menu_flag_card_two">주황색 표시</string>
-    <string name="menu_flag_card_three">초록색 표시</string>
-    <string name="menu_flag_card_four">파란색 표시</string>
-    <string name="menu_flag_card_five">분홍색 표시</string>
-    <string name="menu_flag_card_six">청록색 표시</string>
-    <string name="menu_flag_card_seven">보라색 표시</string>
     <string name="menu_edit_tags">태그 수정</string>
     <string name="delete_note_message">다음 노트와 그 노트의 모든 카드를 정말로 삭제하시겠습니까?\n%s</string>
     <string name="menu_search">%1$s에서 찾아보기</string>
@@ -123,21 +116,18 @@
     grant AnkiDroid the \'Storage\' permission. This needs to be a fairly generic message as implementations
     of the permissions/app info screen will differ between devices. -->
     <string name="startup_no_storage_permission">계속하기 위해서는 AnkiDroid에 \'저장소\'권한이 필요합니다.</string>
-    <string name="rebuild_filtered_deck">필터링된 뭉치를 재구성하는 중...</string>
+    <string name="rebuild_filtered_deck">필터링된 뭉치를 재구성하는 중&#8230;</string>
     <string name="rebuild_cram_label">재생성</string>
     <string name="empty_cram_label">비우기</string>
     <string name="create_subdeck">하위 뭉치 만들기</string>
-    <string name="empty_filtered_deck">필터링된 뭉치를 비우는 중...</string>
+    <string name="empty_filtered_deck">필터링된 뭉치를 비우는 중&#8230;</string>
     <string name="custom_study_deck_name">맞춤 학습 세션</string>
     <string name="custom_study_deck_exists">기존의 맞춤 학습 덱의 이름을 먼저 변경하세요.</string>
-    <string name="empty_deck">이 뭉치는 비어있습니다.</string>
     <string name="search_deck" comment="Deck search for selecting it">뭉치 검색</string>
+    <string name="empty_deck">이 뭉치는 비어있습니다.</string>
     <string name="search_for_download_deck" comment="Deck search value for downloading deck">뭉치 검색</string>
     <string name="invalid_deck_name">유효하지 않은 뭉치 이름입니다</string>
-    <string name="studyoptions_empty">이 카드 묶음은 비어있습니다. + 버튼을 눌러 새 컨텐츠를 추가하세요.</string>
-    <string name="studyoptions_limit_reached">일일 학습량에 도달했습니다</string>
-    <string name="studyoptions_empty_schedule">학습 예정인 카드가 없습니다</string>
-    <string name="studyoptions_congrats_finished">축하합니다! 오늘의 학습을 모두 끝냈습니다.</string>
+    <string name="studyoptions_congrats_finished">Congratulations! You have finished for now.</string>
     <string name="studyoptions_no_cards_due">남은 카드가 없습니다.</string>
     <string name="sd_card_not_mounted">장치 저장소가 마운트되지 않음</string>
     <string name="button_sync" comment="Text of the sync button">동기화</string>
@@ -145,9 +135,8 @@
     <string name="cancel_sync_confirm" tools:ignore="UnusedResources">동기화를 취소하시겠습니까?</string>
     <string name="continue_sync" tools:ignore="UnusedResources">동기화 계속하기</string>
     <string name="sync_cancelled" tools:ignore="UnusedResources">동기화 취소됨</string>
-    <string name="sync_cancel_message" tools:ignore="UnusedResources">취소하는 중...\n시간이 걸릴 수 있습니다.</string>
-    <string name="export">내보내기</string>
-    <string name="export_collection">컬렉션 내보내기</string>
+    <string name="sync_cancel_message" tools:ignore="UnusedResources">취소하는 중&#8230;\n시간이 걸릴 수 있습니다.</string>
+    <string name="syncing_media">Syncing media</string>
     <string name="export_deck">카드 묶음 내보내기</string>
     <string name="nothing">없음</string>
     <!-- Card template editor -->
@@ -166,7 +155,6 @@
     <plurals name="card_template_editor_confirm_delete">
         <item quantity="other">\'%2$s\' 카드 형식과 %1$d 카드를 삭제할까요?</item>
     </plurals>
-    <string name="invalid_template">카드를 생성할 수 없습니다</string>
     <string name="card_template_editor_would_delete_note">해당 카드 유형을 삭제하면 하나, 또는 여러 개의 노트가 삭제됩니다. 먼저 새로운 카드 유형을 만들어주십시오.</string>
     <string name="card_template_editor_save_error">카드 템플릿 변경 사항을 저장할 수 없습니다. %s</string>
     <string name="template_for_current_card_deleted">현재 카드의 카드 유형은 삭제되었습니다.</string>
@@ -187,7 +175,7 @@
     <string name="sync_conflict_remote_confirm_new">AnkiDroid의 컬렉션을 AnkiWeb의 컬렉션으로 덮어쓰시겠습니까?</string>
     <string name="sync_conflict_local_confirm_new">AnkiDroid의 컬렉션을 AnkiWeb의 컬렉션으로 덮어쓰시겠습니까?</string>
     <string name="sync_conflict_title_new">유지할 컬렉션 선택</string>
-    <string name="sync_conflict_replace_title">컬렉션을 덮어쓰는 중...</string>
+    <string name="sync_conflict_replace_title">컬렉션을 덮어쓰는 중&#8230;</string>
     <plurals name="deckpicker_title_zero_due">
         <item quantity="other">%1$d cards (0 due)</item>
     </plurals>
@@ -238,6 +226,7 @@
     <string name="migration__resume_after_failed_dialog__button_positive">Resume migration</string>
     <string name="directory_inaccessible_after_uninstall" comment="Dialog title if AnkiDroid can\'t access the collection once the app is installed">접근할 수 없는 컬렉션</string>
     <string name="directory_inaccessible_after_uninstall_summary" comment="the parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">We are unable to access your collection after AnkiDroid is uninstalled due to a change in Play Store Policy\n\nYour data is safe and can be restored. It is located at\n%s\n\nSelect an option below to restore:</string>
+    <string name="directory_revoked_after_inactivity" comment="the first parameter is WRITE_EXTERNAL_STORAGE the second parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">Android has removed AnkiDroid\'s %1$s permission due to app inactivity.\n\nYour data is safe and can be restored. It is located at\n%2$s\n\nSelect an option below to restore:</string>
     <string name="restore_data_from_ankiweb">Restore from AnkiWeb (recommended)</string>
     <string name="install_non_play_store_ankidroid_recommended">Restore folder access (recommended)</string>
     <string name="install_non_play_store_ankidroid">Restore folder access (advanced)</string>
@@ -249,4 +238,6 @@
     <string name="storage_access_title">Storage access</string>
     <string name="storage_access_summary">Saves your collection in a safe place that will not be deleted if the app is uninstalled</string>
     <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">All files access</string>
+    <string name="image_occlusion">Image Occlusion</string>
+    <string name="remove_account" comment="open a website to start the deletion of an AnkiWeb account">Remove account</string>
 </resources>

@@ -64,6 +64,7 @@
     <string name="log_out">Выйти</string>
     <string name="reset_password">Сбросить пароль</string>
     <string name="lost_mail_instructions">Забыли адрес почты?</string>
+    <string name="sign_in">Вход</string>
     <!-- AndroidManifest.xml -->
     <string name="deckpreferences_title">Параметры XXX</string>
     <string name="sync_title">Синхронизация</string>
@@ -73,12 +74,11 @@
     <!-- Please run ‘Check database’ before syncing -->
     <string name="sync_sanity_local">Локальную</string>
     <string name="sync_sanity_remote">Удалённую</string>
-    <string name="force_full_sync_title">Выполнить полную синхронизацию</string>
-    <string name="force_full_sync_summary">Перезапишет изменения в одном направлении при следующей синхронизации</string>
-    <string name="force_full_sync_confirmation">Принудительная синхронизация</string>
+    <string name="one_way_sync_title">Односторонняя синхронизация</string>
+    <string name="one_way_sync_confirmation">Запрошена односторонняя синхронизация</string>
     <string name="full_sync_confirmation">Последние изменения требуют полную выгрузку базы данных при следующей синхронизации. Если на другом вашем устройстве есть изменения, они будут утеряны. Продолжить?</string>
     <string name="full_sync_confirmation_upgrade">Из-за ошибке в прошлой версии AnkiDroid рекомендуем полную синхронизацию.</string>
     <!-- Deck Picker Sync Icon -->
-    <string name="sync_menu_title_full_sync">Синхро (полностью)</string>
+    <string name="sync_menu_title_one_way_sync">Sync (one-way)</string>
     <string name="sync_menu_title_no_account">Синхро (войти)</string>
 </resources>

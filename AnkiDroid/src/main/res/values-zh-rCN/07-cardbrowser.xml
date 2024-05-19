@@ -52,12 +52,13 @@
         <item quantity="other">显示了 %d 条笔记</item>
     </plurals>
     <string name="card_browser_all_decks">所有牌组</string>
-    <string name="card_browser_delete_card">删除笔记</string>
-    <string name="card_browser_suspend_card">暂停卡片</string>
+    <plurals name="card_browser_delete_cards">
+        <item quantity="other">删除卡片</item>
+    </plurals>
+    <plurals name="card_browser_delete_notes">
+        <item quantity="other">删除笔记</item>
+    </plurals>
     <string name="card_browser_change_deck">更换牌组</string>
-    <string name="card_browser_unsuspend_card">取消暂停卡片</string>
-    <string name="card_browser_mark_card">标记笔记</string>
-    <string name="card_browser_unmark_card">未标记的笔记</string>
     <string name="delete_card_title">确认删除笔记？</string>
     <string name="card_browser_show_marked">筛选已标记卡牌</string>
     <string name="card_browser_show_suspended">筛选已暂停卡牌</string>
@@ -94,6 +95,7 @@
     <string name="card_browser_search_all_decks">搜索全部牌组</string>
     <string name="card_browser_unknown_deck_name">未知</string>
     <string name="card_browser_truncate" comment="allows users to show less of a field value">截断内容</string>
+    <string name="set_due_date_hintText" comment="plural set_due_date_label_suffix is used for parameters, parameter 1 is the plural for 0, parameter 2 is the plural for 1">今天是 ‘0 %1$s’，明天是 ‘1 %2$s’等&#8230;</string>
     <plurals name="card_browser_export_cards">
         <item quantity="other">导出卡片</item>
     </plurals>
@@ -103,5 +105,4 @@
     <plurals name="card_browser_cards_deleted">
         <item quantity="other">%d 张卡片已删除</item>
     </plurals>
-    <!-- Card Info subscreen -->
 </resources>

@@ -28,14 +28,13 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.ichi2.anki.TestUtils.activityInstance
 import com.ichi2.anki.TestUtils.clickChildViewWithId
-import com.ichi2.anki.TestUtils.isScreenSw600dp
+import com.ichi2.anki.TestUtils.isTablet
 import com.ichi2.anki.TestUtils.wasBuiltOnCI
-import com.ichi2.anki.tests.InstrumentedTest.Companion.isEmulator
+import com.ichi2.anki.tests.InstrumentedTest
 import com.ichi2.anki.testutil.GrantStoragePermission.storagePermission
 import com.ichi2.anki.testutil.ThreadUtils.sleep
 import com.ichi2.anki.testutil.grantPermissions
 import com.ichi2.anki.testutil.notificationPermission
-import com.ichi2.anki.utils.EnsureAllFilesAccessRule
 import org.hamcrest.Matchers.instanceOf
 import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
@@ -44,15 +43,12 @@ import org.junit.Rule
 import org.junit.Test
 
 @SuppressLint("DirectSystemCurrentTimeMillisUsage")
-class DeckPickerTest {
+class DeckPickerTest : InstrumentedTest() {
     @get:Rule
-    val mActivityRule = ActivityScenarioRule(DeckPicker::class.java)
+    val activityRule = ActivityScenarioRule(DeckPicker::class.java)
 
     @get:Rule
-    val mRuntimePermissionRule = grantPermissions(storagePermission, notificationPermission)
-
-    @get:Rule
-    val ensureAllFilesAccessRule = EnsureAllFilesAccessRule()
+    val runtimePermissionRule = grantPermissions(storagePermission, notificationPermission)
 
     @Ignore("This test appears to be flaky everywhere")
     @Test
@@ -62,7 +58,7 @@ class DeckPickerTest {
         assumeFalse("Test flaky in CI - #9282, skipping", wasBuiltOnCI())
 
         // For mobile. If it is not a mobile, then test will be ignored.
-        assumeTrue(!isScreenSw600dp)
+        assumeTrue(!isTablet)
         val testString = System.currentTimeMillis().toString() + ""
         createDeckWithCard(testString)
 
@@ -92,7 +88,9 @@ class DeckPickerTest {
         assumeFalse("Test flaky in CI - #9282, skipping", wasBuiltOnCI())
 
         // For tablet. If it is not a tablet, then test will be ignored.
-        assumeTrue(isScreenSw600dp)
+        assumeTrue(isTablet)
+        closeGetStartedScreenIfExists()
+        closeBackupCollectionDialogIfExists()
         val testString = System.currentTimeMillis().toString() + ""
         createDeckWithCard(testString)
 
@@ -105,8 +103,8 @@ class DeckPickerTest {
         // Create a new deck
         onView(withId(R.id.fab_main)).perform(click())
         onView(withId(R.id.add_deck_action)).perform(click())
-        onView(withId(R.id.action_edit)).perform(typeText("TestDeck$testString"))
-        onView(withId(com.afollestad.materialdialogs.R.id.md_button_positive)).perform(click())
+        onView(withId(R.id.dialog_text_input)).perform(typeText("TestDeck$testString"))
+        onView(withText(R.string.dialog_ok)).perform(click())
 
         // The deck is currently empty, so if we tap on it, it becomes the selected deck but doesn't enter
         onView(withId(R.id.files)).perform(
@@ -118,7 +116,7 @@ class DeckPickerTest {
 
         // Create a card belonging to the new deck, using Basic type (guaranteed to exist)
         onView(withId(R.id.fab_main)).perform(click())
-        onView(withId(R.id.add_note_label)).perform(click())
+        onView(withId(R.id.fab_main)).perform(click())
 
         // Close the keyboard, it auto-focuses and obscures enough of the screen
         // on some devices that espresso complains about global visibility being <90%
@@ -131,6 +129,7 @@ class DeckPickerTest {
         closeSoftKeyboard()
 
         // Go back to Deck Picker
+        pressBack()
         pressBack()
     }
 }

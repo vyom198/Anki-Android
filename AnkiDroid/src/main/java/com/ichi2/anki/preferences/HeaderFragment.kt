@@ -72,7 +72,6 @@ class HeaderFragment : PreferenceFragmentCompat() {
                 setBreadcrumbsEnabled(true)
                 setFuzzySearchEnabled(false)
                 setHistoryEnabled(true)
-                textNoResults = activity.getString(R.string.pref_search_no_results)
 
                 index(R.xml.preferences_general)
                 index(R.xml.preferences_reviewing)
@@ -114,6 +113,8 @@ class HeaderFragment : PreferenceFragmentCompat() {
             if (!CompatHelper.hasScrollKeys()) {
                 searchConfiguration.ignorePreference(activity.getString(R.string.double_scrolling_gap_key))
             }
+
+            searchConfiguration.ignorePreference(activity.getString(R.string.user_actions_controls_category_key))
         }
     }
 }

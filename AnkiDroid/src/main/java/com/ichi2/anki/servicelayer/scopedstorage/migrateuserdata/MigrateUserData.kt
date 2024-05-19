@@ -151,7 +151,7 @@ open class MigrateUserData protected constructor(val source: Directory, val dest
      * If the number of retries was exceeded when resolving a file conflict via moving it to the
      * /conflict/ folder.
      */
-    class FileConflictResolutionFailedException(val sourceFile: DiskFile, val attemptedDestination: File) : MigrationException("Failed to move $sourceFile to $attemptedDestination")
+    class FileConflictResolutionFailedException(val sourceFile: DiskFile, attemptedDestination: File) : MigrationException("Failed to move $sourceFile to $attemptedDestination")
 
     /**
      * Context for an [Operation], allowing a change of execution behavior and
@@ -413,7 +413,7 @@ open class MigrateUserData protected constructor(val source: Directory, val dest
         var terminatedWith: Exception? = null
             private set
 
-        val retriedDirectories = hashSetOf<File>()
+        private val retriedDirectories = hashSetOf<File>()
 
         val loggedExceptions = mutableListOf<Exception>()
         private var consecutiveExceptionsWithoutProgress = 0
@@ -589,7 +589,7 @@ open class MigrateUserData protected constructor(val source: Directory, val dest
     /** Returns a sequence of the Files or Directories in [source] which are to be migrated */
     private fun getUserDataFiles() = getDirectoryContent().filter { isUserData(it) }
 
-    fun isEssentialFileName(name: String): Boolean {
+    private fun isEssentialFileName(name: String): Boolean {
         return MigrateEssentialFiles.PRIORITY_FILES.flatMap { it.potentialFileNames }.contains(name)
     }
 
@@ -600,11 +600,7 @@ open class MigrateUserData protected constructor(val source: Directory, val dest
         }
 
         // don't move the "conflict" directory
-        if (file.name == MoveConflictedFile.CONFLICT_DIRECTORY) {
-            return false
-        }
-
-        return true
+        return file.name != MoveConflictedFile.CONFLICT_DIRECTORY
     }
 
     /**

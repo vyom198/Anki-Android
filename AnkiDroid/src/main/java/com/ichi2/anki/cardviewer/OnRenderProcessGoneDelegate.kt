@@ -24,7 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import com.ichi2.anki.AbstractFlashcardViewer
 import com.ichi2.anki.R
-import com.ichi2.anki.UIUtils.showThemedToast
+import com.ichi2.anki.showThemedToast
 import com.ichi2.libanki.CardId
 import com.ichi2.utils.*
 import timber.log.Timber
@@ -41,7 +41,7 @@ open class OnRenderProcessGoneDelegate(val target: AbstractFlashcardViewer) {
      * Last card that the WebView Renderer crashed on.
      * If we get 2 crashes on the same card, then we likely have an infinite loop and want to exit gracefully.
      */
-    private var mLastCrashingCardId: CardId? = null
+    private var lastCrashingCardId: CardId? = null
 
     /** Fix: #5780 - WebView Renderer OOM crashes reviewer  */
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -80,7 +80,7 @@ open class OnRenderProcessGoneDelegate(val target: AbstractFlashcardViewer) {
                     }
 
                     // This logic may need to be better defined. The card could have changed by the time we get here.
-                    mLastCrashingCardId = currentCardId
+                    lastCrashingCardId = currentCardId
                     displayNonFatalError(detail)
                 }
                 else -> Timber.d("WebView crashed while app was minimised - OOM was safe to handle silently")
@@ -155,7 +155,7 @@ open class OnRenderProcessGoneDelegate(val target: AbstractFlashcardViewer) {
     }
 
     private fun webViewRendererLastCrashedOnCard(cardId: CardId): Boolean =
-        mLastCrashingCardId != null && mLastCrashingCardId == cardId
+        lastCrashingCardId != null && lastCrashingCardId == cardId
 
     private fun canRecoverFromWebViewRendererCrash(): Boolean =
         // DEFECT

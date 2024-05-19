@@ -21,11 +21,7 @@ import androidx.annotation.CallSuper
 import com.ichi2.anki.CollectionManager
 import com.ichi2.libanki.ChangeManager
 import com.ichi2.libanki.Collection
-import com.ichi2.libanki.Consts
-import com.ichi2.libanki.Note
-import com.ichi2.libanki.Notetypes
 import com.ichi2.libanki.Storage
-import com.ichi2.libanki.backend.exception.DeckRenameException
 import com.ichi2.libanki.utils.TimeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -36,15 +32,20 @@ import org.hamcrest.Matcher
 import org.junit.After
 import org.junit.Assume
 import org.junit.Before
+import org.junit.Rule
+import org.junit.rules.TestName
 import timber.log.Timber
 import timber.log.Timber.Forest.plant
 
-open class JvmTest {
+open class JvmTest : TestClass {
+    @get:Rule
+    val testName = TestName()
+
     private fun maybeSetupBackend() {
         RustBackendLoader.ensureSetup()
     }
 
-    val col: Collection
+    override val col: Collection
         get() {
             if (col_ == null) {
                 col_ = CollectionManager.getColUnsafe()
@@ -57,6 +58,7 @@ open class JvmTest {
     @Before
     @CallSuper
     open fun setUp() {
+        println("""-- executing test "${testName.methodName}"""")
         TimeManager.resetWith(MockTime(2020, 7, 7, 7, 0, 0, 0, 10))
 
         ChangeManager.clearSubscribers()
@@ -70,10 +72,9 @@ open class JvmTest {
                 if (tag == "Backend\$checkMainThreadOp") {
                     return
                 }
-                System.out.println(tag + ": " + message)
-                if (t != null) {
-                    t.printStackTrace()
-                }
+                // use println(): Timber may not work under the Jvm
+                println("$tag: $message")
+                t?.printStackTrace()
             }
         })
 
@@ -99,69 +100,7 @@ open class JvmTest {
         Dispatchers.resetMain()
         runBlocking { CollectionManager.discardBackend() }
         Timber.uprootAll()
-    }
-
-    protected fun addNoteUsingBasicModel(front: String, back: String): Note {
-        return addNoteUsingModelName("Basic", front, back)
-    }
-
-    protected fun addRevNoteUsingBasicModelDueToday(@Suppress("SameParameterValue") front: String, @Suppress("SameParameterValue") back: String): Note {
-        val note = addNoteUsingBasicModel(front, back)
-        val card = note.firstCard()
-        card.queue = Consts.QUEUE_TYPE_REV
-        card.type = Consts.CARD_TYPE_REV
-        card.due = col.sched.today.toLong()
-        return note
-    }
-
-    protected fun addNoteUsingBasicAndReversedModel(front: String, back: String): Note {
-        return addNoteUsingModelName("Basic (and reversed card)", front, back)
-    }
-
-    protected fun addNoteUsingBasicTypedModel(@Suppress("SameParameterValue") front: String, @Suppress("SameParameterValue") back: String): Note {
-        return addNoteUsingModelName("Basic (type in the answer)", front, back)
-    }
-
-    protected fun addNoteUsingModelName(name: String?, vararg fields: String): Note {
-        val model = col.notetypes.byName((name)!!)
-            ?: throw IllegalArgumentException("Could not find model '$name'")
-        // PERF: if we modify newNote(), we can return the card and return a Pair<Note, Card> here.
-        // Saves a database trip afterwards.
-        val n = col.newNote(model)
-        for ((i, field) in fields.withIndex()) {
-            n.setField(i, field)
-        }
-        check(col.addNote(n) != 0) { "Could not add note: {${fields.joinToString(separator = ", ")}}" }
-        return n
-    }
-
-    protected fun addNonClozeModel(name: String, fields: Array<String>, qfmt: String?, afmt: String?): String {
-        val model = col.notetypes.newModel(name)
-        for (field in fields) {
-            col.notetypes.addFieldInNewModel(model, col.notetypes.newField(field))
-        }
-        val t = Notetypes.newTemplate("Card 1")
-        t.put("qfmt", qfmt)
-        t.put("afmt", afmt)
-        col.notetypes.addTemplateInNewModel(model, t)
-        col.notetypes.add(model)
-        return name
-    }
-
-    protected fun addDeck(deckName: String?): Long {
-        return try {
-            col.decks.id(deckName!!)
-        } catch (filteredAncestor: DeckRenameException) {
-            throw RuntimeException(filteredAncestor)
-        }
-    }
-
-    protected fun addDynamicDeck(name: String?): Long {
-        return try {
-            col.decks.newDyn(name!!)
-        } catch (filteredAncestor: DeckRenameException) {
-            throw RuntimeException(filteredAncestor)
-        }
+        println("""-- executing test "${testName.methodName}"""")
     }
 
     fun <T> assumeThat(actual: T, matcher: Matcher<T>?) {

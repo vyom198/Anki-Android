@@ -49,10 +49,8 @@
     <string name="contextmenu_deckpicker_delete_deck">Skasuj talię</string>
     <string name="delete_deck_title">Skasuj talię</string>
     <string name="no_tts_available_message">Brak dostępnego języka zamiany tekstu na mowę</string>
-    <string name="initializing_tts">Inicjowanie TTS&#8230;</string>
     <string name="tts_no_tts">Nie mów</string>
     <string name="unused_strings">\n\nNieużywane pliki:\n</string>
-    <string name="preview_title" comment="Title of the window allowing to preview card(s)">Podgląd</string>
     <string name="reposition_card_dialog_title">Przestawianie nowej karty</string>
     <string name="reposition_card_dialog_message">Pozycja początkowa:</string>
     <string name="reposition_card_not_new_error">Tylko nowe karty mogą być przestawione</string>
@@ -63,7 +61,6 @@
         <item quantity="other">%d kart przestawiono</item>
     </plurals>
     <string name="reset_card_dialog_title">Reset postępu karty</string>
-    <string name="reset_card_dialog_message">Ta karta zostanie umieszczona na końcu kolejki nowych kart.</string>
     <plurals name="reset_cards_dialog_acknowledge">
         <item quantity="one">%d karta zresetowana</item>
         <item quantity="few">%d karty zresetowane</item>
@@ -71,28 +68,12 @@
         <item quantity="other">%d kart zresetowano</item>
     </plurals>
     <!-- Reschedule Card Dialog -->
-    <plurals name="reschedule_cards_dialog_title_new">
-        <item quantity="one">Zmień harmonogram %d karty</item>
-        <item quantity="few">Zmień harmonogram %d kart</item>
-        <item quantity="many">Zmień harmonogram %d kart</item>
-        <item quantity="other">Zmień harmonogram %d kart</item>
-    </plurals>
-    <plurals name="reschedule_card_dialog_interval">
-        <item quantity="one">Aktualna przerwa: %d dzień</item>
-        <item quantity="few">Aktualna przerwa: %d dni</item>
-        <item quantity="many">Aktualna przerwa: %d dni</item>
-        <item quantity="other">Aktualna przerwa: %d dni</item>
-    </plurals>
-    <string name="reschedule_card_dialog_message">Ustaw ponowne pokazanie się na x dni:</string>
     <plurals name="reschedule_cards_dialog_acknowledge">
         <item quantity="one">%d karta ponownie zaplanowana</item>
         <item quantity="few">%d karty ponownie zaplanowane</item>
         <item quantity="many">%d kart ponownie zaplanowano</item>
         <item quantity="other">%d kart ponownie zaplanowano</item>
     </plurals>
-    <string name="reschedule_card_dialog_new_card_warning">Karta zostanie ponownie zaplanowana. Ponowne zaplanowanie spowoduje zmianę statusu karty z \"nowa\" na \"powtarzana\". Użyj opcji \"przestaw kartę\" by zmienić pozycję nowej karty karty w kolejce bez zmiany jej statusu</string>
-    <string name="reschedule_card_dialog_warning_ease_reset">Ponowne zaplanowanie karty spowoduje także zresetowanie poziomu łatwości (zostanie ustawiona na: %d%%)</string>
-    <string name="firefox_workaround_launched_reviewer_opening_deck">Wybierz talię w twoim menedżerze plików lub odwiedź stronę about:downloads, by ją zaimportować</string>
     <string name="answering_error_title">Błąd bazy danych</string>
     <string name="answering_error_message">Wystąpił błąd podczas zapisywania do kolekcji. Powodem może być uszkodzenie bazy danych albo niewystarczająca ilość miejsca na dysku.\n\nJeśli błąd ten występuje często, spróbuj użyć opcji \"sprawdź bazę danych\" oraz naprawić kolekcję lub przywróć ją z kopii zapasowej (by tego dokonać kliknij „opcje”).\n\nRównie dobrze może to być też błąd AnkiDroid; zgłoś go abyśmy mogli to sprawdzić.</string>
     <string name="answering_error_report">Zgłoś błąd</string>
@@ -121,8 +102,10 @@
     <string name="dialog_confirm" tools:ignore="UnusedResources">Potwierdź</string>
     <string name="dialog_no">Nie</string>
     <string name="dialog_yes">Tak</string>
+    <string name="dialog_keep">Zachowaj</string>
+    <string name="dialog_remove">Usuń</string>
     <string name="dialog_continue">Kontynuuj</string>
-    <string name="dialog_processing">Przetwarzanie...</string>
+    <string name="dialog_processing">Przetwarzanie&#8230;</string>
     <string name="dialog_positive_create" comment="Create a new collection, probably erasing the previous one, may be necessary in case of error.">Utwórz</string>
     <string name="dialog_positive_delete">Usuń</string>
     <!-- Currently unsued, should be useful in the future -->
@@ -189,6 +172,7 @@
     <string name="failed_to_apply_background_image">Nie udało się ustawić obrazu w tle%s</string>
     <string name="background_image_too_large">Tło ekranu wyboru talii zbyt duże</string>
     <string name="image_max_size_allowed">Maksymalny dozwolony rozmiar obrazu: %d MB </string>
+    <string name="image_dimensions_too_large">Rozmiary obrazu są zbyt duże (%1$d × %2$d)</string>
     <!-- Global Intent handler -->
     <!-- Also used by Card Browser, not renaming to save translators effort -->
     <string name="intent_handler_failed_no_storage_permission">Brak wymaganych uprawnień do przechowywania danych. Proszę przyznać uprawnienia do pamięci, a następnie ponowić próbę.</string>
@@ -198,7 +182,7 @@
     <string name="boot_service_failed_to_schedule_notifications">Nie udało się ustawić przypomnień</string>
     <string name="boot_service_too_many_notifications">Ustawiono zbyt dużo przypomnień. Niektóre się nie pojawią</string>
     <!-- Locale Selection Dialog -->
-    <string name="locale_selection_dialog_title">Wybór języka klawiatury</string>
+    <string name="locale_selection_dialog_title_new">Ustaw język</string>
     <string name="locale_selection_dialog_summary">Niektóre wielojęzyczne klawiatury takie jak GBoard obsługują zmianę języka podczas edycji tekstu\n\nJeśli twoja klawiatura automatycznie nie zmienia języka, możesz spróbować poprosić jej twórcę o włączenie funkcji „setImeHintLocales”.</string>
     <!-- Help Dialog -->
     <string name="help_title_using_ankidroid">Używanie AnkiDroid</string>
@@ -226,6 +210,7 @@
     <string name="help_item_ankiweb_terms_and_conditions">Warunki użytkowania AnkiWeb</string>
     <string name="help_title_send_exception">Wyślij raport błędu</string>
     <string name="help_dialog_exception_report_debounce">Raport został już wysłany</string>
+    <string name="help_dialog_exception_report_sent">Raport został wysłany!</string>
     <!--Sync-->
     <plurals name="sync_automatic_sync_needs_more_time">
         <item quantity="one">Automatyczna synchronizacja może zostać uruchomiona za %d sekundę</item>
@@ -233,7 +218,7 @@
         <item quantity="many">Automatyczna synchronizacja może zostać uruchomiona za %d sekund</item>
         <item quantity="other">Automatyczna synchronizacja może zostać uruchomiona za %d sekund</item>
     </plurals>
-    <string name="metered_sync_warning">Korzystasz z połączenia taryfowego. Korzystanie z danych może dodatkowo kosztować</string>
+    <string name="metered_sync_data_warning">Twój dostawca Internetu może pobierać opłaty za korzystanie z danych</string>
     <string name="deck_picker_new">Liczba nowych kart do zobaczenia dziś w tej talii.</string>
     <string name="deck_picker_rev">Liczba kart do powtórki na dziś w tej talii.</string>
     <string name="deck_picker_lrn">Liczba kart w uczeniu się w tej talii.</string>
@@ -258,4 +243,29 @@
     </string>
     <string name="dismiss_backup_warning_upgrade">        Ze względu na zmiany prywatności w systemie Android Twoje dane i automatyczne kopie zapasowe będą niedostępne, jeśli aplikacja zostanie odinstalowana
     </string>
+    <string name="deck_already_exists">Taka talia już istnieje</string>
+    <string name="create_deck_numeric_hint">If you have deck ordering issues (e.g. ‘10’ appears before ‘2’), replace ‘2’ with ‘02’</string>
+    <!-- Set Due Date -->
+    <string name="set_due_date_match_interval" comment="when setting a card\'s due date, this checkbox also changes the interval of the card">Set interval to same value</string>
+    <plurals name="set_due_date_single_day_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in</item>
+        <item quantity="few">Show cards in</item>
+        <item quantity="many">Show cards in</item>
+        <item quantity="other">Show cards in</item>
+    </plurals>
+    <plurals name="set_due_date_range_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in range</item>
+        <item quantity="few">Show cards in range</item>
+        <item quantity="many">Show cards in range</item>
+        <item quantity="other">Show cards in range</item>
+    </plurals>
+    <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
+        <item quantity="one">day</item>
+        <item quantity="few">days</item>
+        <item quantity="many">days</item>
+        <item quantity="other">days</item>
+    </plurals>
+    <string name="range_delimiter" comment="Placed between two input boxes to denote a range">–</string>
+    <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">From</string>
+    <string name="set_due_date_range_end" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'maximum\' value of this range (inclusive)">To</string>
 </resources>

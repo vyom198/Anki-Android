@@ -49,10 +49,8 @@
     <string name="contextmenu_deckpicker_delete_deck">Forigi kartaron</string>
     <string name="delete_deck_title">Ĉu forigi kartaron?</string>
     <string name="no_tts_available_message">Neniu parol-sintezilo disponebla</string>
-    <string name="initializing_tts">Lanĉado de parol-sintezilo&#8230;</string>
-    <string name="tts_no_tts">ne paroli</string>
+    <string name="tts_no_tts">Ne paroli</string>
     <string name="unused_strings">\n\nNeuzataj dosieroj:\n</string>
-    <string name="preview_title" comment="Title of the window allowing to preview card(s)">Antaŭrigardo</string>
     <string name="reposition_card_dialog_title">Repozicii novan karton</string>
     <string name="reposition_card_dialog_message">Komenca pozicio:</string>
     <string name="reposition_card_not_new_error">Nur novaj kartoj povas esti repoziciita</string>
@@ -61,28 +59,15 @@
         <item quantity="other">%d kartoj estas repoziciitaj</item>
     </plurals>
     <string name="reset_card_dialog_title">Nuligi progreson de karto</string>
-    <string name="reset_card_dialog_message">Tiu ĉi karto estos movita al la fino de vico de novaj kartoj</string>
     <plurals name="reset_cards_dialog_acknowledge">
         <item quantity="one">%d karto estas nuligita</item>
         <item quantity="other">%d kartoj estas nuligitaj</item>
     </plurals>
     <!-- Reschedule Card Dialog -->
-    <plurals name="reschedule_cards_dialog_title_new">
-        <item quantity="one">Replani %d karton</item>
-        <item quantity="other">Replani %d kartojn</item>
-    </plurals>
-    <plurals name="reschedule_card_dialog_interval">
-        <item quantity="one">Nuna intertempo: %d tago</item>
-        <item quantity="other">Nuna intertempo: %d tagoj</item>
-    </plurals>
-    <string name="reschedule_card_dialog_message">Replani ripeton de karto post tiom da tagoj:</string>
     <plurals name="reschedule_cards_dialog_acknowledge">
         <item quantity="one">%d karto estas replanita</item>
         <item quantity="other">%d kartoj estas replanitaj</item>
     </plurals>
-    <string name="reschedule_card_dialog_new_card_warning">Nova karto estas replanata. Replanado ankaŭ igas novajn kartojn esti ripetataj kartoj. Uzu la eblaĵon “repozicii karton” por ŝanĝi pozicion de nova karto ene la nova vico</string>
-    <string name="reschedule_card_dialog_warning_ease_reset">Replanado ankaŭ nuligas kiel la planilo traktos la karton estontece (facileco estos agordita al %d%%)</string>
-    <string name="firefox_workaround_launched_reviewer_opening_deck">Elektu kartaron per dosier‑administrilo aŭ malfermu la paĝon about:downloads por malfermi ĝin</string>
     <string name="answering_error_title">Eraro pri datumbazo</string>
     <string name="answering_error_message">Fiaskis skribi al la kolekto. La datumbazo povas esti difektita aŭ eble mankas spaco en la konservejo.\n\nSe tio ĉi okazos pli ofte, provu kontroli la datumbazon, ripari la kolekton aŭ restarigi ĝin el sekurkopio. Frapetu “agordojn” por fari tion.\nAŭ tio ĉi povas esti eraro en AnkiDroid, do bonvolu raporti ĝin por ke ni povu ĝin ripari.</string>
     <string name="answering_error_report">Raporti eraron</string>
@@ -111,8 +96,10 @@
     <string name="dialog_confirm" tools:ignore="UnusedResources">Konfirmi</string>
     <string name="dialog_no">Ne</string>
     <string name="dialog_yes">Jes</string>
+    <string name="dialog_keep">Konservi</string>
+    <string name="dialog_remove">Forigi</string>
     <string name="dialog_continue">Pluigi</string>
-    <string name="dialog_processing">Processing...</string>
+    <string name="dialog_processing">Traktado&#8230;</string>
     <string name="dialog_positive_create" comment="Create a new collection, probably erasing the previous one, may be necessary in case of error.">Krei</string>
     <string name="dialog_positive_delete">Forigi</string>
     <!-- Currently unsued, should be useful in the future -->
@@ -177,6 +164,7 @@
     <string name="failed_to_apply_background_image">Fiaskis apliki fonan bildon %s</string>
     <string name="background_image_too_large">Fono por elektilo de kartaro estas tro granda</string>
     <string name="image_max_size_allowed">Maksimuma permesata grando de bildo estas %d MB</string>
+    <string name="image_dimensions_too_large">Image dimensions are too large (%1$d × %2$d)</string>
     <!-- Global Intent handler -->
     <!-- Also used by Card Browser, not renaming to save translators effort -->
     <string name="intent_handler_failed_no_storage_permission">Mankas permeso al konservejo. Donu permeson al konservejo kaj sekve reprovu.</string>
@@ -186,7 +174,7 @@
     <string name="boot_service_failed_to_schedule_notifications">Fiaskis plani memorigaĵojn</string>
     <string name="boot_service_too_many_notifications">Tro multe da memorigaĵoj planitaj. Iuj ne aperos</string>
     <!-- Locale Selection Dialog -->
-    <string name="locale_selection_dialog_title">Elekti klavarajn sugestojn</string>
+    <string name="locale_selection_dialog_title_new">Difini lingvon</string>
     <string name="locale_selection_dialog_summary">Iuj plurlingvaj klavaroj – ekzemple GBoard – ebligas ŝanĝi lingvon dum enigi tekston\n\nSe via klavaro aŭtomate ne ŝanĝas lingvon, provu peti ĝiajn programistojn pri aldoni la eblaĵon “setImeHintLocales”.</string>
     <!-- Help Dialog -->
     <string name="help_title_using_ankidroid">Uzado de AnkiDroid</string>
@@ -214,12 +202,13 @@
     <string name="help_item_ankiweb_terms_and_conditions">AnkiWeb: kondiĉoj de uzado</string>
     <string name="help_title_send_exception">Sendi raporton pri problemo</string>
     <string name="help_dialog_exception_report_debounce">Raporto sendita</string>
+    <string name="help_dialog_exception_report_sent">Report was sent!</string>
     <!--Sync-->
     <plurals name="sync_automatic_sync_needs_more_time">
         <item quantity="one">Aŭtomata samtempigo povas startigi post %d sekundo</item>
         <item quantity="other">Aŭtomata samtempigo povas startigi post %d sekundoj</item>
     </plurals>
-    <string name="metered_sync_warning">Your connection is metered. Data transfer may cost money</string>
+    <string name="metered_sync_data_warning">Your internet provider may charge money for data use</string>
     <string name="deck_picker_new">Nombro de novaj hodiaŭaj kartoj por montri en tiu ĉi kartaro.</string>
     <string name="deck_picker_rev">Nombro de hodiaŭaj lernendaj kartoj en tiu ĉi kartaro.</string>
     <string name="deck_picker_lrn">Nombro de lernataj kortoj en tiu ĉi kartaro.</string>
@@ -244,4 +233,23 @@
     </string>
     <string name="dismiss_backup_warning_upgrade">        Due to Android privacy changes, your data and automated backups will be inaccessible if the app is uninstalled
     </string>
+    <string name="deck_already_exists">Deck already exists</string>
+    <string name="create_deck_numeric_hint">If you have deck ordering issues (e.g. ‘10’ appears before ‘2’), replace ‘2’ with ‘02’</string>
+    <!-- Set Due Date -->
+    <string name="set_due_date_match_interval" comment="when setting a card\'s due date, this checkbox also changes the interval of the card">Set interval to same value</string>
+    <plurals name="set_due_date_single_day_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in</item>
+        <item quantity="other">Show cards in</item>
+    </plurals>
+    <plurals name="set_due_date_range_label" comment="a date control is provided afterwards">
+        <item quantity="one">Show card in range</item>
+        <item quantity="other">Show cards in range</item>
+    </plurals>
+    <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
+        <item quantity="one">day</item>
+        <item quantity="other">tagoj</item>
+    </plurals>
+    <string name="range_delimiter" comment="Placed between two input boxes to denote a range">–</string>
+    <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">De post</string>
+    <string name="set_due_date_range_end" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'maximum\' value of this range (inclusive)">Ĝis</string>
 </resources>

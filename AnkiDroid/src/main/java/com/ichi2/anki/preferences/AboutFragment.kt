@@ -20,16 +20,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.text.method.LinkMovementMethod
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.parseAsHtml
 import androidx.fragment.app.Fragment
-import com.google.android.material.snackbar.Snackbar
 import com.ichi2.anki.*
 import com.ichi2.anki.servicelayer.DebugInfoService
 import com.ichi2.anki.snackbar.showSnackbar
@@ -37,35 +34,37 @@ import com.ichi2.utils.IntentUtil
 import com.ichi2.utils.VersionUtils.pkgVersionName
 import com.ichi2.utils.copyToClipboard
 import com.ichi2.utils.show
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import net.ankiweb.rsdroid.BuildConfig as BackendBuildConfig
 
-class AboutFragment : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val layoutView = inflater.inflate(R.layout.about_layout, container, false)
+class AboutFragment : Fragment(R.layout.about_layout) {
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         // Version date
         val apkBuildDate = SimpleDateFormat(DateFormat.getBestDateTimePattern(Locale.getDefault(), "d MMM yyyy"))
             .format(Date(BuildConfig.BUILD_TIME))
-        layoutView.findViewById<TextView>(R.id.about_build_date).text = apkBuildDate
+        view.findViewById<TextView>(R.id.about_build_date).text = apkBuildDate
 
         // Version text
-        layoutView.findViewById<TextView>(R.id.about_version).text =
+        view.findViewById<TextView>(R.id.about_version).text =
             pkgVersionName
 
+        // Backend version text
+        view.findViewById<TextView>(R.id.about_backend).text =
+            "(anki " + BackendBuildConfig.ANKI_DESKTOP_VERSION + " / " + BackendBuildConfig.ANKI_COMMIT_HASH.subSequence(0, 8) + ")"
+
         // Logo secret
-        layoutView.findViewById<ImageView>(R.id.about_app_logo)
+        view.findViewById<ImageView>(R.id.about_app_logo)
             .setOnClickListener(DevOptionsSecretClickListener(requireActivity() as Preferences))
 
         // Contributors text
         val contributorsLink = getString(R.string.link_contributors)
         val contributingGuideLink = getString(R.string.link_contribution)
-        layoutView.findViewById<TextView>(R.id.about_contributors_description).apply {
+        view.findViewById<TextView>(R.id.about_contributors_description).apply {
             text = getString(R.string.about_contributors_description, contributorsLink, contributingGuideLink).parseAsHtml()
             movementMethod = LinkMovementMethod.getInstance()
         }
@@ -74,25 +73,25 @@ class AboutFragment : Fragment() {
         val gplLicenseLink = getString(R.string.licence_wiki)
         val agplLicenseLink = getString(R.string.link_agpl_wiki)
         val sourceCodeLink = getString(R.string.link_source)
-        layoutView.findViewById<TextView>(R.id.about_license_description).apply {
+        view.findViewById<TextView>(R.id.about_license_description).apply {
             text = getString(R.string.license_description, gplLicenseLink, agplLicenseLink, sourceCodeLink).parseAsHtml()
             movementMethod = LinkMovementMethod.getInstance()
         }
 
         // Donate text
         val donateLink = getString(R.string.link_opencollective_donate)
-        layoutView.findViewById<TextView>(R.id.about_donate_description).apply {
+        view.findViewById<TextView>(R.id.about_donate_description).apply {
             text = getString(R.string.donate_description, donateLink).parseAsHtml()
             movementMethod = LinkMovementMethod.getInstance()
         }
 
         // Rate Ankidroid button
-        layoutView.findViewById<Button>(R.id.about_rate).setOnClickListener {
+        view.findViewById<Button>(R.id.about_rate).setOnClickListener {
             IntentUtil.tryOpenIntent((requireActivity() as AnkiActivity), AnkiDroidApp.getMarketIntent(requireContext()))
         }
 
         // Open changelog button
-        layoutView.findViewById<Button>(R.id.about_open_changelog).setOnClickListener {
+        view.findViewById<Button>(R.id.about_open_changelog).setOnClickListener {
             val openChangelogIntent = Intent(requireContext(), Info::class.java).apply {
                 putExtra(Info.TYPE_EXTRA, Info.TYPE_NEW_VERSION)
             }
@@ -100,11 +99,9 @@ class AboutFragment : Fragment() {
         }
 
         // Copy debug info button
-        layoutView.findViewById<Button>(R.id.about_copy_debug).setOnClickListener {
+        view.findViewById<Button>(R.id.about_copy_debug).setOnClickListener {
             copyDebugInfo()
         }
-
-        return layoutView
     }
 
     override fun onStart() {
@@ -116,16 +113,13 @@ class AboutFragment : Fragment() {
      * Copies debug info (from [DebugInfoService.getDebugInfo]) to the clipboard
      */
     private fun copyDebugInfo() {
-        val debugInfo = DebugInfoService.getDebugInfo(requireContext())
-        if (requireContext().copyToClipboard(debugInfo)) {
-            showSnackbar(
-                R.string.about_ankidroid_successfully_copied_debug_info,
-                Snackbar.LENGTH_SHORT
-            )
-        } else {
-            showSnackbar(
-                R.string.about_ankidroid_error_copy_debug_info,
-                Snackbar.LENGTH_SHORT
+        launchCatchingTask {
+            val debugInfo = withContext(Dispatchers.IO) {
+                DebugInfoService.getDebugInfo(requireContext())
+            }
+            requireContext().copyToClipboard(
+                debugInfo,
+                failureMessageId = R.string.about_ankidroid_error_copy_debug_info
             )
         }
     }

@@ -46,9 +46,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- generic strings -->
     <string name="disabled">Kikapcsolva</string>
-    <string name="pref_summary_seconds">%s mp</string>
-    <string name="pref_summary_minutes">%s perc</string>
-    <string comment="Percentage value of a preference. %s represents the number to be replaced. Use \%% to represent a single percent sign (%)" name="pref_summary_percentage">%s\%%</string>
+    <plurals name="pref_summ_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d mins</item>
+    </plurals>
+    <string name="pref_milliseconds">%s ms</string>
+    <!-- TODO: move to 20-search-preference so we can contribute upstream (searchpreference_no_results)-->
     <string name="pref_search_no_results">Nincs találat</string>
     <!-- preferences.xml categories-->
     <string name="pref_cat_general" comment="name of the general preference category" maxLength="41">Általános</string>
@@ -60,7 +63,6 @@
     <string name="pref_cat_whiteboard" maxLength="41">Tábla</string>
     <string name="pref_cat_appearance" maxLength="41">Kinézet</string>
     <string name="pref_cat_themes" maxLength="41">Témák</string>
-    <string name="pref_cat_fonts" maxLength="41">Betűtípusok</string>
     <string name="pref_cat_gestures" maxLength="41">Gesztusok</string>
     <string name="pref_cat_controls" maxLength="41">Kezelőszervek</string>
     <string name="pref_cat_advanced" maxLength="41">Haladó</string>
@@ -113,6 +115,7 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">Érintés a közepén</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">Érintés bal alul</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">Érintés jobb alul</string>
+    <string name="gestures_shake" maxLength="41">Shake device</string>
     <string name="card_browser_enable_external_context_menu">\'%s\' Menü</string>
     <string name="card_browser_enable_external_context_menu_summary">Engedélyezi a \'%s\' kontextus menüt globálisan</string>
     <string name="double_scrolling_gap" maxLength="41">Dupla görgetés</string>
@@ -149,10 +152,7 @@
     <string name="notification_minimum_cards_due_vibrate" maxLength="41">Rezgés</string>
     <string name="notification_minimum_cards_due_blink" maxLength="41">Villogó fény</string>
     <string name="timeout_answer_text" maxLength="41">Automatikusan mutassa a választ</string>
-    <string name="timeout_answer" maxLength="41">Időtúllépésnél a válasz</string>
-    <string name="timeout_answer_summ">Válasz automatikus megjelenítése, felhasználói beavatkozása nélkül. A késleltetés magában foglalja az automatikusan lejátszott audió fájlok idejét.</string>
-    <string name="timeout_answer_seconds" maxLength="41">Válasz mutatása ennyi idő elteltével</string>
-    <string name="timeout_question_seconds" maxLength="41">A következő kérdés megjelenítése ennyi idő után</string>
+    <string name="timeout_answer_summ2">Show answer automatically without user input. Configure from deck options.</string>
     <string name="select_locale_title">Nyelv kiválasztása</string>
     <string name="software_render" maxLength="41">Kártya hw megjelenítő (render) tiltása</string>
     <string name="software_render_summ">A hw renderelés gyorsabb, de okozhat problémát, különösen az Android 8/8.1-en. Ha nem látod a kártya ismétléskor a kezelőfelület egy részét, próbáld meg ezt a beállítást.</string>
@@ -165,8 +165,8 @@
     <string name="vertical_centering_summ">A kártyák tartalmának középre igazítása függőlegesen</string>
     <string name="pref_double_tap_time_interval" maxLength="41">Két érintés időzítése (millisec)</string>
     <string name="pref_double_tap_time_interval_summary">A második érintést nem fogja figyelembe venni, ha ezen időn belül történik. Ez megakadályozza a véletlen kettős érintéseket</string>
-    <string name="pref_show_answer_long_press" maxLength="41">Válasz nyomva tartási ideje (ms)</string>
-    <string name="pref_show_answer_long_press_summary">Ennyi ideig kell nyomva tartani a \"Válasz\" gombot, hogy regisztráljon egy érintést. Ez csökkentheti a nem kívánt gombnyomások esélyét. Az alapértelmezett érték 0ms.</string>
+    <string name="pref_show_answer_long_press_time" maxLength="41">Show answer long-press time</string>
+    <string name="pref_show_answer_long_press_time_summary">Minimum pressing time before the show answer button registers a touch.</string>
     <string name="show_estimates" maxLength="41">Idő mutatása a gombokon</string>
     <string name="show_estimates_summ">A gombokon látszódjon a következő esedékesség időpontja</string>
     <string name="show_large_answer_buttons" maxLength="41">Nagy válasz gombok megjelenítése</string>
@@ -175,12 +175,11 @@
     <string name="show_top_bar_summ">Kártya számlálók, jelölők és jelölések mutatása a felső bárban,</string>
     <string name="show_progress" maxLength="41">Hátralévő mutatása</string>
     <string name="show_progress_summ">Hátralévő kártyák számának megjelenítése</string>
-    <string name="show_eta" maxLength="41">ETA megjelenítése</string>
-    <string name="show_eta_summ">Hátralévő idő mutatása</string>
+    <string name="show_eta" maxLength="41">Show ETA</string>
+    <string name="show_eta_summ">Show remaining time</string>
     <string name="use_current" maxLength="41">Új kártyák paklija</string>
     <string name="learn_cutoff" maxLength="41">Korai tanulás korlátai</string>
     <string name="time_limit" maxLength="41">Időkorlát érték</string>
-    <string name="new_timezone" maxLength="41">Új időzóna kezelés</string>
     <string name="day_offset_with_description" maxLength="41">Nap kezdete</string>
     <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
         <item quantity="one">%d hour past midnight</item>
@@ -200,10 +199,9 @@
     <string name="reset">Visszaállít</string>
     <string name="thirdparty_apps_title" maxLength="41">Külsős API alkalmazások</string>
     <string name="thirdparty_apps_summary">Egy lista az alkalmazásokról, amik az AnkiDroid API-t használják, mint például szótárak és segédprogramok.</string>
-    <string name="html_javascript_debugging" maxLength="41">HTML / Javascript hibakeresés</string>
-    <string name="html_javascript_debugging_summ">Távoli WebView kapcsolatok engedélyezése és a HTML kártyák AnkiDroid mappába mentése</string>
     <!-- Appearance settings -->
     <string name="pref_cat_reviewer" maxLength="41">Felülvizsgáló</string>
+    <string name="show_deck_title" maxLength="41">Show deck title</string>
     <string name="accessibility" maxLength="41">Kisegítő lehetőségek</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">Vágólap képeket PNG-ként illeszt be</string>
@@ -242,16 +240,15 @@
     <string name="deck_conf_cram_reschedule" maxLength="41" comment="Title of the box labelled by deck_conf_cram_reschedule_summ">Átütemezés</string>
     <string name="deck_conf_cram_reschedule_summ">A telepített kártyák átütemezése adott válaszaim alapján</string>
     <string name="deck_conf_cram_filter_2_check">Második szűrő engedélyezése</string>
-    <string name="deck_conf_cram_steps" maxLength="41">Egyéni lépések (percben)</string>
     <string name="deck_conf_cram_steps_summ" maxLength="41">Add meg az egyéni lépéseket</string>
+    <string name="deck_conf_cram_preview_delays" maxLength="41">Preview delays</string>
+    <string name="deck_conf_cram_preview_delays_summ">Delays are in seconds. 0 returns card to original deck.</string>
     <!-- analytics options -->
     <string name="analytics_dialog_title">Segítsen az AnkiDroidot jobbá tenni!</string>
     <string name="analytics_title" maxLength="41">Funkiók megosztása</string>
     <string name="analytics_summ">Hozzájárulhat az AnkiDroidhoz azáltal, hogy megmutatja a fejlesztői csapatnak, milyen funkciókat használnak az emberek</string>
     <string name="note_editor_replace_newlines" maxLength="41">Az újsor karakterek HTML helyettesítése</string>
     <string name="note_editor_replace_newlines_summ">A megjegyzés szerkesztőben kártya szerkesztéskor a &lt;br&gt; átcseréli újsor karakterre.</string>
-    <string name="no_code_formatting" maxLength="41">Begépelt válasz egyszerű formázása</string>
-    <string name="no_code_formatting_summ">Javítja a megjelenő ‘􏿾’-t a begépelt válaszban</string>
     <string name="type_in_answer_focus" maxLength="41">\'válasz begépelés\' kiválasztás</string>
     <string name="type_in_answer_focus_summ">Automatikusan a \'válasz begépelés\' mezőre ugrik a kártya ismétlésekor</string>
     <!-- About -->
@@ -268,6 +265,19 @@
     <string name="binding_add_key">Kulcs hozzáadása</string>
     <string name="binding_replace_key">Kulcs felcserélése</string>
     <string name="key_picker_default_press_key">Nyomj meg egy billentyűt</string>
+    <string name="binding_add_axis">Add joystick/motion controller</string>
+    <string name="axis_picker_move_joystick">Move a joystick/motion controller</string>
+    <string name="user_actions" maxLength="41">User actions</string>
+    <string name="user_actions_summary" maxLength="41">Trigger JavaScript from the review screen</string>
+    <string name="user_action_1" maxLength="41">User action 1</string>
+    <string name="user_action_2" maxLength="41">User action 2</string>
+    <string name="user_action_3" maxLength="41">User action 3</string>
+    <string name="user_action_4" maxLength="41">User action 4</string>
+    <string name="user_action_5" maxLength="41">User action 5</string>
+    <string name="user_action_6" maxLength="41">User action 6</string>
+    <string name="user_action_7" maxLength="41">User action 7</string>
+    <string name="user_action_8" maxLength="41">User action 8</string>
+    <string name="user_action_9" maxLength="41">User action 9</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">Kártya oldalának kiválasztása</string>
     <string name="card_side_question">Kérdés</string>
@@ -281,6 +291,8 @@
     <string name="bindings_already_bound">Már össze van kötve: %s</string>
     <!-- Advanced -->
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">Kísérleti</string>
+    <string name="readtext_deprecation_warn">AnkiDroid has introduced a better TTS mechanism which is compatible with other Anki clients and includes more voices and improvements to language playback!\n\nPlease upgrade as soon as possible, as this setting will be removed soon</string>
+    <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">Please upgrade to the new text to speech format</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">Fejlesztői beállítások</string>
     <string name="dev_options_enabled_pref" maxLength="41">Fejlesztői beállítások engedélyezése</string>

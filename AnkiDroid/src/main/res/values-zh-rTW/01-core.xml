@@ -59,15 +59,14 @@
     <!-- DeckPicker.kt -->
     <string name="expand">展開</string>
     <string name="collapse">收回</string>
-    <string name="study_more">繼續學習</string>
     <plurals name="reviewer_window_title">
-        <item quantity="other">還有%d分鐘</item>
+        <item quantity="other">剩下%d分鐘</item>
     </plurals>
     <plurals name="reviewer_window_title_hours_new">
-        <item quantity="other">剩餘 %1$d 小時 %2$d </item>
+        <item quantity="other">%1$d hours %2$d left</item>
     </plurals>
     <plurals name="reviewer_window_title_days_new">
-        <item quantity="other">剩餘 %1$d 天 %2$d </item>
+        <item quantity="other">%1$d days %2$d left</item>
     </plurals>
     <string name="no_cards_placeholder_title">牌組是空的</string>
     <string name="no_cards_placeholder_description">使用「+」符號\n
@@ -83,12 +82,14 @@
     <string name="ease_button_easy">簡單</string>
     <string name="menu_import">匯入</string>
     <string name="undo">復原</string>
+    <string name="redo">Redo</string>
     <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in Reviewer. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)">復原筆觸</string>
     <string name="move_all_to_deck">全部移動到牌組</string>
     <string name="unbury">取消暫時隱藏</string>
     <string name="rename_deck">重新命名牌組</string>
     <string name="create_shortcut">建立捷徑</string>
     <string name="browse_cards">瀏覽卡片</string>
+    <string name="edit_deck_description" comment="edit the deck description">Edit description</string>
     <string name="menu_add" comment="A generic add button. Please inform us if you need more specific strings">新增</string>
     <string name="menu_add_note">新增筆記</string>
     <string name="menu_my_account" comment="Label of the window in which the user should enter their account. This text can\'t be found in AnkiDroid directly.">同步帳戶</string>
@@ -102,14 +103,6 @@
     <string name="menu_delete_note">刪除筆記</string>
     <string name="menu_flag">標記</string>
     <string name="menu_flag_card">標記卡片</string>
-    <string name="menu_flag_card_zero">無標記</string>
-    <string name="menu_flag_card_one">紅色標記</string>
-    <string name="menu_flag_card_two">橙色標記</string>
-    <string name="menu_flag_card_three">綠色標記</string>
-    <string name="menu_flag_card_four">藍色標記</string>
-    <string name="menu_flag_card_five">粉紅色標記</string>
-    <string name="menu_flag_card_six">藍綠色標記</string>
-    <string name="menu_flag_card_seven">紫色標記</string>
     <string name="menu_edit_tags">編輯標籤</string>
     <string name="delete_note_message">真的要刪除這個筆記跟它的卡片嗎？\n%s</string>
     <string name="menu_search">在%1$s中查詢</string>
@@ -131,14 +124,11 @@
     <string name="empty_filtered_deck">清除已篩選牌組中&#8230;</string>
     <string name="custom_study_deck_name">自訂學程</string>
     <string name="custom_study_deck_exists">請先重新命名現有的「自訂學習」牌組。</string>
-    <string name="empty_deck">這個牌組是空的</string>
     <string name="search_deck" comment="Deck search for selecting it">牌組搜尋</string>
+    <string name="empty_deck">這個牌組是空的</string>
     <string name="search_for_download_deck" comment="Deck search value for downloading deck">牌組搜尋</string>
     <string name="invalid_deck_name">無效牌組名稱</string>
-    <string name="studyoptions_empty">這個牌組是空的。按下 + 按鈕增加新內容。</string>
-    <string name="studyoptions_limit_reached">已達每日學習上限</string>
-    <string name="studyoptions_empty_schedule">沒有預訂的卡片要學習</string>
-    <string name="studyoptions_congrats_finished">恭喜！你完成今天的進度了。</string>
+    <string name="studyoptions_congrats_finished">Congratulations! You have finished for now.</string>
     <string name="studyoptions_no_cards_due">尚無到期的卡片。</string>
     <string name="sd_card_not_mounted">儲存裝置未掛載</string>
     <string name="button_sync" comment="Text of the sync button">同步</string>
@@ -147,8 +137,7 @@
     <string name="continue_sync" tools:ignore="UnusedResources">繼續同步</string>
     <string name="sync_cancelled" tools:ignore="UnusedResources">同步已取消</string>
     <string name="sync_cancel_message" tools:ignore="UnusedResources">正在取消&#8230;\n這可能需要一點時間。</string>
-    <string name="export">匯出</string>
-    <string name="export_collection">匯出集合</string>
+    <string name="syncing_media">Syncing media</string>
     <string name="export_deck">匯出牌組</string>
     <string name="nothing">無</string>
     <!-- Card template editor -->
@@ -167,7 +156,6 @@
     <plurals name="card_template_editor_confirm_delete">
         <item quantity="other">刪除卡片種類 \"%2$s\"，和它的 %1$d 張卡片？</item>
     </plurals>
-    <string name="invalid_template">無法生成卡片</string>
     <string name="card_template_editor_would_delete_note">移除這個卡片種類將會導致一或多個筆記被刪除。請先新增並儲存一個卡片種類。</string>
     <string name="card_template_editor_save_error">無法儲存卡片模板變更：%s</string>
     <string name="template_for_current_card_deleted">當前卡片的卡片類型已被刪除。</string>
@@ -235,6 +223,7 @@
     <string name="migration__resume_after_failed_dialog__button_positive">重新遷移</string>
     <string name="directory_inaccessible_after_uninstall" comment="Dialog title if AnkiDroid can\'t access the collection once the app is installed">無法存取收藏</string>
     <string name="directory_inaccessible_after_uninstall_summary" comment="the parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">We are unable to access your collection after AnkiDroid is uninstalled due to a change in Play Store Policy\n\nYour data is safe and can be restored. It is located at\n%s\n\nSelect an option below to restore:</string>
+    <string name="directory_revoked_after_inactivity" comment="the first parameter is WRITE_EXTERNAL_STORAGE the second parameter is the path to the AnkiDroid folder. Typically /storage/emulated/0/AnkiDroid">Android has removed AnkiDroid\'s %1$s permission due to app inactivity.\n\nYour data is safe and can be restored. It is located at\n%2$s\n\nSelect an option below to restore:</string>
     <string name="restore_data_from_ankiweb">從 AnkiWeb 回復 (推薦)</string>
     <string name="install_non_play_store_ankidroid_recommended">Restore folder access (recommended)</string>
     <string name="install_non_play_store_ankidroid">Restore folder access (advanced)</string>
@@ -246,4 +235,6 @@
     <string name="storage_access_title">Storage access</string>
     <string name="storage_access_summary">Saves your collection in a safe place that will not be deleted if the app is uninstalled</string>
     <string name="all_files_access_title" comment="Name of the “All files access” permission from Android 10 and after">All files access</string>
+    <string name="image_occlusion">Image Occlusion</string>
+    <string name="remove_account" comment="open a website to start the deletion of an AnkiWeb account">Remove account</string>
 </resources>

@@ -46,9 +46,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- generic strings -->
     <string name="disabled">معطل</string>
-    <string name="pref_summary_seconds">%s ث</string>
-    <string name="pref_summary_minutes">%s د</string>
-    <string comment="Percentage value of a preference. %s represents the number to be replaced. Use \%% to represent a single percent sign (%)" name="pref_summary_percentage">%s\%%</string>
+    <plurals name="pref_summ_minutes">
+        <item quantity="zero">%d دقيقة</item>
+        <item quantity="one">%d دقيقة</item>
+        <item quantity="two">%d دقيقة</item>
+        <item quantity="few">%d دقائق</item>
+        <item quantity="many">%d دقيقة</item>
+        <item quantity="other">%d دقيقة</item>
+    </plurals>
+    <string name="pref_milliseconds">%s ms</string>
+    <!-- TODO: move to 20-search-preference so we can contribute upstream (searchpreference_no_results)-->
     <string name="pref_search_no_results">لا نتائج</string>
     <!-- preferences.xml categories-->
     <string name="pref_cat_general" comment="name of the general preference category" maxLength="41">عام</string>
@@ -60,7 +67,6 @@
     <string name="pref_cat_whiteboard" maxLength="41">السبورة</string>
     <string name="pref_cat_appearance" maxLength="41">المظهر</string>
     <string name="pref_cat_themes" maxLength="41">المظاهر</string>
-    <string name="pref_cat_fonts" maxLength="41">الخطوط</string>
     <string name="pref_cat_gestures" maxLength="41">الإيماءات</string>
     <string name="pref_cat_controls" maxLength="41">عناصر التحكم</string>
     <string name="pref_cat_advanced" maxLength="41">خيارات متقدمة</string>
@@ -113,6 +119,7 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">النقر في الوسط</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">النقر في أسفل اليسار</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">النقر في أسفل اليمين</string>
+    <string name="gestures_shake" maxLength="41">رج الجهاز</string>
     <string name="card_browser_enable_external_context_menu">قائمة \'%s\'</string>
     <string name="card_browser_enable_external_context_menu_summary">يفعل قائمة سياق \'%s\' عمومًا</string>
     <string name="double_scrolling_gap" maxLength="41">مضاعفة فجوة التمرير</string>
@@ -133,8 +140,8 @@
     <string name="sync_status_badge_summ">تغيير زر المزامنة المعروض عندما يكون من الممكن رفع التغييرات</string>
     <string name="metered_sync_title" maxLength="41">السماح بالمزامنة على الاتصالات المحدودة</string>
     <string name="metered_sync_summary">إذا كان معطلًا، سيتم إنذارك إذا حاولت المزامنة باتصال محدود</string>
-    <string name="backup_limits_frequency">Frequency</string>
-    <string name="backup_limits_lifetime">Lifetime</string>
+    <string name="backup_limits_frequency">الوتيرة</string>
+    <string name="backup_limits_lifetime">مدة الحفظ</string>
     <string name="app_theme" maxLength="41">السمة</string>
     <string name="day_theme" maxLength="41">سمة النهار</string>
     <string name="night_theme" maxLength="41">سمة الليل</string>
@@ -148,10 +155,7 @@
     <string name="notification_minimum_cards_due_vibrate" maxLength="41">اهتزاز</string>
     <string name="notification_minimum_cards_due_blink" maxLength="41">وميض الضوء</string>
     <string name="timeout_answer_text" maxLength="41">عرض الجواب تلقائيًا</string>
-    <string name="timeout_answer" maxLength="41">الإجابة بعد انتهاء المهلة</string>
-    <string name="timeout_answer_summ">إظهار الجواب تلقائيًا بدون تدخل المستخدم. تتضمن المهلة وقت تشغيل الملفات الصوتية تلقائيًا.</string>
-    <string name="timeout_answer_seconds" maxLength="41">مهلة إظهار الجواب</string>
-    <string name="timeout_question_seconds" maxLength="41">مهلة إظهار السؤال التالي</string>
+    <string name="timeout_answer_summ2">إظهار الجواب تلقائيًا بدون تدخل المستخدم. اضبط من خيارات الرزمة.</string>
     <string name="select_locale_title">حدد اللغة</string>
     <string name="software_render" maxLength="41">تعطيل عارض العتاد للبطاقات</string>
     <string name="software_render_summ">عرض العتاد أسرع لكنه قد يسبب مشاكل، خصوصًا على أندرويد 8/8.1. إذا لم تكن قادرًا على رؤية أقسام من واجهة مراجعة البطاقة، جرب هذا الخيار.</string>
@@ -164,8 +168,8 @@
     <string name="vertical_centering_summ">محاذاة محتوى البطاقات إلى الوسط عموديًا</string>
     <string name="pref_double_tap_time_interval" maxLength="41">الفاصل الزمني للنقر المزدوج (مللي ثانية)</string>
     <string name="pref_double_tap_time_interval_summary">سيتم تجاهل نقرة ثانية على أزرار الإجابة إذا لم يمر الوقت. يمنع هذا النقر المزدوج غير المقصود</string>
-    <string name="pref_show_answer_long_press" maxLength="41">Show answer long-press time (ms)</string>
-    <string name="pref_show_answer_long_press_summary">Minimum long-press time before the show answer button will register a touch. May reduce the chance of accidental extra button presses. Default is 0ms</string>
+    <string name="pref_show_answer_long_press_time" maxLength="41">Show answer long-press time</string>
+    <string name="pref_show_answer_long_press_time_summary">Minimum pressing time before the show answer button registers a touch.</string>
     <string name="show_estimates" maxLength="41">إظهار وقت الأزرار</string>
     <string name="show_estimates_summ">إظهار وقت المراجعة التالية على أزرار الإجابة</string>
     <string name="show_large_answer_buttons" maxLength="41">إظهار أزرار إجابة كبيرة</string>
@@ -174,20 +178,19 @@
     <string name="show_top_bar_summ">إظهار عدد البطاقات، والتأشير والتعليم في الشريط العلوي</string>
     <string name="show_progress" maxLength="41">إظهار المتبقي</string>
     <string name="show_progress_summ">إظهار عدد البطاقات المتبقية</string>
-    <string name="show_eta" maxLength="41">إظهار الوقت التقديري المتبقي للدراسة</string>
+    <string name="show_eta" maxLength="41">إظهار الوقت التقديري المتبقي</string>
     <string name="show_eta_summ">إظهار الوقت المتبقي</string>
     <string name="use_current" maxLength="41">رزمة البطاقات الجديدة</string>
     <string name="learn_cutoff" maxLength="41">حد التعلم المبكر</string>
     <string name="time_limit" maxLength="41">مهلة مربع الوقت</string>
-    <string name="new_timezone" maxLength="41">طريقة المعالجة الجديدة للمناطق الزمنية</string>
     <string name="day_offset_with_description" maxLength="41">بداية اليوم التالي (0 يعني منتصف الليل، 23 يعني الساعة 11 مساءً)</string>
     <plurals name="day_offset_summ" comment="%d is going to be replaced with the number of hours past midnight. It can be replaced if something else suits better the translation">
-        <item quantity="zero">%d hours past midnight</item>
-        <item quantity="one">%d hour past midnight</item>
-        <item quantity="two">%d hours past midnight</item>
-        <item quantity="few">%d hours past midnight</item>
-        <item quantity="many">%d hours past midnight</item>
-        <item quantity="other">%d hours past midnight</item>
+        <item quantity="zero">%d ساعة بعد منتصف الليل</item>
+        <item quantity="one">%d ساعة بعد منتصف الليل</item>
+        <item quantity="two">%d ساعة بعد منتصف الليل</item>
+        <item quantity="few">%d ساعت بعد منتصف الليل</item>
+        <item quantity="many">%d ساعت بعد منتصف الليل</item>
+        <item quantity="other">%d ساعة بعد منتصف الليل</item>
     </plurals>
     <string name="pref_keep_screen_on" maxLength="41">إبقاء الشاشة مضيئة</string>
     <string name="pref_keep_screen_on_summ">تعطيل مهلة الشاشة</string>
@@ -203,10 +206,9 @@
     <string name="reset">إعادة ضبط</string>
     <string name="thirdparty_apps_title" maxLength="41">تطبيقات الطرف الثالث التي تستخدم واجهة البرمجة</string>
     <string name="thirdparty_apps_summary">اطلع على قائمة تطبيقات تستخدم واجهة برمجة أنكيدرويد مثل القواميس، والأدوات.</string>
-    <string name="html_javascript_debugging" maxLength="41">تصحيح أخطاء HTML / جافا سكريبت</string>
-    <string name="html_javascript_debugging_summ">تمكين اتصالات عارض الويب البعيدة، وحفظ HTML البطاقة إلى مجلد أنكيدرويد</string>
     <!-- Appearance settings -->
     <string name="pref_cat_reviewer" maxLength="41">شاشة المراجعة</string>
+    <string name="show_deck_title" maxLength="41">إظهار عنوان المجموعة</string>
     <string name="accessibility" maxLength="41">إمكانية الوصول</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">لصق صور الحافظة كـ PNG</string>
@@ -228,12 +230,12 @@
     <!-- Key Bindings -->
     <string name="keyboard">لوحة المفاتيح</string>
     <string name="bluetooth">بلوتوث</string>
-    <string name="answer_buttons" maxLength="41">Answer buttons</string>
-    <string name="card" maxLength="41">Card</string>
-    <string name="note" maxLength="41">Note</string>
-    <string name="navigation" maxLength="41">Navigation</string>
-    <string name="media" maxLength="41">Media</string>
-    <string name="misc" maxLength="41">Misc</string>
+    <string name="answer_buttons" maxLength="41">أزرار الإجابة</string>
+    <string name="card" maxLength="41">بطاقة</string>
+    <string name="note" maxLength="41">ملحوظة</string>
+    <string name="navigation" maxLength="41">التنقل</string>
+    <string name="media" maxLength="41">الوسائط</string>
+    <string name="misc" maxLength="41">منوع</string>
     <!-- studyoptions -->
     <string name="studyoptions_limit_select_tags">اختيار وسوم</string>
     <!-- Deck configurations -->
@@ -246,16 +248,15 @@
     <string name="deck_conf_cram_reschedule" maxLength="41" comment="Title of the box labelled by deck_conf_cram_reschedule_summ">إعادة جدولة</string>
     <string name="deck_conf_cram_reschedule_summ">إعادة جدولة البطاقات بناءً على أجوبتي في هذه الرزمة</string>
     <string name="deck_conf_cram_filter_2_check">تفعيل الفلتر الثاني</string>
-    <string name="deck_conf_cram_steps" maxLength="41">خطوات مخصصة (بالدقيقة)</string>
     <string name="deck_conf_cram_steps_summ" maxLength="41">ضبط خطوات مخصصة</string>
+    <string name="deck_conf_cram_preview_delays" maxLength="41">فواصل المعاينة</string>
+    <string name="deck_conf_cram_preview_delays_summ">الفواصل بالثواني. 0 يعيد البطاقة لرزمتها الأصلية.</string>
     <!-- analytics options -->
     <string name="analytics_dialog_title">ساعد في تحسين أنكيدرويد!</string>
     <string name="analytics_title" maxLength="41">مشاركة بيانات استخدام الميزات</string>
     <string name="analytics_summ">تستطيع المساهمة في أنكيدرويد من خلال مساعدة فريق التطوير على معرفة الميزات التي يستخدمها الناس</string>
     <string name="note_editor_replace_newlines" maxLength="41">استبدال السطور الجديدة بـ HTML</string>
     <string name="note_editor_replace_newlines_summ">في محرر الملحوظات، حوّل أي ظهور لـ &lt;br&gt; إلى سطور جديدة عند تحرير بطاقة.</string>
-    <string name="no_code_formatting" maxLength="41">تنسيق الإجابة الكتابية البسيطة</string>
-    <string name="no_code_formatting_summ">يُصلِح وجود ‘􏿾’ في نتائِج الأجابة المكتوبة</string>
     <string name="type_in_answer_focus" maxLength="41">التركيز على «أدخل الإجابة»</string>
     <string name="type_in_answer_focus_summ">التركيز التلقائي على حقل «أدخل الإجابة» في شاشة المراجعة</string>
     <!-- About -->
@@ -272,6 +273,19 @@
     <string name="binding_add_key">إضافة مفتاح</string>
     <string name="binding_replace_key">استبدال المفتاح</string>
     <string name="key_picker_default_press_key">ضغط مفتاح</string>
+    <string name="binding_add_axis">إضافة وحدة عصا التحكم أو جهاز التحرك/حركة</string>
+    <string name="axis_picker_move_joystick">نقل وحدة عصا التحكم أو جهاز التحرك/حركة</string>
+    <string name="user_actions" maxLength="41">إجراءات المستخدم</string>
+    <string name="user_actions_summary" maxLength="41">Trigger JavaScript from the review screen</string>
+    <string name="user_action_1" maxLength="41">إجراء رقم 1</string>
+    <string name="user_action_2" maxLength="41">إجراء رقم 2</string>
+    <string name="user_action_3" maxLength="41">إجراء رقم 3</string>
+    <string name="user_action_4" maxLength="41">إجراء رقم 4</string>
+    <string name="user_action_5" maxLength="41">إجراء رقم 5</string>
+    <string name="user_action_6" maxLength="41">إجراء رقم 6</string>
+    <string name="user_action_7" maxLength="41">إجراء رقم 7</string>
+    <string name="user_action_8" maxLength="41">إجراء رقم 8</string>
+    <string name="user_action_9" maxLength="41">إجراء رقم 9</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">حدد جانب بطاقة</string>
     <string name="card_side_question">سؤال</string>
@@ -285,6 +299,8 @@
     <string name="bindings_already_bound">مربوط بالفعل بـ %s</string>
     <!-- Advanced -->
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">تجريبي</string>
+    <string name="readtext_deprecation_warn">يوفر أنكيدرويد الآن طريقة جديدة لتحويل نص إلى كلام متوافقة مع برامج أنكي الأخرى وتتضمن أصوات أكثر وتحسينات للتشغيل!\n\nيرجى الترقية بأسرع وقت ممكن لأن هذا الخيار سيزال قريبًا</string>
+    <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">يرجى التحديث إلى الصيغة الجديدة لتحويل النص إلى كلام</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">خيارات المطور</string>
     <string name="dev_options_enabled_pref" maxLength="41">تفعيل خيارات المطور</string>

@@ -17,13 +17,18 @@
 package com.ichi2.anki
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.core.os.bundleOf
 import com.ichi2.async.saveModel
 import com.ichi2.compat.CompatHelper.Companion.compat
 import com.ichi2.compat.CompatHelper.Companion.getSerializableCompat
+import com.ichi2.libanki.Collection
 import com.ichi2.libanki.NoteTypeId
 import com.ichi2.libanki.NotetypeJson
+import com.ichi2.utils.KotlinCleanup
 import org.json.JSONObject
 import timber.log.Timber
 import java.io.ByteArrayInputStream
@@ -32,22 +37,23 @@ import java.io.File
 import java.io.IOException
 
 /** A wrapper for a notetype in JSON format with helpers for editing the notetype. */
+@KotlinCleanup("_templateChanges -> use templateChanges")
 class CardTemplateNotetype(val notetype: NotetypeJson) {
     enum class ChangeType {
         ADD, DELETE
     }
 
-    private var mTemplateChanges = ArrayList<Array<Any>>()
+    private var _templateChanges = ArrayList<Array<Any>>()
     var editedModelFileName: String? = null
 
     fun toBundle(): Bundle = bundleOf(
         INTENT_MODEL_FILENAME to saveTempModel(AnkiDroidApp.instance.applicationContext, notetype),
-        "mTemplateChanges" to mTemplateChanges
+        "mTemplateChanges" to _templateChanges
     )
 
     private fun loadTemplateChanges(bundle: Bundle) {
         try {
-            mTemplateChanges = bundle.getSerializableCompat("mTemplateChanges")!!
+            _templateChanges = bundle.getSerializableCompat("mTemplateChanges")!!
         } catch (e: ClassCastException) {
             Timber.e(e, "Unexpected cast failure")
         }
@@ -85,11 +91,12 @@ class CardTemplateNotetype(val notetype: NotetypeJson) {
         addTemplateChange(ChangeType.DELETE, ord)
     }
 
-    fun saveToDatabase(collection: com.ichi2.libanki.Collection) {
+    context(Collection)
+    fun saveToDatabase() {
         Timber.d("saveToDatabase() called")
         dumpChanges()
         clearTempModelFiles()
-        return saveModel(collection, notetype, adjustedTemplateChanges)
+        return saveModel(notetype, adjustedTemplateChanges)
     }
 
     /**
@@ -137,17 +144,17 @@ class CardTemplateNotetype(val notetype: NotetypeJson) {
         Timber.d("getDeleteDbOrds()")
 
         // array containing the original / db-relative ordinals for all pending deletes plus the proposed one
-        val deletedDbOrds = ArrayList<Int>(mTemplateChanges.size)
+        val deletedDbOrds = ArrayList<Int>(_templateChanges.size)
 
         // For each entry in the changes list - and the proposed delete - scan for deletes to get original ordinal
-        for (i in 0..mTemplateChanges.size) {
+        for (i in 0.._templateChanges.size) {
             var ordinalAdjustment = 0
 
             // We need an initializer. Though proposed change is checked last, it's a reasonable default initializer.
             var currentChange = arrayOf<Any>(ord, ChangeType.DELETE)
-            if (i < mTemplateChanges.size) {
+            if (i < _templateChanges.size) {
                 // Until we exhaust the pending change list we will use them
-                currentChange = mTemplateChanges[i]
+                currentChange = _templateChanges[i]
             }
 
             // If the current pending change isn't a delete, it is unimportant here
@@ -157,7 +164,7 @@ class CardTemplateNotetype(val notetype: NotetypeJson) {
 
             // If it is a delete, scan previous deletes and shift as necessary for original ord
             for (j in 0 until i) {
-                val previousChange = mTemplateChanges[j]
+                val previousChange = _templateChanges[j]
 
                 // Is previous change a delete? Lower ordinal than current change?
                 if (previousChange[1] === ChangeType.DELETE && previousChange[0] as Int <= currentChange[0] as Int) {
@@ -182,8 +189,8 @@ class CardTemplateNotetype(val notetype: NotetypeJson) {
             return
         }
         val adjustedChanges = adjustedTemplateChanges
-        for (i in mTemplateChanges.indices) {
-            val change = mTemplateChanges[i]
+        for (i in _templateChanges.indices) {
+            val change = _templateChanges[i]
             val adjustedChange = adjustedChanges[i]
             Timber.d("dumpChanges() Change %s is ord/type %s/%s", i, change[0], change[1])
             Timber.d(
@@ -197,7 +204,7 @@ class CardTemplateNotetype(val notetype: NotetypeJson) {
 
     val templateChanges: ArrayList<Array<Any>>
         get() {
-            return mTemplateChanges
+            return _templateChanges
         }
 
     /**
@@ -247,8 +254,8 @@ class CardTemplateNotetype(val notetype: NotetypeJson) {
         var postChange = false
         var ordinalAdjustment = 0
         var i = 0
-        while (i < mTemplateChanges.size) {
-            val change = mTemplateChanges[i]
+        while (i < _templateChanges.size) {
+            val change = _templateChanges[i]
             var ordinal = change[0] as Int
             val changeType = change[1] as ChangeType
             Timber.d("compactTemplateChanges() examining change entry %s / %s", ordinal, changeType)
@@ -259,7 +266,7 @@ class CardTemplateNotetype(val notetype: NotetypeJson) {
                     Timber.d("compactTemplateChanges() found our entry at index %s", i)
                     // Remove this entry to start compaction, then fix up the loop counter since we altered size
                     postChange = true
-                    mTemplateChanges.removeAt(i)
+                    _templateChanges.removeAt(i)
                     i--
                 }
                 i++
@@ -436,6 +443,71 @@ class CardTemplateNotetype(val notetype: NotetypeJson) {
                 changesIndex
             )
             return -1
+        }
+    }
+}
+
+/**
+ * Temporary file containing a [NotetypeJson]
+ *
+ * Useful for adding a [NotetypeJson] into a [Bundle], like when using [Intent.putExtra]
+ * for sending an object to another activity.
+ *
+ * The notetype is written into a file because there is a
+ * [limit of 1MB](https://developer.android.com/reference/android/os/TransactionTooLargeException.html)
+ * for [Bundle] transactions, and notetypes can be bigger than that (#5600).
+ */
+class NotetypeFile(path: String) : File(path), Parcelable {
+
+    /**
+     * @param directory where the file will be saved
+     * @param notetype to be stored
+     */
+    constructor(directory: File, notetype: NotetypeJson) : this(createTempFile("notetype", ".tmp", directory).absolutePath) {
+        try {
+            ByteArrayInputStream(notetype.toString().toByteArray()).use { source ->
+                compat.copyFile(source, this.absolutePath)
+            }
+        } catch (ioe: IOException) {
+            Timber.w(ioe, "Unable to create+write temp file for model")
+        }
+    }
+
+    /**
+     * @param context for getting the cache directory
+     * @param notetype to be stored
+     */
+    constructor(context: Context, notetype: NotetypeJson) : this(context.cacheDir, notetype)
+
+    fun getNotetype(): NotetypeJson {
+        return try {
+            ByteArrayOutputStream().use { target ->
+                compat.copyFile(absolutePath, target)
+                NotetypeJson(target.toString())
+            }
+        } catch (e: IOException) {
+            Timber.e(e, "Unable to read+parse tempModel from file %s", absolutePath)
+            throw e
+        }
+    }
+
+    override fun describeContents(): Int = 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeString(path)
+    }
+
+    companion object {
+        @JvmField
+        @Suppress("unused")
+        val CREATOR = object : Parcelable.Creator<NotetypeFile> {
+            override fun createFromParcel(source: Parcel?): NotetypeFile {
+                return NotetypeFile(source!!.readString()!!)
+            }
+
+            override fun newArray(size: Int): Array<NotetypeFile> {
+                return arrayOf()
+            }
         }
     }
 }

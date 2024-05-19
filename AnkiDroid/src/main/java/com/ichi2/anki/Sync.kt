@@ -16,16 +16,18 @@
 
 package com.ichi2.anki
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import anki.sync.SyncAuth
 import anki.sync.SyncCollectionResponse
 import anki.sync.syncAuth
-import com.ichi2.anim.ActivityTransitionAnimation
+import com.google.android.material.snackbar.Snackbar
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.dialogs.DialogHandlerMessage
@@ -33,6 +35,7 @@ import com.ichi2.anki.dialogs.SyncErrorDialog
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.servicelayer.ScopedStorageService
 import com.ichi2.anki.snackbar.showSnackbar
+import com.ichi2.anki.worker.SyncMediaWorker
 import com.ichi2.async.AsyncOperation
 import com.ichi2.libanki.createBackup
 import com.ichi2.libanki.fullUploadOrDownload
@@ -40,11 +43,16 @@ import com.ichi2.libanki.syncCollection
 import com.ichi2.libanki.syncLogin
 import com.ichi2.libanki.utils.TimeManager
 import com.ichi2.preferences.VersatileTextWithASwitchPreference
-import com.ichi2.utils.*
+import com.ichi2.utils.NetworkUtils
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.ankiweb.rsdroid.Backend
+import net.ankiweb.rsdroid.exceptions.BackendInterruptedException
 import net.ankiweb.rsdroid.exceptions.BackendSyncException
 import timber.log.Timber
 
@@ -152,15 +160,22 @@ fun DeckPicker.handleNewSync(
             updateLogin(baseContext, "", "")
             throw exc
         }
+        withCol { notetypes._clear_cache() }
+        setLastSyncTimeToNow()
         refreshState()
     }
 }
 
-fun MyAccount.handleNewLogin(username: String, password: String) {
+fun MyAccount.handleNewLogin(username: String, password: String, resultLauncher: ActivityResultLauncher<String>) {
     val endpoint = getEndpoint(this)
     launchCatchingTask {
         val auth = try {
-            withProgress({}, onCancel = ::cancelSync) {
+            withProgress(
+                extractProgress = {
+                    text = getString(R.string.sign_in)
+                },
+                onCancel = ::cancelSync
+            ) {
                 withCol {
                     syncLogin(username, password, endpoint)
                 }
@@ -171,7 +186,9 @@ fun MyAccount.handleNewLogin(username: String, password: String) {
             throw exc
         }
         updateLogin(baseContext, username, auth.hkey)
-        finishWithAnimation(ActivityTransitionAnimation.Direction.FADE)
+        setResult(RESULT_OK)
+        MyAccount.checkNotificationPermission(this@handleNewLogin, resultLauncher)
+        finish()
     }
 }
 
@@ -183,7 +200,7 @@ private fun updateLogin(context: Context, username: String, hkey: String?) {
     }
 }
 
-private fun cancelSync(backend: Backend) {
+fun cancelSync(backend: Backend) {
     backend.setWantsAbort()
     backend.abortSync()
 }
@@ -193,21 +210,26 @@ private suspend fun handleNormalSync(
     auth: SyncAuth,
     syncMedia: Boolean
 ) {
+    var auth2 = auth
     val output = deckPicker.withProgress(
         extractProgress = {
             if (progress.hasNormalSync()) {
                 text = progress.normalSync.run { "$added\n$removed" }
             }
         },
-        onCancel = ::cancelSync
+        onCancel = ::cancelSync,
+        manualCancelButton = R.string.dialog_cancel
     ) {
-        withCol { syncCollection(auth, media = syncMedia) }
+        withCol {
+            syncCollection(auth2, media = false) // media is synced by SyncMediaWorker
+        }
     }
 
     if (output.hasNewEndpoint()) {
         deckPicker.sharedPrefs().edit {
             putString(SyncPreferences.CURRENT_SYNC_URI, output.newEndpoint)
         }
+        auth2 = syncAuth { this.hkey = auth.hkey; endpoint = output.newEndpoint }
     }
     val mediaUsn = if (syncMedia) { output.serverMediaUsn } else { null }
 
@@ -219,16 +241,16 @@ private suspend fun handleNormalSync(
             deckPicker.showSyncLogMessage(R.string.sync_database_acknowledge, output.serverMessage)
             deckPicker.refreshState()
             if (syncMedia) {
-                monitorMediaSync(deckPicker)
+                SyncMediaWorker.start(deckPicker, auth2)
             }
         }
 
         SyncCollectionResponse.ChangesRequired.FULL_DOWNLOAD -> {
-            handleDownload(deckPicker, auth, mediaUsn)
+            handleDownload(deckPicker, auth2, mediaUsn)
         }
 
         SyncCollectionResponse.ChangesRequired.FULL_UPLOAD -> {
-            handleUpload(deckPicker, auth, mediaUsn)
+            handleUpload(deckPicker, auth2, mediaUsn)
         }
 
         SyncCollectionResponse.ChangesRequired.FULL_SYNC -> {
@@ -277,12 +299,12 @@ private suspend fun handleDownload(
         }
         deckPicker.refreshState()
         if (mediaUsn != null) {
-            monitorMediaSync(deckPicker)
+            SyncMediaWorker.start(deckPicker, auth)
         }
     }
 
     Timber.i("Full Download Completed")
-    deckPicker.showSyncLogMessage(R.string.backup_full_sync_from_server, "")
+    deckPicker.showSyncLogMessage(R.string.backup_one_way_sync_from_server, "")
 }
 
 private suspend fun handleUpload(
@@ -304,17 +326,14 @@ private suspend fun handleUpload(
         }
         deckPicker.refreshState()
         if (mediaUsn != null) {
-            monitorMediaSync(deckPicker)
+            SyncMediaWorker.start(deckPicker, auth)
         }
     }
     Timber.i("Full Upload Completed")
     deckPicker.showSyncLogMessage(R.string.sync_log_uploading_message, "")
 }
 
-// TODO: this needs a dedicated UI for media syncing, and needs to expose
-// a way to interrupt the sync
-
-private fun cancelMediaSync(backend: Backend) {
+fun cancelMediaSync(backend: Backend) {
     backend.setWantsAbort()
     backend.abortMediaSync()
 }
@@ -333,37 +352,46 @@ fun DeckPicker.shouldFetchMedia(preferences: SharedPreferences): Boolean {
         (shouldFetchMedia == onlyIfUnmetered && !NetworkUtils.isActiveNetworkMetered())
 }
 
-private suspend fun monitorMediaSync(
+suspend fun monitorMediaSync(
     deckPicker: DeckPicker
 ) {
     val backend = CollectionManager.getBackend()
-    // TODO: show this in a way that is clear it can be continued in background,
-    // but also warn user that media files will not be available until it completes.
-    // TODO: provide a way for users to abort later, and see it's still going
-    val dialog = AlertDialog.Builder(deckPicker)
-        .setTitle(TR.syncMediaLogTitle())
-        .setMessage("")
-        .setPositiveButton("Background") { _, _ -> }
-        .setOnCancelListener { cancelMediaSync(backend) }
-        .show()
+    val scope = CoroutineScope(Dispatchers.IO)
 
-    deckPicker.launchCatchingTask {
+    val dialog = withContext(Dispatchers.Main) {
+        AlertDialog.Builder(deckPicker)
+            .setTitle(TR.syncMediaLogTitle())
+            .setMessage("")
+            .setPositiveButton(R.string.dialog_continue) { _, _ ->
+                scope.cancel()
+            }
+            .setNegativeButton(R.string.dialog_cancel) { _, _ ->
+                cancelMediaSync(backend)
+            }
+            .show()
+    }
+
+    fun showMessage(msg: String) = deckPicker.showSnackbar(msg, Snackbar.LENGTH_SHORT)
+
+    scope.launch {
         try {
             while (true) {
                 // this will throw if the sync exited with an error
-                val resp = withContext(Dispatchers.IO) {
-                    CollectionManager.getBackend().mediaSyncStatus()
-                }
+                val resp = backend.mediaSyncStatus()
                 if (!resp.active) {
-                    deckPicker.onMediaSyncCompleted(SyncCompletion(isSuccess = true))
-                    return@launchCatchingTask
+                    break
                 }
-                val text = resp.progress.run { "\n$added\n$removed\n$checked" }
+                val text = resp.progress.run { "$added\n$removed\n$checked" }
                 dialog.setMessage(text)
                 delay(100)
             }
-        } catch (exc: Exception) {
-            deckPicker.onMediaSyncCompleted(SyncCompletion(isSuccess = false))
+            showMessage(TR.syncMediaComplete())
+        } catch (_: BackendInterruptedException) {
+            showMessage(TR.syncMediaAborted())
+        } catch (_: CancellationException) {
+            // do nothing
+        } catch (_: Exception) {
+            showMessage(TR.syncMediaFailed())
         } finally {
             dialog.dismiss()
         }
@@ -397,7 +425,7 @@ class MigrateStorageOnSyncSuccess(res: Resources) : AsyncOperation() {
  * @param messageResource String resource for message
  */
 fun DeckPicker.showSyncLogMessage(@StringRes messageResource: Int, syncMessage: String?) {
-    if (mActivityPaused) {
+    if (activityPaused) {
         val res = AnkiDroidApp.appResources
         showSimpleNotification(
             res.getString(R.string.app_name),
@@ -411,6 +439,12 @@ fun DeckPicker.showSyncLogMessage(@StringRes messageResource: Int, syncMessage: 
             val res = AnkiDroidApp.appResources
             showSimpleMessageDialog(title = res.getString(messageResource), message = syncMessage)
         }
+    }
+}
+
+fun Context.setLastSyncTimeToNow() {
+    sharedPrefs().edit {
+        putLong("lastSyncTime", TimeManager.time.intTimeMS())
     }
 }
 

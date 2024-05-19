@@ -21,7 +21,6 @@ import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -32,50 +31,51 @@ import android.os.Parcelable
 import android.text.SpannableString
 import android.text.style.UnderlineSpan
 import android.view.*
-import android.webkit.JavascriptInterface
+import android.webkit.WebView
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
-import androidx.appcompat.widget.TooltipCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.MenuItemCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import anki.frontend.SetSchedulingStatesRequest
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
-import com.ichi2.anim.ActivityTransitionAnimation
 import com.ichi2.anim.ActivityTransitionAnimation.getInverseTransition
-import com.ichi2.anki.AnkiDroidJsAPIConstants.RESET_PROGRESS
-import com.ichi2.anki.AnkiDroidJsAPIConstants.SET_CARD_DUE
-import com.ichi2.anki.AnkiDroidJsAPIConstants.ankiJsErrorCodeDefault
-import com.ichi2.anki.AnkiDroidJsAPIConstants.ankiJsErrorCodeSetDue
+import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.Whiteboard.Companion.createInstance
 import com.ichi2.anki.Whiteboard.OnPaintColorChangeListener
 import com.ichi2.anki.cardviewer.Gesture
 import com.ichi2.anki.cardviewer.ViewerCommand
-import com.ichi2.anki.dialogs.ConfirmationDialog
-import com.ichi2.anki.dialogs.RescheduleDialog.Companion.rescheduleSingleCard
-import com.ichi2.anki.multimediacard.AudioView
-import com.ichi2.anki.multimediacard.AudioView.Companion.createRecorderInstance
+import com.ichi2.anki.pages.AnkiServer.Companion.ANKIDROID_JS_PREFIX
+import com.ichi2.anki.pages.AnkiServer.Companion.ANKI_PREFIX
+import com.ichi2.anki.pages.CardInfo.Companion.toIntent
+import com.ichi2.anki.pages.CardInfoDestination
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.reviewer.*
 import com.ichi2.anki.reviewer.AnswerButtons.Companion.getBackgroundColors
 import com.ichi2.anki.reviewer.AnswerButtons.Companion.getTextColors
-import com.ichi2.anki.reviewer.CardMarker.FlagDef
 import com.ichi2.anki.reviewer.FullScreenMode.Companion.fromPreference
 import com.ichi2.anki.reviewer.FullScreenMode.Companion.isFullScreenReview
+import com.ichi2.anki.scheduling.ForgetCardsDialog
+import com.ichi2.anki.scheduling.SetDueDateDialog
 import com.ichi2.anki.servicelayer.NoteService.isMarked
 import com.ichi2.anki.servicelayer.NoteService.toggleMark
-import com.ichi2.anki.servicelayer.rescheduleCards
-import com.ichi2.anki.servicelayer.resetCards
 import com.ichi2.anki.snackbar.showSnackbar
+import com.ichi2.anki.ui.internationalization.toSentenceCase
 import com.ichi2.anki.utils.remainingTime
-import com.ichi2.anki.workarounds.FirefoxSnackbarWorkaround.handledLaunchFromWebBrowser
 import com.ichi2.annotations.NeedsTest
+import com.ichi2.audio.AudioRecordingController
 import com.ichi2.audio.AudioRecordingController.Companion.generateTempAudioFile
+import com.ichi2.audio.AudioRecordingController.Companion.isAudioRecordingSaved
+import com.ichi2.audio.AudioRecordingController.Companion.isRecording
+import com.ichi2.audio.AudioRecordingController.Companion.setEditorStatus
+import com.ichi2.audio.AudioRecordingController.Companion.tempAudioPath
+import com.ichi2.audio.AudioRecordingController.RecordingState
 import com.ichi2.libanki.*
 import com.ichi2.libanki.Collection
 import com.ichi2.libanki.sched.Counts
@@ -84,36 +84,51 @@ import com.ichi2.libanki.utils.TimeManager
 import com.ichi2.themes.Themes
 import com.ichi2.themes.Themes.currentTheme
 import com.ichi2.utils.*
+import com.ichi2.utils.HandlerUtils.executeFunctionWithDelay
 import com.ichi2.utils.HandlerUtils.getDefaultLooper
 import com.ichi2.utils.Permissions.canRecordAudio
 import com.ichi2.utils.ViewGroupUtils.setRenderWorkaround
 import com.ichi2.widget.WidgetStatus.updateInBackground
 import timber.log.Timber
 import java.io.File
-import java.util.function.Consumer
 
+@Suppress("LeakingThis")
 @KotlinCleanup("too many to count")
+@NeedsTest("#14709: Timebox shouldn't appear instantly when the Reviewer is opened")
 open class Reviewer :
     AbstractFlashcardViewer(),
     ReviewerUi {
-    var queueState: CurrentQueueState? = null
-    val customSchedulingKey = TimeManager.time.intTimeMS().toString()
-    private var mHasDrawerSwipeConflicts = false
-    private var mShowWhiteboard = true
-    private var mPrefFullscreenReview = false
-    private lateinit var mColorPalette: LinearLayout
+    private var queueState: CurrentQueueState? = null
+    private val customSchedulingKey = TimeManager.time.intTimeMS().toString()
+    private var hasDrawerSwipeConflicts = false
+    private var showWhiteboard = true
+    private var prefFullscreenReview = false
+    private lateinit var colorPalette: LinearLayout
     private var toggleStylus = false
+
+    // A flag that determines if the SchedulingStates in CurrentQueueState are
+    // safe to persist in the database when answering a card. This is used to
+    // ensure that the custom JS scheduler has persisted its SchedulingStates
+    // back to the Reviewer before we save it to the database. If the custom
+    // scheduler has not been configured, then it is safe to immediately set
+    // this to true
+    //
+    // This flag should be set to false when we show the front of the card
+    // and only set to true once we know the custom scheduler has finished its
+    // execution, or set to true immediately if the custom scheduler has not
+    // been configured
+    private var statesMutated = false
 
     // TODO: Consider extracting to ViewModel
     // Card counts
-    private var mNewCount: SpannableString? = null
-    private var mLrnCount: SpannableString? = null
-    private var mRevCount: SpannableString? = null
-    private lateinit var mTextBarNew: TextView
-    private lateinit var mTextBarLearn: TextView
-    private lateinit var mTextBarReview: TextView
+    private var newCount: SpannableString? = null
+    private var lrnCount: SpannableString? = null
+    private var revCount: SpannableString? = null
+    private lateinit var textBarNew: TextView
+    private lateinit var textBarLearn: TextView
+    private lateinit var textBarReview: TextView
     private lateinit var answerTimer: AnswerTimer
-    private var mPrefHideDueCount = false
+    private var prefHideDueCount = false
 
     // Whiteboard
     var prefWhiteboard = false
@@ -124,45 +139,58 @@ open class Reviewer :
         protected set
 
     // Record Audio
-    /** File of the temporary mic record  */
-    @get:VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    var audioView: AudioView? = null
-        protected set
-    private var tempAudioPath: String? = null
+    private var isMicToolBarVisible = false
+
+    /** Controller for 'Check Pronunciation' feature */
+    private var audioRecordingController: AudioRecordingController? = null
+    private var isAudioUIInitialized = false
+    private lateinit var micToolBarLayer: LinearLayout
 
     // ETA
-    private var mEta = 0
-    private var mPrefShowETA = false
+    private var eta = 0
+    private var prefShowETA = false
 
     /** Handle Mark/Flag state of cards  */
-    private var mCardMarker: CardMarker? = null
+    @VisibleForTesting
+    internal var cardMarker: CardMarker? = null
 
     // Preferences from the collection
-    private var mShowRemainingCardCount = false
-    private val mActionButtons = ActionButtons(this)
-    private lateinit var mToolbar: Toolbar
+    private var showRemainingCardCount = false
+    private var stopTimerOnAnswer = false
+    private val actionButtons = ActionButtons()
+    private lateinit var toolbar: Toolbar
 
     @VisibleForTesting
-    protected val mProcessor = PeripheralKeymap(this, this)
-    private val mOnboarding = Onboarding.Reviewer(this)
+    protected val processor = PeripheralKeymap(this, this)
+    private val onboarding = Onboarding.Reviewer(this)
+
+    private val addNoteLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        FlashCardViewerResultCallback()
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (showedActivityFailedScreen(savedInstanceState)) {
             return
         }
         super.onCreate(savedInstanceState)
-        if (handledLaunchFromWebBrowser(intent, this)) {
-            this.setResult(RESULT_CANCELED)
-            finishWithAnimation(ActivityTransitionAnimation.Direction.END)
+        if (!ensureStoragePermissions()) {
             return
         }
-        mColorPalette = findViewById(R.id.whiteboard_editor)
+        colorPalette = findViewById(R.id.whiteboard_editor)
         answerTimer = AnswerTimer(findViewById(R.id.card_time))
-        mTextBarNew = findViewById(R.id.new_number)
-        mTextBarLearn = findViewById(R.id.learn_number)
-        mTextBarReview = findViewById(R.id.review_number)
-        mToolbar = findViewById(R.id.toolbar)
-
+        textBarNew = findViewById(R.id.new_number)
+        textBarLearn = findViewById(R.id.learn_number)
+        textBarReview = findViewById(R.id.review_number)
+        toolbar = findViewById(R.id.toolbar)
+        micToolBarLayer = findViewById(R.id.mic_tool_bar_layer)
+        if (sharedPrefs().getString("answerButtonPosition", "bottom") == "bottom") {
+            setNavigationBarColor(R.attr.showAnswerColor)
+        }
+        if (!sharedPrefs().getBoolean("showDeckTitle", false)) {
+            // avoid showing "AnkiDroid"
+            supportActionBar?.title = ""
+        }
         startLoadingCollection()
     }
 
@@ -172,19 +200,27 @@ open class Reviewer :
     }
 
     override fun onResume() {
-        answerTimer.resume()
-        super.onResume()
-        if (answerField != null) {
-            answerField!!.focusWithKeyboard()
+        when {
+            stopTimerOnAnswer && isDisplayingAnswer -> {}
+            else -> launchCatchingTask { answerTimer.resume() }
         }
+        super.onResume()
+        if (typeAnswer?.autoFocusEditText() == true) {
+            answerField?.focusWithKeyboard()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        server.stop()
     }
 
     protected val flagToDisplay: Int
         get() {
             return FlagToDisplay(
                 currentCard!!.userFlag(),
-                mActionButtons.findMenuItem(ActionButtons.RES_FLAG)?.isActionButton ?: true,
-                mPrefFullscreenReview
+                actionButtons.findMenuItem(ActionButtons.RES_FLAG)?.isActionButton ?: true,
+                prefFullscreenReview
             ).get()
         }
 
@@ -203,8 +239,8 @@ open class Reviewer :
         }
 
         // If we don't know: assume it's not shown
-        val shownAsToolbarButton = mActionButtons.findMenuItem(ActionButtons.RES_MARK)?.isActionButton == true
-        return !shownAsToolbarButton || mPrefFullscreenReview
+        val shownAsToolbarButton = actionButtons.findMenuItem(ActionButtons.RES_MARK)?.isActionButton == true
+        return !shownAsToolbarButton || prefFullscreenReview
     }
 
     protected open fun onMark(card: Card?) {
@@ -212,7 +248,7 @@ open class Reviewer :
             return
         }
         launchCatchingTask {
-            toggleMark(card.note())
+            toggleMark(card.note(getColUnsafe), handler = this@Reviewer)
             refreshActionBar()
             onMarkChanged()
         }
@@ -222,17 +258,17 @@ open class Reviewer :
         if (currentCard == null) {
             return
         }
-        mCardMarker!!.displayMark(shouldDisplayMark())
+        cardMarker!!.displayMark(shouldDisplayMark())
     }
 
-    protected open fun onFlag(card: Card?, flag: Int) {
+    protected open fun onFlag(card: Card?, flag: Flag) {
         if (card == null) {
             return
         }
         launchCatchingTask {
-            card.setUserFlag(flag)
-            withCol {
-                setUserFlagForCards(listOf(card.id), flag)
+            card.setUserFlag(flag.code)
+            undoableOp(this@Reviewer) {
+                setUserFlagForCards(listOf(card.id), flag.code)
             }
             refreshActionBar()
             onFlagChanged()
@@ -243,7 +279,7 @@ open class Reviewer :
         if (currentCard == null) {
             return
         }
-        mCardMarker!!.displayFlag(flagToDisplay)
+        cardMarker!!.displayFlag(Flag.fromCode(flagToDisplay))
     }
 
     private fun selectDeckFromExtra() {
@@ -294,14 +330,21 @@ open class Reviewer :
             toggleStylus = MetaDB.getWhiteboardStylusState(this, parentDid)
             whiteboard!!.toggleStylus = toggleStylus
         }
-        launchCatchingTask { updateCardAndRedraw() }
+        launchCatchingTask {
+            withCol { startTimebox() }
+            updateCardAndRedraw()
+        }
         disableDrawerSwipeOnConflicts()
 
         // Set full screen/immersive mode if needed
-        if (mPrefFullscreenReview) {
+        if (prefFullscreenReview) {
             setFullScreen(this)
         }
         setRenderWorkaround(this)
+    }
+
+    fun redo() {
+        launchCatchingTask { redoAndShowSnackbar(ACTION_SNACKBAR_TIME) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -317,11 +360,15 @@ open class Reviewer :
             }
             R.id.action_undo -> {
                 Timber.i("Reviewer:: Undo button pressed")
-                if (mShowWhiteboard && whiteboard != null && !whiteboard!!.undoEmpty()) {
+                if (showWhiteboard && whiteboard != null && !whiteboard!!.undoEmpty()) {
                     whiteboard!!.undo()
                 } else {
                     undo()
                 }
+            }
+            R.id.action_redo -> {
+                Timber.i("Reviewer:: Redo button pressed")
+                redo()
             }
             R.id.action_reset_card_progress -> {
                 Timber.i("Reviewer:: Reset progress button pressed")
@@ -348,24 +395,12 @@ open class Reviewer :
                 Timber.i("Reviewer:: Edit note button pressed")
                 editCard()
             }
-            R.id.action_bury -> {
-                Timber.i("Reviewer:: Bury button pressed")
-                MenuItemCompat.getActionProvider(item)?.hasSubMenu()?.let { isAvailable ->
-                    if (!isAvailable) {
-                        Timber.d("Bury card due to no submenu")
-                        buryCard()
-                    }
-                } ?: Timber.w("Null ActionProvider for bury menu item in Reviewer!")
-            }
-            R.id.action_suspend -> {
-                Timber.i("Reviewer:: Suspend button pressed")
-                MenuItemCompat.getActionProvider(item)?.hasSubMenu()?.let { isAvailable ->
-                    if (!isAvailable) {
-                        Timber.d("Suspend card due to no submenu")
-                        suspendCard()
-                    }
-                } ?: Timber.w("Null ActionProvider for suspend menu item in Reviewer!")
-            }
+            R.id.action_bury_card -> buryCard()
+            R.id.action_bury_note -> buryNote()
+            R.id.action_suspend_card -> suspendCard()
+            R.id.action_suspend_note -> suspendNote()
+            R.id.action_reschedule_card -> showDueDateDialog()
+            R.id.action_reset_card_progress -> showResetCardDialog()
             R.id.action_delete -> {
                 Timber.i("Reviewer:: Delete note button pressed")
                 showDeleteNoteDialog()
@@ -391,8 +426,8 @@ open class Reviewer :
                 clearWhiteboard()
             }
             R.id.action_hide_whiteboard -> { // toggle whiteboard visibility
-                Timber.i("Reviewer:: Whiteboard visibility set to %b", !mShowWhiteboard)
-                setWhiteboardVisibility(!mShowWhiteboard)
+                Timber.i("Reviewer:: Whiteboard visibility set to %b", !showWhiteboard)
+                setWhiteboardVisibility(!showWhiteboard)
                 refreshActionBar()
             }
             R.id.action_toggle_stylus -> { // toggle stylus mode
@@ -419,40 +454,49 @@ open class Reviewer :
             }
             R.id.action_flag_zero -> {
                 Timber.i("Reviewer:: No flag")
-                onFlag(currentCard, CardMarker.FLAG_NONE)
+                onFlag(currentCard, Flag.NONE)
             }
             R.id.action_flag_one -> {
                 Timber.i("Reviewer:: Flag one")
-                onFlag(currentCard, CardMarker.FLAG_RED)
+                onFlag(currentCard, Flag.RED)
             }
             R.id.action_flag_two -> {
                 Timber.i("Reviewer:: Flag two")
-                onFlag(currentCard, CardMarker.FLAG_ORANGE)
+                onFlag(currentCard, Flag.ORANGE)
             }
             R.id.action_flag_three -> {
                 Timber.i("Reviewer:: Flag three")
-                onFlag(currentCard, CardMarker.FLAG_GREEN)
+                onFlag(currentCard, Flag.GREEN)
             }
             R.id.action_flag_four -> {
                 Timber.i("Reviewer:: Flag four")
-                onFlag(currentCard, CardMarker.FLAG_BLUE)
+                onFlag(currentCard, Flag.BLUE)
             }
             R.id.action_flag_five -> {
                 Timber.i("Reviewer:: Flag five")
-                onFlag(currentCard, CardMarker.FLAG_PINK)
+                onFlag(currentCard, Flag.PINK)
             }
             R.id.action_flag_six -> {
                 Timber.i("Reviewer:: Flag six")
-                onFlag(currentCard, CardMarker.FLAG_TURQUOISE)
+                onFlag(currentCard, Flag.TURQUOISE)
             }
             R.id.action_flag_seven -> {
                 Timber.i("Reviewer:: Flag seven")
-                onFlag(currentCard, CardMarker.FLAG_PURPLE)
+                onFlag(currentCard, Flag.PURPLE)
             }
             R.id.action_card_info -> {
                 Timber.i("Card Viewer:: Card Info")
                 openCardInfo()
             }
+            R.id.user_action_1 -> userAction(1)
+            R.id.user_action_2 -> userAction(2)
+            R.id.user_action_3 -> userAction(3)
+            R.id.user_action_4 -> userAction(4)
+            R.id.user_action_5 -> userAction(5)
+            R.id.user_action_6 -> userAction(6)
+            R.id.user_action_7 -> userAction(7)
+            R.id.user_action_8 -> userAction(8)
+            R.id.user_action_9 -> userAction(9)
             else -> {
                 return super.onOptionsItemSelected(item)
             }
@@ -468,7 +512,7 @@ open class Reviewer :
         setWhiteboardEnabledState(prefWhiteboard)
         setWhiteboardVisibility(prefWhiteboard)
         if (!prefWhiteboard) {
-            mColorPalette.visibility = View.GONE
+            colorPalette.visibility = View.GONE
         }
         refreshActionBar()
     }
@@ -480,10 +524,10 @@ open class Reviewer :
     }
 
     public override fun changeWhiteboardPenColor() {
-        if (mColorPalette.visibility == View.GONE) {
-            mColorPalette.visibility = View.VISIBLE
+        if (colorPalette.visibility == View.GONE) {
+            colorPalette.visibility = View.VISIBLE
         } else {
-            mColorPalette.visibility = View.GONE
+            colorPalette.visibility = View.GONE
         }
         updateWhiteboardEditorPosition()
     }
@@ -492,16 +536,29 @@ open class Reviewer :
         if (!openMicToolbar()) {
             return
         }
-
-        // COULD_BE_BETTER: this shows "Failed" if nothing was recorded
-        audioView!!.togglePlay()
+        if (isAudioRecordingSaved) {
+            audioRecordingController?.playPausePlayer()
+        } else {
+            return
+        }
     }
 
     override fun recordVoice() {
         if (!openMicToolbar()) {
             return
         }
-        audioView!!.toggleRecord()
+        audioRecordingController?.toggleToRecorder()
+    }
+
+    override fun saveRecording() {
+        if (!openMicToolbar()) {
+            return
+        }
+        if (isRecording) {
+            audioRecordingController?.toggleSave()
+        } else {
+            return
+        }
     }
 
     override fun updateForNewCard() {
@@ -509,6 +566,7 @@ open class Reviewer :
         if (prefWhiteboard && whiteboard != null) {
             whiteboard!!.clear()
         }
+        audioRecordingController?.updateUIForNewCard()
     }
 
     override fun unblockControls() {
@@ -518,16 +576,9 @@ open class Reviewer :
         super.unblockControls()
     }
 
-    public override fun blockControls(quick: Boolean) {
-        if (prefWhiteboard && whiteboard != null) {
-            whiteboard!!.isEnabled = false
-        }
-        super.blockControls(quick)
-    }
-
     override fun closeReviewer(result: Int) {
         // Stop the mic recording if still pending
-        audioView?.notifyStopRecord()
+        if (isRecording) audioRecordingController?.stopAndSaveRecording()
 
         // Remove the temporary audio file
         tempAudioPath?.let {
@@ -545,10 +596,10 @@ open class Reviewer :
      */
     @VisibleForTesting
     fun openMicToolbar(): Boolean {
-        if (audioView == null || audioView!!.visibility != View.VISIBLE) {
+        if (micToolBarLayer.visibility != View.VISIBLE || audioRecordingController == null) {
             openOrToggleMicToolbar()
         }
-        return audioView != null
+        return audioRecordingController != null
     }
 
     private fun openOrToggleMicToolbar() {
@@ -564,35 +615,34 @@ open class Reviewer :
     }
 
     private fun toggleMicToolBar() {
-        audioView?.let {
-            it.visibility = if (it.visibility != View.VISIBLE) View.VISIBLE else View.GONE
-            return
-        }
-        // Record mic tool bar does not exist yet
         tempAudioPath = generateTempAudioFile(this)
-        if (tempAudioPath == null) {
-            return
+        if (isMicToolBarVisible) {
+            micToolBarLayer.visibility = View.GONE
+        } else {
+            setEditorStatus(false)
+            if (!isAudioUIInitialized) {
+                try {
+                    audioRecordingController = AudioRecordingController()
+                    audioRecordingController?.createUI(
+                        this,
+                        micToolBarLayer,
+                        initialState = RecordingState.ImmediatePlayback.CLEARED,
+                        R.layout.activity_audio_recording_reviewer
+                    )
+                } catch (e: Exception) {
+                    Timber.w(e, "unable to add the audio recorder to toolbar")
+                    CrashReportService.sendExceptionReport(e, "Unable to create recorder tool bar")
+                    showThemedToast(
+                        this,
+                        this.getText(R.string.multimedia_editor_audio_view_create_failed).toString(),
+                        true
+                    )
+                }
+                isAudioUIInitialized = true
+            }
+            micToolBarLayer.visibility = View.VISIBLE
         }
-        audioView = createRecorderInstance(
-            this,
-            R.drawable.ic_play_arrow_white_24dp,
-            R.drawable.ic_pause_white_24dp,
-            R.drawable.ic_stop_white_24dp,
-            R.drawable.ic_rec,
-            R.drawable.ic_rec_stop,
-            tempAudioPath!!
-        )
-        if (audioView == null) {
-            tempAudioPath = null
-            return
-        }
-        val lp2 = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        audioView!!.layoutParams = lp2
-        val micToolBarLayer = findViewById<LinearLayout>(R.id.mic_tool_bar_layer)
-        micToolBarLayer.addView(audioView)
+        isMicToolBarVisible = !isMicToolBarVisible
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -605,33 +655,14 @@ open class Reviewer :
         }
     }
 
-    private fun showRescheduleCardDialog() {
-        val runnable = Consumer { days: Int ->
-            val cardIds = listOf(currentCard!!.id)
-            launchCatchingTask {
-                rescheduleCards(cardIds, days)
-            }
-        }
-        val dialog = rescheduleSingleCard(resources, currentCard!!, runnable)
+    private fun showDueDateDialog() {
+        val dialog = SetDueDateDialog.newInstance(listOf(currentCardId!!))
         showDialogFragment(dialog)
     }
 
     private fun showResetCardDialog() {
-        // Show confirmation dialog before resetting card progress
         Timber.i("showResetCardDialog() Reset progress button pressed")
-        // Show confirmation dialog before resetting card progress
-        val dialog = ConfirmationDialog()
-        val title = resources.getString(R.string.reset_card_dialog_title)
-        val message = resources.getString(R.string.reset_card_dialog_message)
-        dialog.setArgs(title, message)
-        val confirm = Runnable {
-            Timber.i("NoteEditor:: ResetProgress button pressed")
-            val cardIds = listOf(currentCard!!.id)
-            launchCatchingTask {
-                resetCards(cardIds)
-            }
-        }
-        dialog.setConfirm(confirm)
+        val dialog = ForgetCardsDialog.newInstance(listOf(currentCardId!!))
         showDialogFragment(dialog)
     }
 
@@ -641,7 +672,7 @@ open class Reviewer :
         val animation = getAnimationTransitionFromGesture(fromGesture)
         intent.putExtra(NoteEditor.EXTRA_CALLER, NoteEditor.CALLER_REVIEWER_ADD)
         intent.putExtra(FINISH_ANIMATION_EXTRA, getInverseTransition(animation) as Parcelable)
-        startActivityForResultWithAnimation(intent, ADD_NOTE, animation)
+        addNoteLauncher.launch(intent)
     }
 
     @NeedsTest("Starting animation from swipe is inverse to the finishing one")
@@ -650,7 +681,7 @@ open class Reviewer :
             showSnackbar(getString(R.string.multimedia_editor_something_wrong), Snackbar.LENGTH_SHORT)
             return
         }
-        val intent = com.ichi2.anki.pages.CardInfo.getIntent(this, currentCard!!.id)
+        val intent = CardInfoDestination(currentCard!!.id).toIntent(this)
         val animation = getAnimationTransitionFromGesture(fromGesture)
         intent.putExtra(FINISH_ANIMATION_EXTRA, getInverseTransition(animation) as Parcelable)
         startActivityWithAnimation(intent, animation)
@@ -662,11 +693,12 @@ open class Reviewer :
         Timber.d("onCreateOptionsMenu()")
         // NOTE: This is called every time a new question is shown via invalidate options menu
         menuInflater.inflate(R.menu.reviewer, menu)
+        setFlagTitles(menu)
         displayIcons(menu)
-        mActionButtons.setCustomButtonsStatus(menu)
-        var alpha = if (super.controlBlocked !== ReviewerUi.ControlBlock.SLOW) Themes.ALPHA_ICON_ENABLED_LIGHT else Themes.ALPHA_ICON_DISABLED_LIGHT
+        actionButtons.setCustomButtonsStatus(menu)
+        val alpha = Themes.ALPHA_ICON_ENABLED_LIGHT
         val markCardIcon = menu.findItem(R.id.action_mark_card)
-        if (currentCard != null && isMarked(currentCard!!.note())) {
+        if (currentCard != null && isMarked(getColUnsafe, currentCard!!.note(getColUnsafe))) {
             markCardIcon.setTitle(R.string.menu_unmark_note).setIcon(R.drawable.ic_star_white)
         } else {
             markCardIcon.setTitle(R.string.menu_mark_note).setIcon(R.drawable.ic_star_border_white)
@@ -690,10 +722,14 @@ open class Reviewer :
             flagIcon.iconAlpha = alpha
         }
 
+        // Anki Desktop Translations
+        menu.findItem(R.id.action_reschedule_card).title =
+            CollectionManager.TR.actionsSetDueDate().toSentenceCase(R.string.sentence_set_due_date)
+
         // Undo button
         @DrawableRes val undoIconId: Int
         val undoEnabled: Boolean
-        val whiteboardIsShownAndHasStrokes = mShowWhiteboard && whiteboard?.undoEmpty() == false
+        val whiteboardIsShownAndHasStrokes = showWhiteboard && whiteboard?.undoEmpty() == false
         if (whiteboardIsShownAndHasStrokes) {
             undoIconId = R.drawable.eraser
             undoEnabled = true
@@ -701,7 +737,7 @@ open class Reviewer :
             undoIconId = R.drawable.ic_undo_white
             undoEnabled = colIsOpenUnsafe() && getColUnsafe.undoAvailable()
         }
-        val alphaUndo = if (undoEnabled && super.controlBlocked !== ReviewerUi.ControlBlock.SLOW) Themes.ALPHA_ICON_ENABLED_LIGHT else Themes.ALPHA_ICON_DISABLED_LIGHT
+        val alphaUndo = Themes.ALPHA_ICON_ENABLED_LIGHT
         val undoIcon = menu.findItem(R.id.action_undo)
         undoIcon.setIcon(undoIconId)
         undoIcon.setEnabled(undoEnabled).iconAlpha = alphaUndo
@@ -717,10 +753,22 @@ open class Reviewer :
                 // so in some languages such as Japanese, which have pre/post-positional particle with the object,
                 // we need to use the string for just "Undo" instead of the string for "Undo %s".
                 undoIcon.title = resources.getString(R.string.undo)
+                undoIcon.iconAlpha = Themes.ALPHA_ICON_DISABLED_LIGHT
+            }
+            menu.findItem(R.id.action_redo)?.apply {
+                if (getColUnsafe.redoAvailable()) {
+                    title = getColUnsafe.redoLabel()
+                    iconAlpha = Themes.ALPHA_ICON_ENABLED_LIGHT
+                    isEnabled = true
+                } else {
+                    setTitle(R.string.redo)
+                    iconAlpha = Themes.ALPHA_ICON_DISABLED_LIGHT
+                    isEnabled = false
+                }
             }
         }
         if (undoEnabled) {
-            mOnboarding.onUndoButtonEnabled()
+            onboarding.onUndoButtonEnabled()
         }
         val toggleWhiteboardIcon = menu.findItem(R.id.action_toggle_whiteboard)
         val toggleStylusIcon = menu.findItem(R.id.action_toggle_stylus)
@@ -732,25 +780,25 @@ open class Reviewer :
             toggleWhiteboardIcon.setTitle(R.string.disable_whiteboard)
             // Always allow "Disable Whiteboard", even if "Enable Whiteboard" is disabled
             toggleWhiteboardIcon.isVisible = true
-            if (!mActionButtons.status.toggleStylusIsDisabled()) {
+            if (!actionButtons.status.toggleStylusIsDisabled()) {
                 toggleStylusIcon.isVisible = true
             }
-            if (!mActionButtons.status.hideWhiteboardIsDisabled()) {
+            if (!actionButtons.status.hideWhiteboardIsDisabled()) {
                 hideWhiteboardIcon.isVisible = true
             }
-            if (!mActionButtons.status.clearWhiteboardIsDisabled()) {
+            if (!actionButtons.status.clearWhiteboardIsDisabled()) {
                 menu.findItem(R.id.action_clear_whiteboard).isVisible = true
             }
-            if (!mActionButtons.status.saveWhiteboardIsDisabled()) {
+            if (!actionButtons.status.saveWhiteboardIsDisabled()) {
                 menu.findItem(R.id.action_save_whiteboard).isVisible = true
             }
-            if (!mActionButtons.status.whiteboardPenColorIsDisabled()) {
+            if (!actionButtons.status.whiteboardPenColorIsDisabled()) {
                 changePenColorIcon.isVisible = true
             }
-            val whiteboardIcon = ContextCompat.getDrawable(this, R.drawable.ic_gesture_white)!!.mutate()
+            val whiteboardIcon = ContextCompat.getDrawable(applicationContext, R.drawable.ic_gesture_white)!!.mutate()
             val stylusIcon = ContextCompat.getDrawable(this, R.drawable.ic_gesture_stylus)!!.mutate()
             val whiteboardColorPaletteIcon = VectorDrawableCompat.create(resources, R.drawable.ic_color_lens_white_24dp, this.theme)!!.mutate()
-            if (mShowWhiteboard) {
+            if (showWhiteboard) {
                 whiteboardIcon.alpha = Themes.ALPHA_ICON_ENABLED_LIGHT
                 hideWhiteboardIcon.icon = whiteboardIcon
                 hideWhiteboardIcon.setTitle(R.string.hide_whiteboard)
@@ -774,46 +822,43 @@ open class Reviewer :
                 toggleStylusIcon.icon = stylusIcon
                 changePenColorIcon.isEnabled = false
                 changePenColorIcon.icon = whiteboardColorPaletteIcon
-                mColorPalette.visibility = View.GONE
+                colorPalette.visibility = View.GONE
             }
         } else {
             toggleWhiteboardIcon.setTitle(R.string.enable_whiteboard)
         }
-        if (colIsOpenUnsafe() && getColUnsafe.decks.isDyn(parentDid)) {
+        if (colIsOpenUnsafe() && getColUnsafe.decks.isFiltered(parentDid)) {
             menu.findItem(R.id.action_open_deck_options).isVisible = false
         }
-        if (mTTS.enabled && !mActionButtons.status.selectTtsIsDisabled()) {
+        if (tts.enabled && !actionButtons.status.selectTtsIsDisabled()) {
             menu.findItem(R.id.action_select_tts).isVisible = true
         }
-        // Setup bury / suspend providers
-        val suspendIcon = menu.findItem(R.id.action_suspend)
-        val buryIcon = menu.findItem(R.id.action_bury)
-        MenuItemCompat.setActionProvider(suspendIcon, SuspendProvider(this))
-        MenuItemCompat.setActionProvider(buryIcon, BuryProvider(this))
-        if (suspendNoteAvailable()) {
-            suspendIcon.setIcon(R.drawable.ic_action_suspend_dropdown)
-            suspendIcon.setTitle(R.string.menu_suspend)
-        } else {
-            suspendIcon.setIcon(R.drawable.ic_pause_circle_outline)
-            suspendIcon.setTitle(R.string.menu_suspend_card)
+        if (!suspendNoteAvailable() && !actionButtons.status.suspendIsDisabled()) {
+            menu.findItem(R.id.action_suspend).isVisible = false
+            menu.findItem(R.id.action_suspend_card).isVisible = true
         }
-        if (buryNoteAvailable()) {
-            buryIcon.setIcon(R.drawable.ic_flip_to_back_dropdown)
-            buryIcon.setTitle(R.string.menu_bury)
-        } else {
-            buryIcon.setIcon(R.drawable.ic_flip_to_back_white)
-            buryIcon.setTitle(R.string.menu_bury_card)
+        if (!buryNoteAvailable() && !actionButtons.status.buryIsDisabled()) {
+            menu.findItem(R.id.action_bury).isVisible = false
+            menu.findItem(R.id.action_bury_card).isVisible = true
         }
-        alpha = if (super.controlBlocked !== ReviewerUi.ControlBlock.SLOW) Themes.ALPHA_ICON_ENABLED_LIGHT else Themes.ALPHA_ICON_DISABLED_LIGHT
-        buryIcon.iconAlpha = alpha
-        suspendIcon.iconAlpha = alpha
-        MenuItemCompat.setActionProvider(menu.findItem(R.id.action_schedule), ScheduleProvider(this))
-        mOnboarding.onCreate()
+
+        onboarding.onCreate()
 
         increaseHorizontalPaddingOfOverflowMenuIcons(menu)
         tintOverflowMenuIcons(menu, skipIf = { isFlagResource(it.itemId) })
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun setFlagTitles(menu: Menu) {
+        menu.findItem(R.id.action_flag_zero).title = Flag.NONE.displayName()
+        menu.findItem(R.id.action_flag_one).title = Flag.RED.displayName()
+        menu.findItem(R.id.action_flag_two).title = Flag.ORANGE.displayName()
+        menu.findItem(R.id.action_flag_three).title = Flag.GREEN.displayName()
+        menu.findItem(R.id.action_flag_four).title = Flag.BLUE.displayName()
+        menu.findItem(R.id.action_flag_five).title = Flag.PINK.displayName()
+        menu.findItem(R.id.action_flag_six).title = Flag.TURQUOISE.displayName()
+        menu.findItem(R.id.action_flag_seven).title = Flag.PURPLE.displayName()
     }
 
     @SuppressLint("RestrictedApi")
@@ -837,18 +882,25 @@ open class Reviewer :
         if (answerFieldIsFocused()) {
             return super.onKeyDown(keyCode, event)
         }
-        if (mProcessor.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)) {
+        if (processor.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event)) {
             return true
         }
         return false
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        return if (mProcessor.onKeyUp(keyCode, event)) {
+        return if (processor.onKeyUp(keyCode, event)) {
             true
         } else {
             super.onKeyUp(keyCode, event)
         }
+    }
+
+    override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
+        if (motionEventHandler.onGenericMotionEvent(event)) {
+            return true
+        }
+        return super.onGenericMotionEvent(event)
     }
 
     override fun canAccessScheduler(): Boolean {
@@ -861,7 +913,7 @@ open class Reviewer :
 
     override fun displayAnswerBottomBar() {
         super.displayAnswerBottomBar()
-        mOnboarding.onAnswerShown()
+        onboarding.onAnswerShown()
         // Set correct label and background resource for each button
         // Note that it's necessary to set the resource dynamically as the ease2 / ease3 buttons
         // (which libanki expects ease to be 2 and 3) can either be hard, good, or easy - depending on num buttons shown
@@ -900,11 +952,11 @@ open class Reviewer :
 
     override fun restorePreferences(): SharedPreferences {
         val preferences = super.restorePreferences()
-        mPrefHideDueCount = preferences.getBoolean("hideDueCount", false)
-        mPrefShowETA = preferences.getBoolean("showETA", true)
-        mProcessor.setup()
-        mPrefFullscreenReview = isFullScreenReview(preferences)
-        mActionButtons.setup(preferences)
+        prefHideDueCount = preferences.getBoolean("hideDueCount", false)
+        prefShowETA = preferences.getBoolean("showETA", false)
+        processor.setup()
+        prefFullscreenReview = isFullScreenReview(preferences)
+        actionButtons.setup(preferences)
         return preferences
     }
 
@@ -914,22 +966,22 @@ open class Reviewer :
     }
 
     private fun updateWhiteboardEditorPosition() {
-        mAnswerButtonsPosition = this.sharedPrefs()
+        answerButtonsPosition = this.sharedPrefs()
             .getString("answerButtonPosition", "bottom")
         val layoutParams: RelativeLayout.LayoutParams
-        when (mAnswerButtonsPosition) {
+        when (answerButtonsPosition) {
             "none", "top" -> {
-                layoutParams = mColorPalette.layoutParams as RelativeLayout.LayoutParams
+                layoutParams = colorPalette.layoutParams as RelativeLayout.LayoutParams
                 layoutParams.removeRule(RelativeLayout.ABOVE)
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-                mColorPalette.layoutParams = layoutParams
+                colorPalette.layoutParams = layoutParams
             }
 
             "bottom" -> {
-                layoutParams = mColorPalette.layoutParams as RelativeLayout.LayoutParams
+                layoutParams = colorPalette.layoutParams as RelativeLayout.LayoutParams
                 layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
                 layoutParams.addRule(RelativeLayout.ABOVE, R.id.bottom_area_layout)
-                mColorPalette.layoutParams = layoutParams
+                colorPalette.layoutParams = layoutParams
             }
         }
     }
@@ -940,42 +992,42 @@ open class Reviewer :
         val actionBar = supportActionBar
         val counts = queue.counts
         if (actionBar != null) {
-            if (mPrefShowETA) {
+            if (prefShowETA) {
                 launchCatchingTask {
-                    mEta = withCol { sched.eta(counts, false) }
-                    actionBar.subtitle = remainingTime(this@Reviewer, (mEta * 60).toLong())
+                    eta = withCol { sched.eta(counts, false) }
+                    actionBar.subtitle = remainingTime(this@Reviewer, (eta * 60).toLong())
                 }
             }
         }
-        mNewCount = SpannableString(counts.new.toString())
-        mLrnCount = SpannableString(counts.lrn.toString())
-        mRevCount = SpannableString(counts.rev.toString())
-        if (mPrefHideDueCount) {
-            mRevCount = SpannableString("???")
+        newCount = SpannableString(counts.new.toString())
+        lrnCount = SpannableString(counts.lrn.toString())
+        revCount = SpannableString(counts.rev.toString())
+        if (prefHideDueCount) {
+            revCount = SpannableString("???")
         }
         // if this code is run as a card is being answered, currentCard may be non-null but
         // the queues may be empty - we can't call countIdx() in such a case
         if (counts.count() != 0) {
             when (queue.countsIndex) {
-                Counts.Queue.NEW -> mNewCount!!.setSpan(UnderlineSpan(), 0, mNewCount!!.length, 0)
-                Counts.Queue.LRN -> mLrnCount!!.setSpan(UnderlineSpan(), 0, mLrnCount!!.length, 0)
-                Counts.Queue.REV -> mRevCount!!.setSpan(UnderlineSpan(), 0, mRevCount!!.length, 0)
+                Counts.Queue.NEW -> newCount!!.setSpan(UnderlineSpan(), 0, newCount!!.length, 0)
+                Counts.Queue.LRN -> lrnCount!!.setSpan(UnderlineSpan(), 0, lrnCount!!.length, 0)
+                Counts.Queue.REV -> revCount!!.setSpan(UnderlineSpan(), 0, revCount!!.length, 0)
             }
         }
-        mTextBarNew.text = mNewCount
-        mTextBarLearn.text = mLrnCount
-        mTextBarReview.text = mRevCount
+        textBarNew.text = newCount
+        textBarLearn.text = lrnCount
+        textBarReview.text = revCount
     }
 
     override fun fillFlashcard() {
         super.fillFlashcard()
-        if (!isDisplayingAnswer && mShowWhiteboard && whiteboard != null) {
+        if (!isDisplayingAnswer && showWhiteboard && whiteboard != null) {
             whiteboard!!.clear()
         }
     }
 
-    override fun onPageFinished() {
-        super.onPageFinished()
+    override fun onPageFinished(view: WebView) {
+        super.onPageFinished(view)
         onFlagChanged()
         onMarkChanged()
         if (!displayAnswer) {
@@ -1004,7 +1056,7 @@ open class Reviewer :
             }
         }.also {
             if (ease == Consts.BUTTON_ONE && wasLeech) {
-                state.topCard.load()
+                state.topCard.load(getColUnsafe)
                 val leechMessage: String = if (state.topCard.queue < 0) {
                     resources.getString(R.string.leech_suspend_notification)
                 } else {
@@ -1025,7 +1077,7 @@ open class Reviewer :
             message(text = timeboxMessage)
             positiveButton(R.string.dialog_continue) {}
             negativeButton(text = CollectionManager.TR.studyingFinish()) {
-                finishWithAnimation(ActivityTransitionAnimation.Direction.END)
+                finish()
             }
             cancelable(true)
             setOnCancelListener { }
@@ -1033,54 +1085,78 @@ open class Reviewer :
     }
 
     override fun displayCardQuestion() {
+        statesMutated = false
         // show timer, if activated in the deck's preferences
-        answerTimer.setupForCard(currentCard!!)
+        answerTimer.setupForCard(getColUnsafe, currentCard!!)
         delayedHide(100)
         super.displayCardQuestion()
     }
 
     @VisibleForTesting
     override fun displayCardAnswer() {
+        if (queueState?.customSchedulingJs?.isEmpty() == true) {
+            statesMutated = true
+        }
+        if (!statesMutated) {
+            executeFunctionWithDelay(50) { displayCardAnswer() }
+            return
+        }
+
         delayedHide(100)
+        if (stopTimerOnAnswer) {
+            answerTimer.pause()
+        }
         super.displayCardAnswer()
     }
 
     private fun runStateMutationHook() {
         val state = queueState ?: return
         if (state.customSchedulingJs.isEmpty()) {
+            statesMutated = true
             return
         }
         val key = customSchedulingKey
         val js = state.customSchedulingJs
         webView?.evaluateJavascript(
             """
-        anki.mutateNextCardStates('$key', async (states, customData, ctx) => {{ $js }})
-            .catch(err => console.log(err));
+        anki.mutateNextCardStates('$key', async (states, customData, ctx) => { $js })
+            .catch(err => { console.log(err); window.location.href = "state-mutation-error:"; });
 """
-        ) {}
+        ) { result ->
+            if ("null" == result) {
+                // eval failed, usually a syntax error
+                // Note, we get "null" (string) and not null
+                statesMutated = true
+            }
+        }
+    }
+
+    override fun onStateMutationError() {
+        super.onStateMutationError()
+        statesMutated = true
     }
 
     override fun initLayout() {
         super.initLayout()
-        if (!mShowRemainingCardCount) {
-            mTextBarNew.visibility = View.GONE
-            mTextBarLearn.visibility = View.GONE
-            mTextBarReview.visibility = View.GONE
+        if (!showRemainingCardCount) {
+            textBarNew.visibility = View.GONE
+            textBarLearn.visibility = View.GONE
+            textBarReview.visibility = View.GONE
         }
 
         // can't move this into onCreate due to mTopBarLayout
         val mark = topBarLayout!!.findViewById<ImageView>(R.id.mark_icon)
         val flag = topBarLayout!!.findViewById<ImageView>(R.id.flag_icon)
-        mCardMarker = CardMarker(mark, flag)
+        cardMarker = CardMarker(mark, flag)
     }
 
     override fun switchTopBarVisibility(visible: Int) {
         super.switchTopBarVisibility(visible)
         answerTimer.setVisibility(visible)
-        if (mShowRemainingCardCount) {
-            mTextBarNew.visibility = visible
-            mTextBarLearn.visibility = visible
-            mTextBarReview.visibility = visible
+        if (showRemainingCardCount) {
+            textBarNew.visibility = visible
+            textBarLearn.visibility = visible
+            textBarReview.visibility = visible
         }
     }
 
@@ -1094,54 +1170,55 @@ open class Reviewer :
     override fun initControls() {
         super.initControls()
         if (prefWhiteboard) {
-            setWhiteboardVisibility(mShowWhiteboard)
+            setWhiteboardVisibility(showWhiteboard)
         }
-        if (mShowRemainingCardCount) {
-            mTextBarNew.visibility = View.VISIBLE
-            mTextBarLearn.visibility = View.VISIBLE
-            mTextBarReview.visibility = View.VISIBLE
+        if (showRemainingCardCount) {
+            textBarNew.visibility = View.VISIBLE
+            textBarLearn.visibility = View.VISIBLE
+            textBarReview.visibility = View.VISIBLE
         }
     }
 
     override fun executeCommand(which: ViewerCommand, fromGesture: Gesture?): Boolean {
-        if (isControlBlocked && which !== ViewerCommand.EXIT) {
-            return false
-        }
         when (which) {
             ViewerCommand.TOGGLE_FLAG_RED -> {
-                toggleFlag(CardMarker.FLAG_RED)
+                toggleFlag(Flag.RED)
                 return true
             }
             ViewerCommand.TOGGLE_FLAG_ORANGE -> {
-                toggleFlag(CardMarker.FLAG_ORANGE)
+                toggleFlag(Flag.ORANGE)
                 return true
             }
             ViewerCommand.TOGGLE_FLAG_GREEN -> {
-                toggleFlag(CardMarker.FLAG_GREEN)
+                toggleFlag(Flag.GREEN)
                 return true
             }
             ViewerCommand.TOGGLE_FLAG_BLUE -> {
-                toggleFlag(CardMarker.FLAG_BLUE)
+                toggleFlag(Flag.BLUE)
                 return true
             }
             ViewerCommand.TOGGLE_FLAG_PINK -> {
-                toggleFlag(CardMarker.FLAG_PINK)
+                toggleFlag(Flag.PINK)
                 return true
             }
             ViewerCommand.TOGGLE_FLAG_TURQUOISE -> {
-                toggleFlag(CardMarker.FLAG_TURQUOISE)
+                toggleFlag(Flag.TURQUOISE)
                 return true
             }
             ViewerCommand.TOGGLE_FLAG_PURPLE -> {
-                toggleFlag(CardMarker.FLAG_PURPLE)
+                toggleFlag(Flag.PURPLE)
                 return true
             }
             ViewerCommand.UNSET_FLAG -> {
-                onFlag(currentCard, CardMarker.FLAG_NONE)
+                onFlag(currentCard, Flag.NONE)
                 return true
             }
             ViewerCommand.MARK -> {
                 onMark(currentCard)
+                return true
+            }
+            ViewerCommand.REDO -> {
+                redo()
                 return true
             }
             ViewerCommand.ADD_NOTE -> {
@@ -1153,30 +1230,76 @@ open class Reviewer :
                 return true
             }
             ViewerCommand.RESCHEDULE_NOTE -> {
-                showRescheduleCardDialog()
+                showDueDateDialog()
+                return true
+            }
+            ViewerCommand.USER_ACTION_1 -> {
+                userAction(1)
+                return true
+            }
+            ViewerCommand.USER_ACTION_2 -> {
+                userAction(2)
+                return true
+            }
+            ViewerCommand.USER_ACTION_3 -> {
+                userAction(3)
+                return true
+            }
+            ViewerCommand.USER_ACTION_4 -> {
+                userAction(4)
+                return true
+            }
+            ViewerCommand.USER_ACTION_5 -> {
+                userAction(5)
+                return true
+            }
+            ViewerCommand.USER_ACTION_6 -> {
+                userAction(6)
+                return true
+            }
+            ViewerCommand.USER_ACTION_7 -> {
+                userAction(7)
+                return true
+            }
+            ViewerCommand.USER_ACTION_8 -> {
+                userAction(8)
+                return true
+            }
+            ViewerCommand.USER_ACTION_9 -> {
+                userAction(9)
                 return true
             }
             else -> return super.executeCommand(which, fromGesture)
         }
     }
 
-    private fun toggleFlag(@FlagDef flag: Int) {
-        if (currentCard!!.userFlag() == flag) {
+    @Retention(AnnotationRetention.SOURCE)
+    @IntDef(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    annotation class UserAction
+
+    private fun userAction(@UserAction number: Int) {
+        Timber.v("userAction%d", number)
+        loadUrlInViewer("javascript: userAction($number);")
+    }
+
+    private fun toggleFlag(flag: Flag) {
+        if (currentCard!!.userFlag() == flag.code) {
             Timber.i("Toggle flag: unsetting flag")
-            onFlag(currentCard, CardMarker.FLAG_NONE)
+            onFlag(currentCard, Flag.NONE)
         } else {
-            Timber.i("Toggle flag: Setting flag to %d", flag)
+            Timber.i("Toggle flag: Setting flag to %d", flag.code)
             onFlag(currentCard, flag)
         }
     }
 
     override fun restoreCollectionPreferences(col: Collection) {
         super.restoreCollectionPreferences(col)
-        mShowRemainingCardCount = col.config.get("dueCounts") ?: true
+        showRemainingCardCount = col.config.get("dueCounts") ?: true
+        stopTimerOnAnswer = col.decks.configDictForDeckId(col.decks.current().id).getBoolean("stopTimerOnAnswer")
     }
 
     override fun onSingleTap(): Boolean {
-        if (mPrefFullscreenReview && isImmersiveSystemUiVisible(this)) {
+        if (prefFullscreenReview && isImmersiveSystemUiVisible(this)) {
             delayedHide(INITIAL_HIDE_DELAY)
             return true
         }
@@ -1184,7 +1307,7 @@ open class Reviewer :
     }
 
     override fun onFling() {
-        if (mPrefFullscreenReview && isImmersiveSystemUiVisible(this)) {
+        if (prefFullscreenReview && isImmersiveSystemUiVisible(this)) {
             delayedHide(INITIAL_HIDE_DELAY)
         }
     }
@@ -1201,9 +1324,9 @@ open class Reviewer :
         }
     }
 
-    private val mFullScreenHandler: Handler = object : Handler(getDefaultLooper()) {
+    private val fullScreenHandler: Handler = object : Handler(getDefaultLooper()) {
         override fun handleMessage(msg: Message) {
-            if (mPrefFullscreenReview) {
+            if (prefFullscreenReview) {
                 setFullScreen(this@Reviewer)
             }
         }
@@ -1212,8 +1335,8 @@ open class Reviewer :
     /** Hide the navigation if in full-screen mode after a given period of time  */
     protected open fun delayedHide(delayMillis: Int) {
         Timber.d("Fullscreen delayed hide in %dms", delayMillis)
-        mFullScreenHandler.removeMessages(0)
-        mFullScreenHandler.sendEmptyMessageDelayed(0, delayMillis.toLong())
+        fullScreenHandler.removeMessages(0)
+        fullScreenHandler.sendEmptyMessageDelayed(0, delayMillis.toLong())
     }
 
     private fun setWhiteboardEnabledState(state: Boolean) {
@@ -1289,6 +1412,51 @@ open class Reviewer :
         return activity.window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_HIDE_NAVIGATION == 0
     }
 
+    override suspend fun handlePostRequest(uri: String, bytes: ByteArray): ByteArray {
+        return if (uri.startsWith(ANKI_PREFIX)) {
+            when (val methodName = uri.substring(ANKI_PREFIX.length)) {
+                "getSchedulingStatesWithContext" -> getSchedulingStatesWithContext()
+                "setSchedulingStates" -> setSchedulingStates(bytes)
+                else -> throw IllegalArgumentException("unhandled request: $methodName")
+            }
+        } else if (uri.startsWith(ANKIDROID_JS_PREFIX)) {
+            jsApi.handleJsApiRequest(
+                uri.substring(ANKIDROID_JS_PREFIX.length),
+                bytes,
+                returnDefaultValues = false
+            )
+        } else {
+            throw IllegalArgumentException("unhandled request: $uri")
+        }
+    }
+
+    private fun getSchedulingStatesWithContext(): ByteArray {
+        val state = queueState ?: return ByteArray(0)
+        return state.schedulingStatesWithContext().toBuilder()
+            .mergeStates(
+                state.states.toBuilder().mergeCurrent(
+                    state.states.current.toBuilder()
+                        .setCustomData(state.topCard.toBackendCard().customData).build()
+                ).build()
+            )
+            .build()
+            .toByteArray()
+    }
+
+    private fun setSchedulingStates(bytes: ByteArray): ByteArray {
+        val state = queueState
+        if (state == null) {
+            statesMutated = true
+            return ByteArray(0)
+        }
+        val req = SetSchedulingStatesRequest.parseFrom(bytes)
+        if (req.key == customSchedulingKey) {
+            state.states = req.states
+        }
+        statesMutated = true
+        return ByteArray(0)
+    }
+
     private fun createWhiteboard() {
         whiteboard = createInstance(this, true, this)
 
@@ -1307,8 +1475,8 @@ open class Reviewer :
             if (event == null) return@setOnTouchListener false
             // If the whiteboard is currently drawing, and triggers the system UI to show, we want to continue drawing.
             if (!whiteboard!!.isCurrentlyDrawing && (
-                !mShowWhiteboard || (
-                    mPrefFullscreenReview &&
+                !showWhiteboard || (
+                    prefFullscreenReview &&
                         isImmersiveSystemUiVisible(this@Reviewer)
                     )
                 )
@@ -1323,22 +1491,22 @@ open class Reviewer :
 
     // Show or hide the whiteboard
     private fun setWhiteboardVisibility(state: Boolean) {
-        mShowWhiteboard = state
+        showWhiteboard = state
         MetaDB.storeWhiteboardVisibility(this, parentDid, state)
         if (state) {
             whiteboard!!.visibility = View.VISIBLE
             disableDrawerSwipe()
         } else {
             whiteboard!!.visibility = View.GONE
-            if (!mHasDrawerSwipeConflicts) {
+            if (!hasDrawerSwipeConflicts) {
                 enableDrawerSwipe()
             }
         }
     }
 
     private fun disableDrawerSwipeOnConflicts() {
-        if (mGestureProcessor.isBound(Gesture.SWIPE_UP, Gesture.SWIPE_DOWN, Gesture.SWIPE_RIGHT)) {
-            mHasDrawerSwipeConflicts = true
+        if (gestureProcessor.isBound(Gesture.SWIPE_UP, Gesture.SWIPE_DOWN, Gesture.SWIPE_RIGHT)) {
+            hasDrawerSwipeConflicts = true
             super.disableDrawerSwipe()
         }
     }
@@ -1352,7 +1520,7 @@ open class Reviewer :
         if (hasFocus) {
             delayedHide(INITIAL_HIDE_DELAY)
         } else {
-            mFullScreenHandler.removeMessages(0)
+            fullScreenHandler.removeMessages(0)
         }
     }
 
@@ -1362,7 +1530,7 @@ open class Reviewer :
      */
     @KotlinCleanup("mCurrentCard handling")
     private fun suspendNoteAvailable(): Boolean {
-        return if (currentCard == null || isControlBlocked) {
+        return if (currentCard == null) {
             false
         } else {
             getColUnsafe.db.queryScalar(
@@ -1376,7 +1544,7 @@ open class Reviewer :
 
     @KotlinCleanup("mCurrentCard handling")
     private fun buryNoteAvailable(): Boolean {
-        return if (currentCard == null || isControlBlocked) {
+        return if (currentCard == null) {
             false
         } else {
             getColUnsafe.db.queryScalar(
@@ -1390,220 +1558,24 @@ open class Reviewer :
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     fun hasDrawerSwipeConflicts(): Boolean {
-        return mHasDrawerSwipeConflicts
+        return hasDrawerSwipeConflicts
     }
 
-    /**
-     * Inner class which implements the submenu for the Suspend button
-     */
-    internal inner class SuspendProvider(context: Context) : ActionProviderCompat(context), MenuItem.OnMenuItemClickListener {
-
-        override fun onCreateActionView(forItem: MenuItem): View {
-            return createActionViewWith(context, forItem, R.menu.reviewer_suspend, ::onMenuItemClick) {
-                hasSubMenu()
-            }
+    override fun getCardDataForJsApi(): AnkiDroidJsAPI.CardDataForJsApi {
+        val cardDataForJsAPI = AnkiDroidJsAPI.CardDataForJsApi().apply {
+            newCardCount = queueState?.counts?.new ?: -1
+            lrnCardCount = queueState?.counts?.lrn ?: -1
+            revCardCount = queueState?.counts?.rev ?: -1
+            nextTime1 = easeButton1!!.nextTime
+            nextTime2 = easeButton2!!.nextTime
+            nextTime3 = easeButton3!!.nextTime
+            nextTime4 = easeButton4!!.nextTime
+            eta = this@Reviewer.eta
         }
-
-        override fun hasSubMenu(): Boolean {
-            return suspendNoteAvailable()
-        }
-
-        override fun onPrepareSubMenu(subMenu: SubMenu) {
-            subMenu.clear()
-            menuInflater.inflate(R.menu.reviewer_suspend, subMenu)
-            for (i in 0 until subMenu.size()) {
-                subMenu.getItem(i).setOnMenuItemClickListener(this)
-            }
-        }
-
-        override fun onMenuItemClick(item: MenuItem): Boolean {
-            val itemId = item.itemId
-            if (itemId == R.id.action_suspend_card) {
-                return suspendCard()
-            } else if (itemId == R.id.action_suspend_note) {
-                return suspendNote()
-            }
-            return false
-        }
-    }
-
-    /**
-     * Inner class which implements the submenu for the Bury button
-     */
-    internal inner class BuryProvider(context: Context) : ActionProviderCompat(context), MenuItem.OnMenuItemClickListener {
-
-        override fun onCreateActionView(forItem: MenuItem): View {
-            return createActionViewWith(context, forItem, R.menu.reviewer_bury, ::onMenuItemClick) {
-                hasSubMenu()
-            }
-        }
-
-        override fun hasSubMenu(): Boolean {
-            return buryNoteAvailable()
-        }
-
-        override fun onPrepareSubMenu(subMenu: SubMenu) {
-            subMenu.clear()
-            menuInflater.inflate(R.menu.reviewer_bury, subMenu)
-            for (i in 0 until subMenu.size()) {
-                subMenu.getItem(i).setOnMenuItemClickListener(this)
-            }
-        }
-
-        override fun onMenuItemClick(item: MenuItem): Boolean {
-            val itemId = item.itemId
-            if (itemId == R.id.action_bury_card) {
-                return buryCard()
-            } else if (itemId == R.id.action_bury_note) {
-                return buryNote()
-            }
-            return false
-        }
-    }
-
-    private fun createActionViewWith(
-        context: Context,
-        menuItem: MenuItem,
-        @MenuRes subMenuRes: Int,
-        onMenuItemSelection: (MenuItem) -> Boolean,
-        showsSubMenu: () -> Boolean
-    ): View = ImageButton(context, null, android.R.attr.actionButtonStyle).apply {
-        TooltipCompat.setTooltipText(this, menuItem.title)
-        menuItem.icon?.isAutoMirrored = true
-        setImageDrawable(menuItem.icon)
-        id = menuItem.itemId
-        setOnClickListener {
-            if (!menuItem.isEnabled) {
-                return@setOnClickListener
-            }
-            if (showsSubMenu()) {
-                PopupMenu(context, this).apply {
-                    inflate(subMenuRes)
-                    setOnMenuItemClickListener(onMenuItemSelection)
-                    show()
-                }
-            } else {
-                onOptionsItemSelected(menuItem)
-            }
-        }
-    }
-
-    /**
-     * Inner class which implements the submenu for the Schedule button
-     */
-    internal inner class ScheduleProvider(context: Context) : ActionProviderCompat(context), MenuItem.OnMenuItemClickListener {
-
-        override fun onCreateActionView(forItem: MenuItem): View {
-            return createActionViewWith(context, forItem, R.menu.reviewer_schedule, ::onMenuItemClick) { true }
-        }
-
-        override fun hasSubMenu(): Boolean {
-            return true
-        }
-
-        override fun onPrepareSubMenu(subMenu: SubMenu) {
-            subMenu.clear()
-            menuInflater.inflate(R.menu.reviewer_schedule, subMenu)
-            for (i in 0 until subMenu.size()) {
-                subMenu.getItem(i).setOnMenuItemClickListener(this)
-            }
-        }
-
-        override fun onMenuItemClick(item: MenuItem): Boolean {
-            val itemId = item.itemId
-            if (itemId == R.id.action_reschedule_card) {
-                showRescheduleCardDialog()
-                return true
-            } else if (itemId == R.id.action_reset_card_progress) {
-                showResetCardDialog()
-                return true
-            }
-            return false
-        }
-    }
-
-    override fun javaScriptFunction(): AnkiDroidJsAPI {
-        return ReviewerJavaScriptFunction(this)
-    }
-
-    inner class ReviewerJavaScriptFunction(activity: AbstractFlashcardViewer) : AnkiDroidJsAPI(activity) {
-        @JavascriptInterface
-        override fun ankiGetNewCardCount(): String {
-            return mNewCount.toString()
-        }
-
-        @JavascriptInterface
-        override fun ankiGetLrnCardCount(): String {
-            return mLrnCount.toString()
-        }
-
-        @JavascriptInterface
-        override fun ankiGetRevCardCount(): String {
-            return mRevCount.toString()
-        }
-
-        @JavascriptInterface
-        override fun ankiGetETA(): Int {
-            return mEta
-        }
-
-        @JavascriptInterface
-        override fun ankiGetNextTime1(): String {
-            return easeButton1!!.nextTime
-        }
-
-        @JavascriptInterface
-        override fun ankiGetNextTime2(): String {
-            return easeButton2!!.nextTime
-        }
-
-        @JavascriptInterface
-        override fun ankiGetNextTime3(): String {
-            return easeButton3!!.nextTime
-        }
-
-        @JavascriptInterface
-        override fun ankiGetNextTime4(): String {
-            return easeButton4!!.nextTime
-        }
-
-        @JavascriptInterface
-        override fun ankiSetCardDue(days: Int): Boolean {
-            val apiList = getJsApiListMap()!!
-            if (!apiList[SET_CARD_DUE]!!) {
-                showDeveloperContact(ankiJsErrorCodeDefault)
-                return false
-            }
-
-            if (days < 0 || days > 9999) {
-                showDeveloperContact(ankiJsErrorCodeSetDue)
-                return false
-            }
-
-            val cardIds = listOf(currentCard!!.id)
-            launchCatchingTask {
-                rescheduleCards(cardIds, days)
-            }
-            return true
-        }
-
-        @JavascriptInterface
-        override fun ankiResetProgress(): Boolean {
-            val apiList = getJsApiListMap()!!
-            if (!apiList[RESET_PROGRESS]!!) {
-                showDeveloperContact(ankiJsErrorCodeDefault)
-                return false
-            }
-            val cardIds = listOf(currentCard!!.id)
-            launchCatchingTask {
-                resetCards(cardIds)
-            }
-            return true
-        }
+        return cardDataForJsAPI
     }
 
     companion object {
-        private const val ADD_NOTE = 12
         private const val REQUEST_AUDIO_PERMISSION = 0
         private const val ANIMATION_DURATION = 200
         private const val TRANSPARENCY = 0.90f

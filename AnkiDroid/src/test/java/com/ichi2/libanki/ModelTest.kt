@@ -43,7 +43,6 @@ class NotetypeTest : JvmTest() {
     @Test
     fun test_frontSide_field() {
         // #8951 - Anki Special-cases {{FrontSide}} on the front to return empty string
-        val col = col
         val m = col.notetypes.current()
         m.getJSONArray("tmpls").getJSONObject(0).put("qfmt", "{{Front}}{{FrontSide}}")
         col.notetypes.save(m)
@@ -51,7 +50,7 @@ class NotetypeTest : JvmTest() {
         note.setItem("Front", "helloworld")
         col.addNote(note)
         val card = note.firstCard()
-        val q = card.q()
+        val q = card.question()
         assertThat(
             "field should be at the end of the template - empty string for front",
             q,
@@ -67,7 +66,6 @@ class NotetypeTest : JvmTest() {
     @Test
     fun test_field_named_frontSide() {
         // #8951 - A field named "FrontSide" is ignored - this matches Anki 2.1.34 (8af8f565)
-        val col = col
         val m = col.notetypes.current()
 
         // Add a field called FrontSide and FrontSide2 (to ensure that fields are added correctly)
@@ -82,7 +80,7 @@ class NotetypeTest : JvmTest() {
         note.setItem("FrontSide2", "2")
         col.addNote(note)
         val card = note.firstCard()
-        val q = card.q()
+        val q = card.question()
         assertThat(
             "FrontSide should be an empty string, even though it was set",
             q,
@@ -96,7 +94,6 @@ class NotetypeTest : JvmTest() {
     @Test
     @Throws(ConfirmModSchemaException::class)
     fun test_modelDelete() {
-        val col = col
         val note = col.newNote()
         note.setItem("Front", "1")
         note.setItem("Back", "2")
@@ -108,7 +105,6 @@ class NotetypeTest : JvmTest() {
 
     @Test
     fun test_modelCopy() {
-        val col = col
         val m = col.notetypes.current()
         val m2 = col.notetypes.copy(m)
         assertEquals("Basic copy", m2.getString("name"))
@@ -127,7 +123,6 @@ class NotetypeTest : JvmTest() {
     @Test
     @Throws(ConfirmModSchemaException::class)
     fun test_fields() {
-        val col = col
         var note = col.newNote()
         note.setItem("Front", "1")
         note.setItem("Back", "2")
@@ -143,8 +138,8 @@ class NotetypeTest : JvmTest() {
         // add a field
         var field: JSONObject? = col.notetypes.newField("foo")
         col.notetypes.addField(m, field!!)
-        assertArrayEquals(
-            arrayOf("1", "2", ""),
+        assertEquals(
+            listOf("1", "2", ""),
             col.getNote(
                 col.notetypes.nids(
                     m
@@ -158,8 +153,8 @@ class NotetypeTest : JvmTest() {
         assertEquals("", col.getNote(col.notetypes.nids(m)[0]).getItem("bar"))
         // delete back
         col.notetypes.remField(m, m.getJSONArray("flds").getJSONObject(1))
-        assertArrayEquals(
-            arrayOf("1", ""),
+        assertEquals(
+            listOf("1", ""),
             col.getNote(
                 col.notetypes.nids(
                     m
@@ -168,8 +163,8 @@ class NotetypeTest : JvmTest() {
         )
         // move 0 -> 1
         col.notetypes.moveField(m, m.getJSONArray("flds").getJSONObject(0), 1)
-        assertArrayEquals(
-            arrayOf("", "1"),
+        assertEquals(
+            listOf("", "1"),
             col.getNote(
                 col.notetypes.nids(
                     m
@@ -178,8 +173,8 @@ class NotetypeTest : JvmTest() {
         )
         // move 1 -> 0
         col.notetypes.moveField(m, m.getJSONArray("flds").getJSONObject(1), 0)
-        assertArrayEquals(
-            arrayOf("1", ""),
+        assertEquals(
+            listOf("1", ""),
             col.getNote(
                 col.notetypes.nids(
                     m
@@ -192,8 +187,8 @@ class NotetypeTest : JvmTest() {
         note = col.getNote(col.notetypes.nids(m)[0])
         note.setItem("baz", "2")
         note.flush()
-        assertArrayEquals(
-            arrayOf("1", "", "2"),
+        assertEquals(
+            listOf("1", "", "2"),
             col.getNote(
                 col.notetypes.nids(
                     m
@@ -202,8 +197,8 @@ class NotetypeTest : JvmTest() {
         )
         // move 2 -> 1
         col.notetypes.moveField(m, m.getJSONArray("flds").getJSONObject(2), 1)
-        assertArrayEquals(
-            arrayOf("1", "2", ""),
+        assertEquals(
+            listOf("1", "2", ""),
             col.getNote(
                 col.notetypes.nids(
                     m
@@ -212,8 +207,8 @@ class NotetypeTest : JvmTest() {
         )
         // move 0 -> 2
         col.notetypes.moveField(m, m.getJSONArray("flds").getJSONObject(0), 2)
-        assertArrayEquals(
-            arrayOf("2", "", "1"),
+        assertEquals(
+            listOf("2", "", "1"),
             col.getNote(
                 col.notetypes.nids(
                     m
@@ -222,8 +217,8 @@ class NotetypeTest : JvmTest() {
         )
         // move 0 -> 1
         col.notetypes.moveField(m, m.getJSONArray("flds").getJSONObject(0), 1)
-        assertArrayEquals(
-            arrayOf("", "2", "1"),
+        assertEquals(
+            listOf("", "2", "1"),
             col.getNote(
                 col.notetypes.nids(
                     m
@@ -235,7 +230,6 @@ class NotetypeTest : JvmTest() {
     @Test
     @Throws(ConfirmModSchemaException::class)
     fun test_templates() {
-        val col = col
         val m = col.notetypes.current()
         val mm = col.notetypes
         var t = Notetypes.newTemplate("Reverse")
@@ -267,7 +261,7 @@ class NotetypeTest : JvmTest() {
         // and should have updated the other cards' ordinals
         c = note.cards()[0]
         assertEquals(0, c.ord)
-        assertEquals("1", stripHTML(c.q()))
+        assertEquals("1", stripHTML(c.question()))
         // it shouldn't be possible to orphan notes by removing templates
         t = Notetypes.newTemplate("template name")
         t.put("qfmt", "{{Front}}1")
@@ -284,7 +278,6 @@ class NotetypeTest : JvmTest() {
     @Test
     @Throws(ConfirmModSchemaException::class)
     fun test_cloze_ordinals() {
-        val col = col
         col.notetypes.setCurrent(col.notetypes.byName("Cloze")!!)
         val m = col.notetypes.current()
         val mm = col.notetypes
@@ -312,14 +305,13 @@ class NotetypeTest : JvmTest() {
 
     @Test
     fun test_text() {
-        val col = col
         val m = col.notetypes.current()
         m.getJSONArray("tmpls").getJSONObject(0).put("qfmt", "{{text:Front}}")
         col.notetypes.save(m)
         val note = col.newNote()
         note.setItem("Front", "hello<b>world")
         col.addNote(note)
-        assertThat(note.cards()[0].q(), containsString("helloworld"))
+        assertThat(note.cards()[0].question(), containsString("helloworld"))
     }
 
     @Test
@@ -328,7 +320,6 @@ class NotetypeTest : JvmTest() {
             // backend protects against adding the same note twice
             note.id = 0
         }
-        val col = col
         col.notetypes.setCurrent(col.notetypes.byName("Cloze")!!)
         var note = col.newNote()
         assertEquals("Cloze", note.notetype.getString("name"))
@@ -351,7 +342,6 @@ class NotetypeTest : JvmTest() {
 
     @Test
     fun test_cloze_mathjax() {
-        val col = col
         col.notetypes.setCurrent(col.notetypes.byName("Cloze")!!)
         var note = col.newNote()
         note.setItem(
@@ -360,14 +350,14 @@ class NotetypeTest : JvmTest() {
         )
         assertNotEquals(0, col.addNote(note))
         assertEquals(5, note.numberOfCards())
-        assertThat(note.cards()[0].q(), containsString(clozeClass()))
-        assertThat(note.cards()[1].q(), containsString(clozeClass()))
+        assertThat(note.cards()[0].question(), containsString(clozeClass()))
+        assertThat(note.cards()[1].question(), containsString(clozeClass()))
         assertThat(
-            note.cards()[2].q(),
+            note.cards()[2].question(),
             not(containsString(clozeClass()))
         )
-        assertThat(note.cards()[3].q(), containsString(clozeClass()))
-        assertThat(note.cards()[4].q(), containsString(clozeClass()))
+        assertThat(note.cards()[3].question(), containsString(clozeClass()))
+        assertThat(note.cards()[4].question(), containsString(clozeClass()))
 
         note = col.newNote()
         note.setItem("Text", "\\(a\\) {{c1::b}} \\[ {{c1::c}} \\]")
@@ -377,7 +367,6 @@ class NotetypeTest : JvmTest() {
 
     @Test
     fun test_type_and_cloze() {
-        val col = col
         val m = col.notetypes.byName("Cloze")
         col.notetypes.setCurrent(m!!)
         m.getJSONArray("tmpls").getJSONObject(0).put("qfmt", "{{cloze:Text}}{{type:cloze:Text}}")
@@ -386,7 +375,7 @@ class NotetypeTest : JvmTest() {
         note.setItem("Text", "hello {{c1::world}}")
         col.addNote(note)
         assertThat(
-            note.cards()[0].q(),
+            note.cards()[0].question(),
             containsString("[[type:cloze:Text]]")
         )
     }
@@ -395,7 +384,6 @@ class NotetypeTest : JvmTest() {
     @Throws(ConfirmModSchemaException::class)
     @Suppress("SpellCheckingInspection") // chaine
     fun test_chained_mods() {
-        val col = col
         col.notetypes.setCurrent(col.notetypes.byName("Cloze")!!)
         val m = col.notetypes.current()
         val mm = col.notetypes
@@ -414,7 +402,7 @@ class NotetypeTest : JvmTest() {
         val a2 = "<i>chained</i>"
         note.setItem("Text", "This {{c1::$q1::$a1}} demonstrates {{c1::$q2::$a2}} clozes.")
         assertEquals(1, col.addNote(note))
-        note.cards()[0].q()
+        note.cards()[0].question()
         /* TODO: chained modifier
         assertThat("Question «"+question+"» does not contain the expected string", question, containsString("This <span class=cloze>[sentence]</span> demonstrates <span class=cloze>[chained]</span> clozes.")
                    );
@@ -427,7 +415,6 @@ class NotetypeTest : JvmTest() {
     @Test
     @Throws(ConfirmModSchemaException::class)
     fun test_modelChange() {
-        val col = col
         val cloze = col.notetypes.byName("Cloze")
         // enable second template and add a note
         val basic = col.notetypes.current()
@@ -453,16 +440,16 @@ class NotetypeTest : JvmTest() {
         // switch cards
         val c0 = note.cards()[0]
         val c1 = note.cards()[1]
-        assertThat(c0.q(), containsString("b123"))
-        assertThat(c1.q(), containsString("note"))
+        assertThat(c0.question(), containsString("b123"))
+        assertThat(c1.question(), containsString("note"))
         assertEquals(0, c0.ord)
         assertEquals(1, c1.ord)
         col.notetypes.change(basic, note.id, basic, noOp, map)
         note.load()
         c0.load()
         c1.load()
-        assertThat(c0.q(), containsString("note"))
-        assertThat(c1.q(), containsString("b123"))
+        assertThat(c0.question(), containsString("note"))
+        assertThat(c1.question(), containsString("b123"))
         assertEquals(1, c0.ord)
         assertEquals(0, c1.ord)
         // .cards() returns cards in order
@@ -471,10 +458,6 @@ class NotetypeTest : JvmTest() {
         map = HashMap()
         map[0] = null
         map[1] = 1
-        // if (isWin) {
-        //     // The low precision timer on Windows reveals a race condition
-        //     time.sleep(0.05);
-        // }
         col.notetypes.change(basic, note.id, basic, noOp, map)
         note.load()
         c0.load()
@@ -532,7 +515,6 @@ class NotetypeTest : JvmTest() {
 
     @Test
     fun nonEmptyFieldTest() {
-        val col = col
         val mm = col.notetypes
         val basic = mm.byName("Basic")
         val s: MutableSet<String> = HashSet<String>()
@@ -554,7 +536,6 @@ class NotetypeTest : JvmTest() {
 
     @Test
     fun getDid_test() {
-        val col = col
         val mm = col.notetypes
         val basic = mm.byName("Basic")
         basic!!.put("did", 999L)
@@ -563,7 +544,7 @@ class NotetypeTest : JvmTest() {
         assertEquals("getDid() should return the model did", expected, basic.did)
 
         // Check if returns default deck id (1) when did is null
-        basic.put("did", null)
+        basic.put("did", null as Int?)
         val expected2 = 1L
         assertEquals(
             "getDid() should return 1 (default deck id) if model did is null",

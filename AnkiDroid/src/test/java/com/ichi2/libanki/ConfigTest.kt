@@ -47,7 +47,7 @@ class ConfigTest : JvmTest() {
         assertThat(col.config.get("int"), equalTo(5))
         // explicitly nulled key should work
         col.config.set("null", JSONObject.NULL)
-        var b: Int? = null
+        val b: Int? = null
         assertThat(col.config.get("null"), equalTo(b))
         // missing key should be the same
         assertThat(col.config.get("missing"), equalTo(b))
@@ -70,6 +70,17 @@ class ConfigTest : JvmTest() {
             // heterogenerous maps are not supported
             col.config.set("map2", map2)
         }
+    }
+
+    @Test
+    fun `A string value is handled as a long - Issue 14096`() {
+        col.config.set("test", '"' + "1688546411954" + '"')
+        col.config.set("test1", "1688546411954")
+        col.config.set("test2", 1688546411954)
+
+        assertThat(col.config.get<Long>("test"), equalTo(null))
+        assertThat(col.config.get<Long>("test1"), equalTo(1688546411954L))
+        assertThat(col.config.get<Long>("test2"), equalTo(1688546411954L))
     }
 }
 
